@@ -1,0 +1,51 @@
+[main]
+test_result_dir = raw_data
+test_metadata_dir = circle_ci
+test_artifact_dir = junit
+
+[circleci_scraper]
+;create a personal Circle CI token: https://circleci.com/docs/managing-api-tokens/
+token =
+base_url = https://circleci.com/api/v2
+vcs_slug = gh
+pipelines = [
+      {
+        "organization": "mozilla",
+        "repository": "fxa",
+        "workflows": {
+          "nightly": [
+            "Unit Test (nightly)",
+            "Functional Tests - Playwright (nightly)"
+          ],
+          "stage_smoke_tests": [
+            "Smoke Test Stage - Playwright"
+          ],
+          "production_smoke_tests": [
+            "Smoke Test Production - Playwright"
+          ]
+        }
+      },
+      {
+        "organization": "mozilla-services",
+        "repository": "autopush-rs",
+        "branches": ["master"],
+        "workflows": {
+          "build-test-deploy": [
+            "test"
+          ]
+        }
+      },
+      {
+        "organization": "mozilla-services",
+        "repository": "merino-py",
+        "workflows": {
+          "main-workflow": [
+            "unit-tests",
+            "integration-tests",
+            "contract-tests"
+          ]
+        }
+      }
+    ]
+;(optional) Get data starting from x days past from now (default: all available data)
+days_of_data = 2

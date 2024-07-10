@@ -63,6 +63,11 @@ license = "Mozilla Public License Version 2.0"
 [tool.poetry.dependencies]
 python = "^3.12"
 
+[tool.poetry.group.circleci_scraper.dependencies]
+pydantic = "^2.8.0"
+requests = "^2.32.3"
+types-requests = "^2.31.0"
+
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.9"
 mypy = "^1.10.1"
