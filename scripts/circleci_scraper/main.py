@@ -31,7 +31,7 @@ def main(config_file: str = "config.ini") -> None:
             else "Scraping all available data."
         )
         client = CircleCIClient(config.circleci_scraper_config)
-        scraper = CircleCIScraper(config.main_config, client)
+        scraper = CircleCIScraper(config.common_config, client)
         scraper.export_test_metadata_and_artifacts(
             config.circleci_scraper_config.pipelines, config.circleci_scraper_config.date_limit
         )

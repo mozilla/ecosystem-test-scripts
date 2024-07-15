@@ -1,4 +1,4 @@
-[main]
+[common]
 test_result_dir = raw_data
 test_metadata_dir = circle_ci
 test_artifact_dir = junit
@@ -49,3 +49,6 @@ pipelines = [
     ]
 ;(optional) Get data starting from x days past from now (default: all available data)
 days_of_data = 2
+
+[test_metric_reporter]
+reports_dir = reports
