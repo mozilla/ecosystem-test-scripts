@@ -6,7 +6,7 @@
 
 import json
 import logging
-import os
+from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any
 
@@ -24,8 +24,9 @@ from client import (
     Artifact,
     Workflow,
 )
-from config import CircleCIScraperPipelineConfig, MainConfig
-from scripts.circleci_scraper.error import BaseError
+from scripts.circleci_scraper.config import CircleCIScraperPipelineConfig
+from scripts.common.config import CommonConfig
+from scripts.common.error import BaseError
 
 
 class CircleCIScraperError(BaseError):
@@ -39,18 +40,18 @@ class CircleCIScraper:
 
     logger = logging.getLogger(__name__)
 
-    def __init__(self, main_config: MainConfig, client: CircleCIClient):
+    def __init__(self, common_config: CommonConfig, client: CircleCIClient):
         """Initialize the CircleCIScraper.
 
         Args:
-            main_config (MainConfig): Directory information to store test results.
+            common_config (CommonConfig): Directory information to store test results.
             client (CircleCIClient): The CircleCI client to interact with the API.
 
         """
         self._client = client
-        self._test_result_dir = main_config.test_result_dir
-        self._test_metadata_dir = main_config.test_metadata_dir
-        self._test_artifact_dir = main_config.test_artifact_dir
+        self._test_result_dir = common_config.test_result_dir
+        self._test_metadata_dir = common_config.test_metadata_dir
+        self._test_artifact_dir = common_config.test_artifact_dir
 
     def export_test_metadata_and_artifacts(
         self,
@@ -227,17 +228,19 @@ class CircleCIScraper:
             CircleCIClientError: If there is an error in the CircleCI API request.
             CircleCIScraperError: If there is an error in downloading the artifacts.
         """
-        test_metadata_directory: str = os.path.join(
-            self._test_result_dir, repository, workflow_name, job.name, self._test_metadata_dir
+        test_metadata_directory = (
+            Path(self._test_result_dir)
+            / repository
+            / workflow_name
+            / job.name
+            / self._test_metadata_dir
         )
-        if not os.path.isdir(test_metadata_directory):
-            os.makedirs(test_metadata_directory)
-        file_path: str = os.path.join(test_metadata_directory, f"{job.job_number}.json")
-        if os.path.exists(file_path):
+        test_metadata_directory.mkdir(parents=True, exist_ok=True)
+        file_path = test_metadata_directory / f"{job.job_number}.json"
+        if file_path.exists():
             self.logger.info(f"{file_path} already exists, skipping download.")
         else:
-            with open(file_path, "w") as file:
-                file.write(json.dumps(file_content, default=str))
+            file_path.write_text(json.dumps(file_content, default=str))
             self.logger.info(f"Output {file_path}")
 
     def export_test_artifacts_by_job(
@@ -288,25 +291,22 @@ class CircleCIScraper:
             CircleCIClientError: If there is an error in the CircleCI API request.
             CircleCIScraperError: If there is an error in downloading the artifacts.
         """
-        artifact_directory: str = os.path.join(
-            self._test_result_dir,
-            repository,
-            workflow_name,
-            job.name,
-            self._test_artifact_dir,
-            str(job.job_number),
+        artifact_directory = (
+            Path(self._test_result_dir)
+            / repository
+            / workflow_name
+            / job.name
+            / self._test_artifact_dir
+            / str(job.job_number)
         )
-        if artifacts and not os.path.isdir(artifact_directory):
-            os.makedirs(artifact_directory)
+        if artifacts:
+            artifact_directory.mkdir(parents=True, exist_ok=True)
         for index, artifact in enumerate(artifacts):
-            # adding the index prefix guarantees file name uniqueness
-            file_path: str = os.path.join(
-                artifact_directory, f"{index}-{os.path.basename(artifact.path)}"
-            )
-            if os.path.exists(file_path):
+            file_path = artifact_directory / f"{index}-{Path(artifact.path).name}"
+            if file_path.exists():
                 self.logger.info(f"{file_path} already exists, skipping download.")
             else:
-                self.download_artifact(file_path, artifact.url)
+                self.download_artifact(str(file_path), artifact.url)
 
     def download_artifact(self, file_name: str, url: str) -> None:
         """Download an artifact from the specified URL.

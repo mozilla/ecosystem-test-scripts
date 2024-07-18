@@ -12,7 +12,7 @@ from pydantic import BaseModel, ValidationError
 from requests.exceptions import RequestException
 
 from scripts.circleci_scraper.config import CircleCIScraperConfig
-from scripts.circleci_scraper.error import BaseError
+from scripts.common.error import BaseError
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -162,10 +162,11 @@ class CircleCIClient:
             response_json: dict[str, Any] = response.json()
             return response_model(**response_json)
         except (RequestException, ValidationError) as error:
-            if isinstance(error, RequestException):
-                error_msg = f"Request to {url} failed"
-            else:  # isinstance(error, ValidationError)
-                error_msg = f"Unexpected schema for '{endpoint}' endpoint"
+            error_mapping: dict[type, str] = {
+                RequestException: f"Request to {url} failed",
+                ValidationError: f"Unexpected schema for '{endpoint}' endpoint",
+            }
+            error_msg = error_mapping[type(error)]
             self.logger.error(error_msg, exc_info=error)
             raise CircleCIClientError(error_msg, error)
 

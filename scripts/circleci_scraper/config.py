@@ -4,28 +4,19 @@
 
 """CircleCIScraper configs and related objects"""
 
-import configparser
 import json
 import logging
+from configparser import ConfigParser, NoSectionError, NoOptionError
 from datetime import datetime, timezone, timedelta
 from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ValidationError, Field
 
-from scripts.circleci_scraper.error import BaseError
+from scripts.common.config import BaseConfig, InvalidConfigError
 
-DIRECTORY_PATTERN = r"^[^<>:;,?\"*|]+$"
 REPOSITORY_PATTERN = r"^[a-zA-Z0-9-_]+$"
 TOKEN_PATTERN = r"^\S+$"  # nosec B105
 URL_PATTERN = r"^https?://[a-zA-Z0-9.-]+(/[a-zA-Z0-9._~-]*)*$"
-
-
-class MainConfig(BaseModel):
-    """Main Configuration."""
-
-    test_result_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
-    test_metadata_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
-    test_artifact_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
 
 
 class CircleCIScraperPipelineConfig(BaseModel):
@@ -48,13 +39,7 @@ class CircleCIScraperConfig(BaseModel):
     date_limit: datetime | None
 
 
-class InvalidConfigError(BaseError):
-    """Raise for errors in the CircleCIScraper configuration."""
-
-    pass
-
-
-class Config:
+class Config(BaseConfig):
     """Load and validate the CircleCIScraper configuration."""
 
     logger = logging.getLogger(__name__)
@@ -68,32 +53,13 @@ class Config:
         Raises:
             InvalidCircleCIScraperConfigError: If there's an error in the configuration.
         """
-        config_parser = configparser.ConfigParser()
-        config_parser.read(config_file)
-        self.main_config: MainConfig = self._parse_main_config(config_parser)
+        super().__init__(config_file)
         self.circleci_scraper_config: CircleCIScraperConfig = self._parse_circleci_scraper_config(
-            config_parser
+            self.config_parser
         )
         self.logger.info("Successfully loaded configuration")
 
-    def _parse_main_config(self, config_parser: configparser.ConfigParser) -> MainConfig:
-        try:
-            return MainConfig(
-                test_result_dir=config_parser.get("main", "test_result_dir"),
-                test_metadata_dir=config_parser.get("main", "test_metadata_dir"),
-                test_artifact_dir=config_parser.get("main", "test_artifact_dir"),
-            )
-        except (configparser.NoOptionError, ValidationError) as error:
-            if isinstance(error, configparser.NoOptionError):
-                error_msg = "Missing config option in 'main' section"
-            else:  # isinstance(error, ValidationError)
-                error_msg = "Unexpected value in 'main' section"
-            self.logger.error(error_msg, exc_info=error)
-            raise InvalidConfigError(error_msg, error)
-
-    def _parse_circleci_scraper_config(
-        self, config_parser: configparser.ConfigParser
-    ) -> CircleCIScraperConfig:
+    def _parse_circleci_scraper_config(self, config_parser: ConfigParser) -> CircleCIScraperConfig:
         try:
             pipelines_json_str: str = config_parser.get("circleci_scraper", "pipelines")
             pipelines_json: Any = json.loads(pipelines_json_str)
@@ -116,13 +82,13 @@ class Config:
                 days_of_data=days_of_data,
                 date_limit=date_limit,
             )
-        except (configparser.NoOptionError, json.JSONDecodeError, ValidationError) as error:
-            if isinstance(error, configparser.NoOptionError):
-                error_msg = "Missing config option in 'circleci_scraper' section"
-            elif isinstance(error, json.JSONDecodeError):
-                error_msg = "Invalid JSON format in 'circleci_scraper.pipelines' section"
-            else:  # isinstance(error, ValidationError)
-                error_msg = "Unexpected value or schema in 'circleci_scraper' section"
-
+        except (NoSectionError, NoOptionError, json.JSONDecodeError, ValidationError) as error:
+            error_mapping: dict[type, str] = {
+                NoSectionError: "The 'circleci_scraper' section is missing",
+                NoOptionError: "Missing config option in 'circleci_scraper' section",
+                json.JSONDecodeError: "Invalid JSON format in 'circleci_scraper.pipelines' section",
+                ValidationError: "Unexpected value or schema in 'circleci_scraper' section",
+            }
+            error_msg = error_mapping[type(error)]
             self.logger.error(error_msg, exc_info=error)
             raise InvalidConfigError(error_msg, error)
