@@ -1,0 +1,6 @@
+[book]
+authors = ["Kat Anderson", "Benjamin Forehand", "Ankita", "pdehaan"]
+language = "en"
+multilingual = false
+src = "docs"
+title = "mozilla/ecosystem-test-scripts"
