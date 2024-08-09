@@ -1,0 +1,65 @@
+<testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="26.845">
+    <testsuite name="react-conversion/oauthSignin.spec.ts" timestamp="2024-07-17T00:23:12.353Z" hostname="local" tests="1" failures="1" skipped="0" time="26.845" errors="0">
+        <testcase name="severity-1 #smoke › react OAuth signin › verified account with cached login, no email confirmation required" classname="react-conversion/oauthSignin.spec.ts" time="26.845">
+            <failure message="oauthSignin.spec.ts:41:9 verified account with cached login, no email confirmation required" type="FAILURE">
+                <![CDATA[  [local] › react-conversion/oauthSignin.spec.ts:41:9 › severity-1 #smoke › react OAuth signin › verified account with cached login, no email confirmation required
+
+    Error: page.goto: NS_BINDING_ABORTED
+    Call log:
+      - navigating to "http://localhost:3030/oauth/signin?showReactApp=true&deviceId=6808fa7211a64d989f06ee4effd55122&flowBeginTime=1721175881860&flowId=a4a02d3d4c6e6496c8794f7ebccdf705e1e0de600fbdc0a7f834f82da01593e0&access_type=offline&client_id=dcdb5ae7add825d2&pkce_client_id=38a6b9b3a65a1871&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Foauth&scope=profile%20openid&action=email&state=2ac865bf85dd19a9fe9f8103f60bfb9b4fdc5405308e8a5371c8601a2548835b&flow_id=a4a02d3d4c6e6496c8794f7ebccdf705e1e0de600fbdc0a7f834f82da01593e0&flow_begin_time=1721175881860&device_id=6808fa7211a64d989f06ee4effd55122&email=signind2769b721b66ed80%40restmail.net&forceExperiment=generalizedReactApp&forceExperimentGroup=react", waiting until "load"
+
+
+      68 |
+      69 |       // reload page with React experiment params
+    > 70 |       await page.goto(
+         |                  ^
+      71 |         `${page.url()}&forceExperiment=generalizedReactApp&forceExperimentGroup=react`
+      72 |       );
+      73 |
+
+        at /home/circleci/project/packages/functional-tests/tests/react-conversion/oauthSignin.spec.ts:70:18
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../artifacts/functional/react-conversion-oauthSign-916d9-email-confirmation-required-local/trace.zip
+    Usage:
+
+        yarn playwright show-trace ../../artifacts/functional/react-conversion-oauthSign-916d9-email-confirmation-required-local/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: NS_BINDING_ABORTED
+    Call log:
+      - navigating to "http://localhost:3030/oauth/signin?showReactApp=true&deviceId=69b8df9d92204f7da1945b309389eb64&flowBeginTime=1721175897833&flowId=aa9a74383215c2645307ad973c338ae79b42696ced8fc0fd7f75b6c899385ddc&access_type=offline&client_id=dcdb5ae7add825d2&pkce_client_id=38a6b9b3a65a1871&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Foauth&scope=profile%20openid&action=email&state=49f1f7e4846db5f9d667f959d167878707a1afa1522bee58c96a26357fe2e648&flow_id=aa9a74383215c2645307ad973c338ae79b42696ced8fc0fd7f75b6c899385ddc&flow_begin_time=1721175897833&device_id=69b8df9d92204f7da1945b309389eb64&email=signindf87ef5f15cc792f%40restmail.net&forceExperiment=generalizedReactApp&forceExperimentGroup=react", waiting until "load"
+
+
+      68 |
+      69 |       // reload page with React experiment params
+    > 70 |       await page.goto(
+         |                  ^
+      71 |         `${page.url()}&forceExperiment=generalizedReactApp&forceExperimentGroup=react`
+      72 |       );
+      73 |
+
+        at /home/circleci/project/packages/functional-tests/tests/react-conversion/oauthSignin.spec.ts:70:18
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../artifacts/functional/react-conversion-oauthSign-916d9-email-confirmation-required-local-retry1/trace.zip
+    Usage:
+
+        yarn playwright show-trace ../../artifacts/functional/react-conversion-oauthSign-916d9-email-confirmation-required-local-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+            </failure>
+            <system-out>
+                <![CDATA[
+[[ATTACHMENT|../functional/react-conversion-oauthSign-916d9-email-confirmation-required-local/trace.zip]]
+
+[[ATTACHMENT|../functional/react-conversion-oauthSign-916d9-email-confirmation-required-local-retry1/trace.zip]]
+]]>
+            </system-out>
+        </testcase>
+    </testsuite>
+</testsuites>

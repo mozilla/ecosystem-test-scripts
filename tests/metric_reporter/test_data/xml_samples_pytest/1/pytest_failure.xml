@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+    <testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.019" timestamp="2024-07-03T15:05:24.279183" hostname="ip-10-0-175-52">
+        <testcase classname="tests.integration.providers.weather.backends.test_accuweather" name="test_get_weather_report_from_cache_without_ttl" time="0.019">
+            <failure message="AssertionError: assert ['accuweather...it.forecasts'] == ['accuweather...it.forecasts']&#10;  At index 1 diff: 'accuweather.cache.fetch.miss.ttl' != 'accuweather.cache.hit.currentconditions'&#10;  Left contains one more item: 'accuweather.cache.hit.forecasts'&#10;  Full diff:&#10;    [&#10;     'accuweather.cache.hit.locations',&#10;  +  'accuweather.cache.fetch.miss.ttl',&#10;     'accuweather.cache.hit.currentconditions',&#10;     'accuweather.cache.hit.forecasts',&#10;    ]">
+                redis_client = Redis&lt;ConnectionPool&lt;Connection&lt;host=localhost,port=32769,db=0&gt;&gt;&gt;
+                geolocation = Location(country='US', country_name=None, region='CA',
+                region_name=None, city='San Francisco', dma=807, postal_code='94105', key=None)
+                statsd_mock = &lt;MagicMock spec='Client' id='139764321538688'&gt;
+                expected_weather_report = WeatherReport(city_name='San Francisco',
+                current_conditions=CurrentConditions(url=Url('https://www.accuweather.com/en/.../39376?lang=en-us'),
+                summary='Pleasant Saturday', high=Temperature(c=21, f=70), low=Temperature(c=14,
+                f=57)), ttl=1800)
+                accuweather_parameters = {'api_key': 'test', 'cached_current_condition_ttl_sec':
+                1800, 'cached_forecast_ttl_sec': 1800, 'cached_location_key_ttl_sec': 1800, ...}
+                accuweather_cached_location_key = b'{"key": "39376", "localized_name": "San
+                Francisco"}'
+                accuweather_cached_current_conditions = b'{"url":
+                "https://www.accuweather.com/en/us/san-francisco-ca/94103/current-weather/39376?lang=en-us",
+                "summary": "Mostly cloudy", "icon_id": 6, "temperature": {"c": 15.5, "f": 60.0}}'
+                accuweather_cached_forecast_fahrenheit = b'{"url":
+                "https://www.accuweather.com/en/us/san-francisco-ca/94103/daily-weather-forecast/39376?lang=en-us",
+                "summary": "Pleasant Saturday", "high": {"f": 70.0}, "low": {"f": 57.0}}'
+
+                @pytest.mark.asyncio
+                async def test_get_weather_report_from_cache_without_ttl(
+                redis_client: Redis,
+                geolocation: Location,
+                statsd_mock: Any,
+                expected_weather_report: WeatherReport,
+                accuweather_parameters: dict[str, Any],
+                accuweather_cached_location_key: bytes,
+                accuweather_cached_current_conditions: bytes,
+                accuweather_cached_forecast_fahrenheit: bytes,
+                ) -&gt; None:
+                """Test that we can get the weather report from cache without a TTL set for forecast
+                and
+                current conditions
+                """
+                # set up the accuweather backend object with the testcontainer redis client
+                accuweather: AccuweatherBackend = AccuweatherBackend(
+                cache=RedisAdapter(redis_client), **accuweather_parameters
+                )
+
+                # get cache keys
+                cache_keys = generate_accuweather_cache_keys(accuweather, geolocation)
+
+                # set the above keys with their values as their corresponding fixtures
+                keys_and_values = [
+                (cache_keys.location_key, accuweather_cached_location_key),
+                (cache_keys.current_conditions_key, accuweather_cached_current_conditions),
+                (cache_keys.forecast_key, accuweather_cached_forecast_fahrenheit),
+                ]
+                await set_redis_keys(redis_client, keys_and_values)
+
+                # this http client mock isn't used to make any calls, but we do assert below on it
+                not being
+                # called
+                client_mock: AsyncMock = cast(AsyncMock, accuweather.http_client)
+
+                report: Optional[WeatherReport] = await accuweather.get_weather_report(geolocation)
+
+                assert report == expected_weather_report
+                client_mock.get.assert_not_called()
+
+                metrics_timeit_called = [call_arg[0][0] for call_arg in
+                statsd_mock.timeit.call_args_list]
+                assert metrics_timeit_called == ["accuweather.cache.fetch"]
+
+                metrics_increment_called = [
+                call_arg[0][0] for call_arg in statsd_mock.increment.call_args_list
+                ]
+
+                &gt; assert metrics_increment_called == [
+                "accuweather.cache.hit.locations",
+                "accuweather.cache.hit.currentconditions",
+                "accuweather.cache.hit.forecasts",
+                ]
+                E AssertionError: assert ['accuweather...it.forecasts'] ==
+                ['accuweather...it.forecasts']
+                E At index 1 diff: 'accuweather.cache.fetch.miss.ttl' !=
+                'accuweather.cache.hit.currentconditions'
+                E Left contains one more item: 'accuweather.cache.hit.forecasts'
+                E Full diff:
+                E [
+                E 'accuweather.cache.hit.locations',
+                E + 'accuweather.cache.fetch.miss.ttl',
+                E 'accuweather.cache.hit.currentconditions',
+                E 'accuweather.cache.hit.forecasts',
+                E ]
+
+                tests/integration/providers/weather/backends/test_accuweather.py:456: AssertionError
+            </failure>
+        </testcase>
+    </testsuite>
+</testsuites>

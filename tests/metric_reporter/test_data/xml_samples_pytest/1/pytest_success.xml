@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+    <testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.178" timestamp="2024-07-03T15:05:24.279183" hostname="ip-10-0-175-52">
+        <testcase classname="tests.integration.test_setup" name="test_unknown_providers_should_shutdown_app" time="0.178"/>
+    </testsuite>
+</testsuites>

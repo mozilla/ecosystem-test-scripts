@@ -57,43 +57,35 @@ class CircleCIJsonParser:
 
     logger = logging.getLogger(__name__)
 
-    def parse(self, test_metadata_directory: str) -> list[CircleCIJobTestMetadata]:
+    def parse(self, metadata_path: Path) -> list[CircleCIJobTestMetadata]:
         """Parse CircleCI JSON test metadata from the specified directory.
 
         Args:
-            test_metadata_directory (str): The path to the directory containing the test metadata
-                                           files.
+            metadata_path (Path): The path to the directory containing the test metadata files.
 
         Returns:
-            list[CircleCIJobTestMetadata]: A list of parsed CircleCIJobTestMetadata objects.
+            list[CircleCIJobTestMetadata]: A list of CircleCIJobTestMetadata objects.
 
         Raises:
-            CircleCIJsonParserError: If the directory does not exist, if there are errors reading
-                                     files, or if there are issues with parsing the JSON data.
+            CircleCIJsonParserError: If there are errors reading files, or if there are issues with
+                                     parsing the JSON data.
         """
-        test_metadata_path = Path(test_metadata_directory)
-        if not test_metadata_path.is_dir():
-            raise CircleCIJsonParserError(
-                f"The test_metadata_directory, {test_metadata_directory}, does not exist"
-            )
-
-        results: list[CircleCIJobTestMetadata] = []
-
-        test_result_files: list[Path] = sorted(test_metadata_path.iterdir())
-        for test_result_file in test_result_files:
-            self.logger.info(f"Parsing {test_result_file}")
+        metadata_list: list[CircleCIJobTestMetadata] = []
+        metadata_file_paths: list[Path] = sorted(metadata_path.iterdir())
+        for metadata_file_path in metadata_file_paths:
+            self.logger.info(f"Parsing {metadata_file_path}")
             try:
-                with test_result_file.open() as file:
+                with metadata_file_path.open() as file:
                     data: dict[str, Any] = json.load(file)
-                    test_suite_result = CircleCIJobTestMetadata(**data)
-                    results.append(test_suite_result)
+                    metadata = CircleCIJobTestMetadata(**data)
+                    metadata_list.append(metadata)
             except (OSError, json.JSONDecodeError, ValidationError) as error:
                 error_mapping: dict[type, str] = {
-                    OSError: f"Error reading test metadata file {test_result_file}",
-                    json.JSONDecodeError: f"Invalid JSON format for metadata file {test_result_file}",
-                    ValidationError: f"Unexpected value or schema in metadata file {test_result_file}",
+                    OSError: f"Error reading the file {metadata_file_path}",
+                    json.JSONDecodeError: f"Invalid JSON format for file {metadata_file_path}",
+                    ValidationError: f"Unexpected value or schema in file {metadata_file_path}",
                 }
                 error_msg: str = error_mapping[type(error)]
                 self.logger.error(error_msg, exc_info=error)
                 raise CircleCIJsonParserError(error_msg, error)
-        return results
+        return metadata_list
