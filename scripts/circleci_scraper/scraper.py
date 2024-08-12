@@ -171,6 +171,14 @@ class CircleCIScraper:
             jobs: JobGroup = self._client.get_jobs(workflow.id, next_page_token)
             for job in jobs.items:
                 if job.name in job_names:
+                    if not job.job_number:
+                        # This happens when workflows are cancelled before a number is assigned
+                        # to the test job
+                        logging.warning(
+                            f"Skipping data for workflow {workflow.id} because the job number is "
+                            f"missing for {organization}>{repository}>{workflow.name}>{job.name}"
+                        )
+                        continue
                     self.export_test_metadata_by_job(organization, repository, workflow.name, job)
                     self.export_test_artifacts_by_job(organization, repository, workflow.name, job)
             next_page_token = jobs.next_page_token
