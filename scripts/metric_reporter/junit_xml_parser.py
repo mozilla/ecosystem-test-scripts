@@ -31,7 +31,7 @@ class JUnitXmlSkipped(BaseModel):
 class JUnitXmlFailure(BaseModel):
     """Represents a failure of a test case."""
 
-    message: str
+    message: str | None = None
     type: str | None = None
     text: str | None = None
 

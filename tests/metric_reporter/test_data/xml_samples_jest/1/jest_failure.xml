@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="1" failures="1" errors="0" time="0.017">
+  <testsuite name="useCheckboxStateResult" errors="0" failures="1" skipped="0" timestamp="2024-07-13T00:21:53" time="0.017" tests="1">
+    <testcase classname="useInfoBoxMessage coupon type is &quot;repeating&quot; plan interval equal to coupon duration" name="useInfoBoxMessage coupon type is &quot;repeating&quot; plan interval equal to coupon duration" time="0.017">
+      <failure>Error: expect(element).not.toBeInTheDocument()</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
