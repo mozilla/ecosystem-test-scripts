@@ -28,6 +28,49 @@ EXPECTED_JEST = [
                 id=None,
                 name="jest tests",
                 tests=1,
+                failures=1,
+                skipped=None,
+                errors=0,
+                time=0.017,
+                timestamp=None,
+                test_suites=[
+                    JUnitXmlTestSuite(
+                        name="useCheckboxStateResult",
+                        timestamp="2024-07-13T00:21:53",
+                        hostname=None,
+                        tests=1,
+                        failures=1,
+                        skipped=0,
+                        time=0.017,
+                        errors=0,
+                        test_cases=[
+                            JUnitXmlTestCase(
+                                name=(
+                                    'useInfoBoxMessage coupon type is "repeating" plan interval '
+                                    "equal to coupon duration"
+                                ),
+                                classname=(
+                                    'useInfoBoxMessage coupon type is "repeating" plan interval '
+                                    "equal to coupon duration"
+                                ),
+                                time=0.017,
+                                properties=None,
+                                skipped=None,
+                                failure=JUnitXmlFailure(
+                                    message=None,
+                                    type=None,
+                                    text="Error: expect(element).not.toBeInTheDocument()",
+                                ),
+                                system_out=None,
+                            )
+                        ],
+                    )
+                ],
+            ),
+            JUnitXmlTestSuites(
+                id=None,
+                name="jest tests",
+                tests=1,
                 failures=0,
                 skipped=None,
                 errors=0,
