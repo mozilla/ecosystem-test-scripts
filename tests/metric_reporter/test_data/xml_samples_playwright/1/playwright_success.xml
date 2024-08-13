@@ -1,0 +1,6 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="21.957">
+    <testsuite name="key-stretching-v2/totp.spec.ts" timestamp="2024-07-17T00:22:53.711Z" hostname="local" tests="1" failures="0" skipped="0" time="21.957" errors="0">
+        <testcase name="signs up as v1, enable totp, signs in as v2" classname="key-stretching-v2/totp.spec.ts" time="21.957">
+        </testcase>
+    </testsuite>
+</testsuites>

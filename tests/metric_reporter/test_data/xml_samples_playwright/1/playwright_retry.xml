@@ -1,0 +1,7 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="1148.7179780000001">
+    <testsuite name="settings/changeEmailBlocked.spec.ts" timestamp="2024-08-03T00:22:46.165Z" hostname="local" tests="1" failures="0" skipped="0" time="28.136" errors="0">
+        <testcase name="change primary - unblock › change primary email, get blocked with invalid password, redirect enter password page" classname="settings/changeEmailBlocked.spec.ts" time="28.136">
+            <system-out><![CDATA[[[ATTACHMENT|../functional/settings-changeEmailBlocke-81857-edirect-enter-password-page-local/trace.zip]]]]></system-out>
+        </testcase>
+    </testsuite>
+</testsuites>

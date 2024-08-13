@@ -20,7 +20,7 @@ help:
 	@echo "  test_coverage_html       Run tests and generate HTML coverage report"
 	@echo "  clean                    Clean up installation and cache files"
 	@echo "  run_circleci_scraper     Run the CircleCI scraper"
-	@echo "  run_test_metric_reporter Run the Test Metric Reporter"
+	@echo "  run_metric_reporter      Run the Metric Reporter"
 
 .PHONY: install
 install: $(INSTALL_STAMP)
@@ -30,7 +30,7 @@ $(INSTALL_STAMP): $(PYPROJECT_TOML) $(POETRY_LOCK)
 		echo "Poetry could not be found. See https://python-poetry.org/docs/"; \
 		exit 2; \
 	fi
-	$(POETRY) install --no-root --with circleci_scraper,test_metric_reporter,dev
+	$(POETRY) install --no-root --with circleci_scraper,metric_reporter,dev
 	# Create an empty install stamp file to indicate that dependencies have been installed
 	touch $(INSTALL_STAMP)
 
@@ -61,7 +61,7 @@ test_coverage: $(INSTALL_STAMP)
 	$(POETRY) run pytest $(TESTS_DIR) --cov=$(SCRIPTS_DIR) --cov-report=term-missing
 
 .PHONY: test_coverage_html
-test_coverage-html: $(INSTALL_STAMP)
+test_coverage_html: $(INSTALL_STAMP)
 	$(POETRY) run pytest $(TESTS_DIR) --cov=$(SCRIPTS_DIR) --cov-report=html
 
 .PHONY: clean
@@ -77,6 +77,6 @@ clean:
 run_circleci_scraper: $(INSTALL_STAMP)
 	PYTHONPATH=. $(POETRY) run python $(SCRIPTS_DIR)/circleci_scraper/main.py --config=config.ini
 
-.PHONY: run_test_metric_reporter
-run_test_metric_reporter: $(INSTALL_STAMP)
-	PYTHONPATH=. $(POETRY) run python $(SCRIPTS_DIR)/test_metric_reporter/main.py --config=config.ini
+.PHONY: run_metric_reporter
+run_metric_reporter: $(INSTALL_STAMP)
+	PYTHONPATH=. $(POETRY) run python $(SCRIPTS_DIR)/metric_reporter/main.py --config=config.ini

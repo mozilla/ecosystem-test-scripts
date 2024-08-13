@@ -1,0 +1,8 @@
+<testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="26.845">
+    <testsuite name="react-conversion/oauthSignin.spec.ts" timestamp="2024-07-17T00:23:12.353Z" hostname="local" tests="1" failures="1" skipped="0" time="26.845" errors="0">
+        <testcase name="react OAuth signin › verified account with cached login, no email confirmation required" classname="react-conversion/oauthSignin.spec.ts" time="26.845">
+            <failure message="oauthSignin.spec.ts:41:9 verified account with cached login, no email confirmation required" type="FAILURE"><![CDATA[Error: page.goto: NS_BINDING_ABORTED]]></failure>
+            <system-out><![CDATA[[[ATTACHMENT|../functional/react-conversion-oauthSign-916d9-email-confirmation-required-local/trace.zip]][[ATTACHMENT|../functional/react-conversion-oauthSign-916d9-email-confirmation-required-local-retry1/trace.zip]]]]></system-out>
+        </testcase>
+    </testsuite>
+</testsuites>

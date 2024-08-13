@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+    <testsuite name="pytest" errors="0" failures="0" skipped="1" tests="1" time="0.000" timestamp="2024-08-06T09:17:36.201378" hostname="ip-10-0-175-52">
+        <testcase classname="tests.unit.providers.weather.test_provider" name="test_enabled_by_default" time="0.000">
+            <skipped type="pytest.skip" message="see DISCO-5555">
+                /merino-py/tests/unit/providers/weather/test_provider.py:59:
+                see DISCO-5555
+            </skipped>
+        </testcase>
+    </testsuite>
+</testsuites>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="0.002" tests="1" failures="1">
+    <testsuite name="deleteUnverifiedAccounts" timestamp="2024-07-19T00:18:31" tests="1" file="/home/circleci/project/packages/fxa-auth-server/test/local/routes/cloud-scheduler.js" time="0.002" failures="1">
+        <testcase name="CloudSchedulerHandler deleteUnverifiedAccounts should call processAccountDeletionInRange with correct parameters" time="0.002" classname="should call processAccountDeletionInRange with correct parameters">
+            <failure message="expected processAccountDeletionInRange to be called once and with exact arguments" type="AssertionError"><![CDATA[AssertionError: expected processAccountDeletionInRange to be called once and with exact arguments]]></failure>
+        </testcase>
+    </testsuite>
+</testsuites>

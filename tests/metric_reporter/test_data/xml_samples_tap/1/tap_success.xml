@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<testsuites>
+    <testsuite tests="1" failures="0" errors="0" name="Subtest: test/local/ban_tests.js">
+        <testcase name="#1 test/local/ban_tests.js"/>
+    </testsuite>
+</testsuites>
+

@@ -50,5 +50,5 @@ pipelines = [
 ;(optional) Get data starting from x days past from now (default: all available data)
 days_of_data = 2
 
-[test_metric_reporter]
+[metric_reporter]
 reports_dir = reports

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="1" failures="0" errors="0" time="0.042">
+    <testsuite name="lib/amplitude" errors="0" failures="0" skipped="0" timestamp="2024-07-19T00:18:01" time="0.042" tests="1">
+        <testcase classname="lib/amplitude logs a correctly formatted message" name="lib/amplitude logs a correctly formatted message" time="0.042">
+        </testcase>
+    </testsuite>
+</testsuites>
