@@ -1,22 +1,22 @@
 {
     "job": {
         "dependencies": [],
-        "job_number": 4,
-        "id": "4",
-        "started_at": "2024-01-04T00:00:00Z",
+        "job_number": 3,
+        "id": "3",
+        "started_at": "2024-01-03T00:00:00Z",
         "name": "test-job",
         "project_slug": "test/test-project",
         "status": "success",
         "type": "build",
-        "stopped_at": "2024-01-04T01:00:00Z"
+        "stopped_at": "2024-01-03T01:00:00Z"
     },
     "test_metadata": [
         {
             "classname": "test_class",
-            "name": "test_unknown",
-            "result": "system-err",
+            "name": "test_skipped",
+            "result": "skipped",
             "message": "",
-            "run_time": 1.23,
+            "run_time": 1.3,
             "source": "test_source"
         }
     ]

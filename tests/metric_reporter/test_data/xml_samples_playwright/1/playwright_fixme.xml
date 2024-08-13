@@ -1,0 +1,12 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="1" errors="0" time="8.756">
+    <testsuite name="syncV3/signinCached.spec.ts" timestamp="2024-04-07T00:18:43.341Z" hostname="local" tests="1" failures="0" skipped="1" time="8.756" errors="0">
+        <testcase name="sync signin cached › sign in on desktop then specify a different email on query parameter continues to cache desktop signin" classname="syncV3/signinCached.spec.ts" time="8.756">
+            <properties>
+                <property name="fixme" value="test to be fixed, see FXA-9194">
+                </property>
+            </properties>
+            <skipped>
+            </skipped>
+        </testcase>
+    </testsuite>
+</testsuites>

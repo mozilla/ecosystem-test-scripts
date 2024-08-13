@@ -1,0 +1,12 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="1" errors="0" time="5.577">
+    <testsuite name="misc/forceAuth.spec.ts" timestamp="2024-05-15T14:25:27.188Z" hostname="production" tests="1" failures="0" skipped="1" time="5.577" errors="0">
+        <testcase name="force auth › with a registered email, registered uid" classname="misc/forceAuth.spec.ts" time="5.577">
+            <properties>
+                <property name="skip" value="FXA-8267">
+                </property>
+            </properties>
+            <skipped>
+            </skipped>
+        </testcase>
+    </testsuite>
+</testsuites>

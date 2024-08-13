@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="0.001" tests="1" failures="0">
+    <testsuite name="quickDelete" timestamp="2024-07-19T00:18:13" tests="1" file="/home/circleci/project/packages/fxa-auth-server/test/local/account-delete.js" time="0.001" failures="0">
+        <testcase name="AccountDeleteManager quickDelete should delete the account" time="0.001" classname="should delete the account">
+        </testcase>
+    </testsuite>
+</testsuites>

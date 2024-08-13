@@ -1,14 +1,14 @@
 {
     "job": {
         "dependencies": [],
-        "job_number": 3,
-        "id": "3",
-        "started_at": "2024-01-03T00:00:00Z",
+        "job_number": 4,
+        "id": "4",
+        "started_at": "2024-01-04T00:00:00Z",
         "name": "test-job",
         "project_slug": "test/test-project",
         "status": "success",
         "type": "build",
-        "stopped_at": "2024-01-03T01:00:00Z"
+        "stopped_at": "2024-01-04T01:00:00Z"
     },
     "test_metadata": [
         {
@@ -16,7 +16,7 @@
             "name": "test_success",
             "result": "success",
             "message": "",
-            "run_time": 1.23,
+            "run_time": 1.4,
             "source": "test_source"
         }
     ]
