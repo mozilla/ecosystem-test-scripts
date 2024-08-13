@@ -31,7 +31,8 @@ pipelines = [
         "branches": ["master"],
         "workflows": {
           "build-test-deploy": [
-            "test"
+            "Rust Unit Tests",
+            "Integration Tests"
           ]
         }
       },
