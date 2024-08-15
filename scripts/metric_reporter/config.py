@@ -22,6 +22,7 @@ class MetricReporterArgs(BaseModel):
     test_suite: str
     metadata_path: Path
     artifact_path: Path
+    averages_csv_report_path: Path
     results_csv_report_path: Path
 
 
@@ -95,6 +96,10 @@ class Config(BaseConfig):
                             test_suite=test_suite,
                             metadata_path=metadata_path,
                             artifact_path=artifact_path,
+                            averages_csv_report_path=(
+                                Path(self.metric_reporter_config.reports_dir)
+                                / f"{repository}_{test_suite}_averages.csv"
+                            ),
                             results_csv_report_path=(
                                 Path(self.metric_reporter_config.reports_dir)
                                 / f"{repository}_{test_suite}_results.csv"

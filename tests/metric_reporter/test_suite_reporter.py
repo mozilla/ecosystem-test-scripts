@@ -444,7 +444,7 @@ EXPECTED_METADATA_RESULTS: list[SuiteReporterResult] = [
         date="2024-01-01",
         job=1,
         run_time=1.1,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         failure=1,
     ),
     SuiteReporterResult(
@@ -455,7 +455,7 @@ EXPECTED_METADATA_RESULTS: list[SuiteReporterResult] = [
         date="2024-01-02",
         job=2,
         run_time=1.2,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         skipped=1,
     ),
     SuiteReporterResult(
@@ -466,7 +466,7 @@ EXPECTED_METADATA_RESULTS: list[SuiteReporterResult] = [
         date="2024-01-03",
         job=3,
         run_time=1.3,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         success=1,
     ),
     SuiteReporterResult(
@@ -477,7 +477,7 @@ EXPECTED_METADATA_RESULTS: list[SuiteReporterResult] = [
         date="2024-01-04",
         job=4,
         run_time=1.4,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         skipped=1,
     ),
     SuiteReporterResult(
@@ -488,7 +488,7 @@ EXPECTED_METADATA_RESULTS: list[SuiteReporterResult] = [
         date="2024-01-05",
         job=5,
         run_time=1.5,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         success=1,
     ),
     SuiteReporterResult(
@@ -499,7 +499,7 @@ EXPECTED_METADATA_RESULTS: list[SuiteReporterResult] = [
         date="2024-01-06",
         job=6,
         run_time=1.6,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         unknown=1,
     ),
 ]
@@ -514,7 +514,7 @@ EXPECTED_ARTIFACT_AND_METADATA_RESULTS: list[SuiteReporterResult] = [
         job=1,
         run_time=1.1,
         execution_time=1.1,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         failure=1,
         retry=1,
     ),
@@ -527,7 +527,7 @@ EXPECTED_ARTIFACT_AND_METADATA_RESULTS: list[SuiteReporterResult] = [
         job=2,
         run_time=1.2,
         execution_time=1.2,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         skipped=1,
         fixme=1,
     ),
@@ -540,7 +540,7 @@ EXPECTED_ARTIFACT_AND_METADATA_RESULTS: list[SuiteReporterResult] = [
         job=3,
         run_time=1.3,
         execution_time=1.3,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         success=1,
         retry=1,
     ),
@@ -553,7 +553,7 @@ EXPECTED_ARTIFACT_AND_METADATA_RESULTS: list[SuiteReporterResult] = [
         job=4,
         run_time=1.4,
         execution_time=1.4,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         skipped=1,
     ),
     SuiteReporterResult(
@@ -565,7 +565,7 @@ EXPECTED_ARTIFACT_AND_METADATA_RESULTS: list[SuiteReporterResult] = [
         job=5,
         run_time=1.5,
         execution_time=1.5,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         success=1,
     ),
     SuiteReporterResult(
@@ -576,13 +576,13 @@ EXPECTED_ARTIFACT_AND_METADATA_RESULTS: list[SuiteReporterResult] = [
         date="2024-01-06",
         job=6,
         run_time=1.6,
-        job_execution_time=3600.0,
+        job_time=3600.0,
         unknown=1,
     ),
 ]
 
 EXPECTED_ARTIFACT_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Execution Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
+    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
     "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,1.1,,1.1,0,1,0,0,0,1,1,0.0,100.0,0.0,0.0,0.0\r\n"
     "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,1.2,,1.2,0,0,1,1,0,0,1,0.0,0.0,100.0,100.0,0.0\r\n"
     "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,1.3,,1.3,1,0,0,0,0,1,1,100.0,0.0,0.0,0.0,0.0\r\n"
@@ -591,7 +591,7 @@ EXPECTED_ARTIFACT_CSV: str = (
 )
 
 EXPECTED_METADATA_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Execution Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
+    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
     "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,,3600.0,1.1,0,1,0,0,0,0,1,0.0,100.0,0.0,0.0,0.0\r\n"
     "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,,3600.0,1.2,0,0,1,0,0,0,1,0.0,0.0,100.0,0.0,0.0\r\n"
     "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,,3600.0,1.3,1,0,0,0,0,0,1,100.0,0.0,0.0,0.0,0.0\r\n"
@@ -601,7 +601,7 @@ EXPECTED_METADATA_CSV: str = (
 )
 
 EXPECTED_ARTIFACT_AND_METADATA_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Execution Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
+    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
     "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,1.1,3600.0,1.1,0,1,0,0,0,1,1,0.0,100.0,0.0,0.0,0.0\r\n"
     "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,1.2,3600.0,1.2,0,0,1,1,0,0,1,0.0,0.0,100.0,100.0,0.0\r\n"
     "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,1.3,3600.0,1.3,1,0,0,0,0,1,1,100.0,0.0,0.0,0.0,0.0\r\n"
@@ -692,7 +692,7 @@ def test_suite_reporter_output_csv(
     mocker.patch("builtins.open", mock_open)
     mocker.patch("os.makedirs")
 
-    reporter.output_results_csv(report_path)
+    reporter.output_csv(report_path)
 
     mock_open.assert_called_once_with(report_path, "w", newline="")
     handle = mock_open()
@@ -724,7 +724,7 @@ def test_suite_reporter_output_csv_with_empty_test_results(
         mocker.patch("builtins.open", mock_open)
         mocker.patch("os.makedirs")
 
-        reporter.output_results_csv(report_path)
+        reporter.output_csv(report_path)
 
         mock_open.assert_not_called()
         assert expected_log in caplog.text

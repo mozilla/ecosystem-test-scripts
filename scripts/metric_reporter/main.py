@@ -7,6 +7,8 @@
 import argparse
 import logging
 
+from scripts.metric_reporter.averages_reporter import AveragesReporter
+from scripts.metric_reporter.base_reporter import ReporterError
 from scripts.metric_reporter.circleci_json_parser import (
     CircleCIJsonParserError,
     CircleCIJsonParser,
@@ -18,7 +20,7 @@ from scripts.metric_reporter.junit_xml_parser import (
     JUnitXmlParser,
     JUnitXmlParserError,
 )
-from scripts.metric_reporter.suite_reporter import SuiteReporter, ReporterError
+from scripts.metric_reporter.suite_reporter import SuiteReporter
 
 # Configure logging
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -50,7 +52,12 @@ def main(config_file: str = "config.ini") -> None:
             suite_reporter = SuiteReporter(
                 args.repository, args.workflow, args.test_suite, metadata_list, artifact_list
             )
-            suite_reporter.output_results_csv(args.results_csv_report_path)
+            suite_reporter.output_csv(args.results_csv_report_path)
+
+            averages_reporter = AveragesReporter(
+                args.repository, args.workflow, args.test_suite, suite_reporter.results
+            )
+            averages_reporter.output_csv(args.averages_csv_report_path)
         logger.info("Reporting complete")
     except InvalidConfigError as error:
         logger.error(f"Configuration error: {error}")
