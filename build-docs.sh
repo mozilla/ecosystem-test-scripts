@@ -1,0 +1,2 @@
+mdbook clean
+mdbook build
