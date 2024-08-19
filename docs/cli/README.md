@@ -162,7 +162,7 @@ In order to use this command, you need to make sure you set your [personal Circl
 token = <YoUr_tOkEn_hErE>
 ```
 
-By default, only the 2 previous days of data is fetched. If you want to customize how many previous days are fetched, you can set the `days_of_data` option in your local config.ini file:
+If the `days_of_data` option is not present in the config.ini file, the default of "all available data" will be fetched. If you want to customize how many previous days are fetched, you can set the `days_of_data` option in your local config.ini file:
 
 ```ini
 [circleci_scraper]
