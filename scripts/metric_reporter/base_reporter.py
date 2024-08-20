@@ -60,6 +60,8 @@ class BaseReporter:
                 writer.writeheader()
                 for result in self.results:
                     writer.writerow(result.dict_with_fieldnames())
+
+            self.logger.info(f"CSV report written to {report_path}")
         except (OSError, IOError) as error:
             error_mapping: dict[type, str] = {
                 OSError: "Error creating directories for the report file",

@@ -122,7 +122,7 @@ class AveragesReporter(BaseReporter):
         last_datetime: datetime = datetime.strptime(last_date, DATE_FORMAT)
 
         while last_datetime >= first_datetime + timedelta(days=DAYS_30):
-            averages_dict = {
+            averages_result_dict: dict[str, Any] = {
                 "repository": repository,
                 "workflow": workflow,
                 "test_suite": test_suite,
@@ -130,7 +130,7 @@ class AveragesReporter(BaseReporter):
                 **self._calculate_averages(suite_results, last_datetime, DAYS_60),
                 **self._calculate_averages(suite_results, last_datetime, DAYS_90),
             }
-            results.append(AveragesReporterResult(**averages_dict))
+            results.append(AveragesReporterResult(**averages_result_dict))
             last_datetime -= timedelta(days=DAYS_1)
         results.reverse()  # Reverse the list to get chronological order
         return results
@@ -146,7 +146,7 @@ class AveragesReporter(BaseReporter):
             if r.date and start_date <= datetime.strptime(r.date, DATE_FORMAT) <= stop_date
         ]
         suite_count: int = len(subset)
-        averages = {
+        averages: dict[str, Any] = {
             f"start_date_{str(delta)}": start_date.strftime(DATE_FORMAT),
             f"stop_date_{str(delta)}": stop_date.strftime(DATE_FORMAT),
             f"suite_count_{str(delta)}": suite_count,
