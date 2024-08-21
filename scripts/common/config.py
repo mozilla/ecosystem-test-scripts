@@ -60,6 +60,6 @@ class BaseConfig:
                 NoOptionError: "Missing config option in 'common' section",
                 ValidationError: "Unexpected value in 'common' section",
             }
-            error_msg = error_mapping[type(error)]
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
-            raise InvalidConfigError(error_msg, error)
+            raise InvalidConfigError(error_msg) from error

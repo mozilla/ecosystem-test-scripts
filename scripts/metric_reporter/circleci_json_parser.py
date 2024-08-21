@@ -85,7 +85,7 @@ class CircleCIJsonParser:
                     json.JSONDecodeError: f"Invalid JSON format for file {metadata_file_path}",
                     ValidationError: f"Unexpected value or schema in file {metadata_file_path}",
                 }
-                error_msg: str = error_mapping[type(error)]
+                error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
                 self.logger.error(error_msg, exc_info=error)
-                raise CircleCIJsonParserError(error_msg, error)
+                raise CircleCIJsonParserError(error_msg) from error
         return metadata_list

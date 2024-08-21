@@ -89,6 +89,6 @@ class Config(BaseConfig):
                 json.JSONDecodeError: "Invalid JSON format in 'circleci_scraper.pipelines' section",
                 ValidationError: "Unexpected value or schema in 'circleci_scraper' section",
             }
-            error_msg = error_mapping[type(error)]
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
-            raise InvalidConfigError(error_msg, error)
+            raise InvalidConfigError(error_msg) from error
