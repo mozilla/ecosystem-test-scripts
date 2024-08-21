@@ -4,21 +4,19 @@
 
 """Module for reporting test suite results from CircleCI metadata."""
 
-import csv
-import logging
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
-from pydantic import BaseModel
-
-from scripts.common.error import BaseError
+from scripts.metric_reporter.base_reporter import (
+    BaseReporter,
+    ReporterResultBase,
+    DATETIME_FORMAT,
+    DATE_FORMAT,
+)
 from scripts.metric_reporter.circleci_json_parser import CircleCIJobTestMetadata
 from scripts.metric_reporter.junit_xml_parser import JUnitXmlJobTestSuites
 
-DATE_FORMAT = "%Y-%m-%d"
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 SUCCESS_RESULTS = {"success", "system-out"}
 FAILURE_RESULT = "failure"
 SKIPPED_RESULT = "skipped"
@@ -33,7 +31,7 @@ class Status(Enum):
     UNKNOWN = "unknown"
 
 
-class SuiteReporterResult(BaseModel):
+class SuiteReporterResult(ReporterResultBase):
     """Represents the results of a test suite run."""
 
     repository: str
@@ -68,7 +66,7 @@ class SuiteReporterResult(BaseModel):
     execution_time: float | None = None
 
     # CI only. The amount of time for the test CI Job in seconds.
-    job_execution_time: float | None = None
+    job_time: float | None = None
 
     success: int = 0
     failure: int = 0
@@ -143,7 +141,7 @@ class SuiteReporterResult(BaseModel):
             "Job Number": self.job,
             "Status": self.status.value,
             "Execution Time": self.execution_time,
-            "Job Execution Time": self.job_execution_time,
+            "Job Time": self.job_time,
             "Run Time": self.run_time,
             "Success": self.success,
             "Failure": self.failure,
@@ -160,16 +158,8 @@ class SuiteReporterResult(BaseModel):
         }
 
 
-class ReporterError(BaseError):
-    """Exception raised for errors in the Reporter."""
-
-    pass
-
-
-class SuiteReporter:
+class SuiteReporter(BaseReporter):
     """Handles the reporting of test suite results from CircleCI metadata and JUnit XML Reports."""
-
-    logger = logging.getLogger(__name__)
 
     def __init__(
         self,
@@ -190,7 +180,8 @@ class SuiteReporter:
             artifacts_list (list[JUnitXmlJobTestSuites] | None): The test results from JUnit XML
                                                                  artifacts.
         """
-        self.results: list[SuiteReporterResult] = self._parse_results(
+        super().__init__()
+        self.results: Sequence[SuiteReporterResult] = self._parse_results(
             repository, workflow, test_suite, metadata_list, artifacts_list
         )
 
@@ -214,14 +205,16 @@ class SuiteReporter:
                 repository, workflow, test_suite, artifacts_list
             )
 
-        # Reconcile data preferring artifact results, but use 'job_execution_time' from metadata
-        # results if available
+        # Reconcile data preferring artifact results except for date, timestamp and
+        # job_time from metadata
         results: list[SuiteReporterResult] = []
         for job_number, artifact_result in artifact_results_dict.items():
             metadata_result = metadata_results_dict.pop(job_number, None)
             if metadata_result:
                 self._check_for_mismatch(artifact_result, metadata_result)
-                artifact_result.job_execution_time = metadata_result.job_execution_time
+                artifact_result.date = metadata_result.date
+                artifact_result.timestamp = metadata_result.timestamp
+                artifact_result.job_time = metadata_result.job_time
             results.append(artifact_result)
 
         # Add remaining metadata results that were not matched
@@ -246,7 +239,7 @@ class SuiteReporter:
 
             started_at = datetime.strptime(metadata.job.started_at, DATETIME_FORMAT)
             stopped_at = datetime.strptime(metadata.job.stopped_at, DATETIME_FORMAT)
-            job_execution_time = (stopped_at - started_at).total_seconds()
+            job_time = (stopped_at - started_at).total_seconds()
             test_suite_result = SuiteReporterResult(
                 repository=repository,
                 workflow=workflow,
@@ -254,7 +247,7 @@ class SuiteReporter:
                 job=metadata.job.job_number,
                 date=started_at.strftime(DATE_FORMAT),
                 timestamp=metadata.job.started_at,
-                job_execution_time=job_execution_time,
+                job_time=job_time,
             )
 
             run_time: float = 0
@@ -349,7 +342,7 @@ class SuiteReporter:
             "test_suite",
             "timestamp",
             "execution_time",
-            "job_execution_time",
+            "job_time",
             "fixme",
             "retry",
         }
@@ -371,34 +364,3 @@ class SuiteReporter:
                 f"{artifact_result.timestamp}:\n"
                 f"Mismatched Fields: {mismatches}"
             )
-
-    def output_results_csv(self, report_path: Path) -> None:
-        """Output the test suite results to a CSV file.
-
-        Args:
-            report_path (Path): Path to the file where the CSV report will be saved.
-
-        Raises:
-            SuiteReporterError: If the report file cannot be created or written to, or if there is
-                                an issue with the test data.
-        """
-        try:
-            report_path.parent.mkdir(parents=True, exist_ok=True)
-            if not self.results:
-                self.logger.info("No data to write to the CSV file.")
-                return
-
-            fieldnames: list[str] = list(self.results[0].dict_with_fieldnames().keys())
-            with open(report_path, "w", newline="") as csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                writer.writeheader()
-                for result in self.results:
-                    writer.writerow(result.dict_with_fieldnames())
-        except (OSError, IOError) as error:
-            error_mapping: dict[type, str] = {
-                OSError: "Error creating directories for the report file",
-                IOError: "The report file cannot be created or written to",
-            }
-            error_msg: str = error_mapping[type(error)]
-            self.logger.error(error_msg, exc_info=error)
-            raise ReporterError(error_msg, error)
