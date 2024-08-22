@@ -67,6 +67,6 @@ class BaseReporter:
                 OSError: "Error creating directories for the report file",
                 IOError: "The report file cannot be created or written to",
             }
-            error_msg: str = error_mapping[type(error)]
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
-            raise ReporterError(error_msg, error)
+            raise ReporterError(error_msg) from error

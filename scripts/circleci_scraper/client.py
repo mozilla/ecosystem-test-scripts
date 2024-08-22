@@ -166,9 +166,9 @@ class CircleCIClient:
                 RequestException: f"Request to {url} failed",
                 ValidationError: f"Unexpected schema for '{endpoint}' endpoint",
             }
-            error_msg = error_mapping[type(error)]
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
-            raise CircleCIClientError(error_msg, error)
+            raise CircleCIClientError(error_msg) from error
 
     def get_pipelines(
         self, organization: str, next_page_token: str | None = None

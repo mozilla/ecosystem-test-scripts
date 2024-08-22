@@ -62,9 +62,9 @@ class Config(BaseConfig):
                 NoOptionError: "Missing config option in 'metric_reporter' section",
                 ValidationError: "Unexpected value or schema in 'metric_reporter' section",
             }
-            error_msg: str = error_mapping[type(error)]
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
-            raise InvalidConfigError(error_msg, error)
+            raise InvalidConfigError(error_msg) from error
 
     @staticmethod
     def _normalize_name(name: str, delimiter: str = "") -> str:
@@ -115,6 +115,6 @@ class Config(BaseConfig):
                     "Unexpected value or schema while building Metric Reporter arguments"
                 ),
             }
-            error_msg: str = error_mapping[type(error)]
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
-            raise InvalidConfigError(error_msg, error)
+            raise InvalidConfigError(error_msg) from error

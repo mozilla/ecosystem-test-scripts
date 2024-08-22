@@ -170,9 +170,11 @@ class JUnitXmlParser:
                         ElementTree.ParseError: f"Invalid XML format for file {artifact_file_path}",
                         ValidationError: f"Unexpected value or schema in file {artifact_file_path}",
                     }
-                    error_msg = error_mapping[type(error)]
+                    error_msg: str = next(
+                        m for t, m in error_mapping.items() if isinstance(error, t)
+                    )
                     self.logger.error(error_msg, exc_info=error)
-                    raise JUnitXmlParserError(error_msg, error)
+                    raise JUnitXmlParserError(error_msg) from error
             artifact_list.append(
                 JUnitXmlJobTestSuites(job=job_number, test_suites=test_suites_list)
             )
