@@ -44,13 +44,13 @@ def main(config_file: str = "config.ini") -> None:
                 circleci_parser = CircleCIJsonParser()
                 metadata_list = circleci_parser.parse(args.metadata_path)
 
-            artifact_list: list[JUnitXmlJobTestSuites] | None = None
-            if args.artifact_path.is_dir():
+            junit_artifact_list: list[JUnitXmlJobTestSuites] | None = None
+            if args.junit_artifact_path.is_dir():
                 junit_xml_parser = JUnitXmlParser()
-                artifact_list = junit_xml_parser.parse(args.artifact_path)
+                junit_artifact_list = junit_xml_parser.parse(args.junit_artifact_path)
 
             suite_reporter = SuiteReporter(
-                args.repository, args.workflow, args.test_suite, metadata_list, artifact_list
+                args.repository, args.workflow, args.test_suite, metadata_list, junit_artifact_list
             )
             suite_reporter.output_csv(args.results_csv_report_path)
 

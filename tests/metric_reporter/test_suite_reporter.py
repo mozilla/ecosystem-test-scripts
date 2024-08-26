@@ -717,7 +717,7 @@ def test_suite_reporter_output_csv_with_empty_test_results(
     artifact_list: list[JUnitXmlJobTestSuites] | None = None
     reporter = SuiteReporter(repository, workflow, test_suite, metadata_list, artifact_list)
     report_path = test_data_directory / "fake_path.csv"
-    expected_log = "No data to write to the CSV file."
+    expected_log = f"No data to write to {report_path}"
 
     with caplog.at_level(logging.INFO):
         mock_open: MagicMock = mocker.mock_open()

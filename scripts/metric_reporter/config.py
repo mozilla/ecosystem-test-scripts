@@ -21,7 +21,7 @@ class MetricReporterArgs(BaseModel):
     workflow: str
     test_suite: str
     metadata_path: Path
-    artifact_path: Path
+    junit_artifact_path: Path
     averages_csv_report_path: Path
     results_csv_report_path: Path
 
@@ -85,9 +85,9 @@ class Config(BaseConfig):
             for directory_path, directory_names, files in test_result_path.walk():
                 for directory_name in directory_names:
                     current_path = Path(directory_path) / directory_name
-                    artifact_path = current_path / self.common_config.test_artifact_dir
+                    junit_artifact_path = current_path / self.common_config.junit_artifact_dir
                     metadata_path = current_path / self.common_config.test_metadata_dir
-                    if artifact_path.exists() or metadata_path.exists():
+                    if junit_artifact_path.exists() or metadata_path.exists():
                         repository = self._normalize_name(Path(directory_path).parents[0].name)
                         test_suite = self._normalize_name(directory_name, "_")
                         test_metric_args = MetricReporterArgs(
@@ -95,7 +95,7 @@ class Config(BaseConfig):
                             workflow=directory_path.name,
                             test_suite=test_suite,
                             metadata_path=metadata_path,
-                            artifact_path=artifact_path,
+                            junit_artifact_path=junit_artifact_path,
                             averages_csv_report_path=(
                                 Path(self.metric_reporter_config.reports_dir)
                                 / f"{repository}_{test_suite}_averages.csv"

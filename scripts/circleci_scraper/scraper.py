@@ -6,6 +6,7 @@
 
 import json
 import logging
+import re
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any
@@ -27,6 +28,8 @@ from client import (
 from scripts.circleci_scraper.config import CircleCIScraperPipelineConfig
 from scripts.common.config import CommonConfig
 from scripts.common.error import BaseError
+
+COVERAGE_FILE_REGEX = r".*cov.*\.json$"
 
 
 class CircleCIScraperError(BaseError):
@@ -51,7 +54,8 @@ class CircleCIScraper:
         self._client = client
         self._test_result_dir = common_config.test_result_dir
         self._test_metadata_dir = common_config.test_metadata_dir
-        self._test_artifact_dir = common_config.test_artifact_dir
+        self._junit_artifact_dir = common_config.junit_artifact_dir
+        self._coverage_artifact_dir = common_config.coverage_artifact_dir
 
     def export_test_metadata_and_artifacts(
         self,
@@ -204,7 +208,7 @@ class CircleCIScraper:
             CircleCIClientError: If there is an error in the CircleCI API request.
             CircleCIScraperError: If there is an error in downloading the artifacts.
         """
-        file_content: dict[str, Any] = {"job": job.dict(), "test_metadata": []}
+        file_content: dict[str, Any] = {"job": job.model_dump(), "test_metadata": []}
         next_page_token: str | None = None
         while True:
             test_metadata: TestMetadataGroup = self._client.get_test_metadata(
@@ -212,7 +216,7 @@ class CircleCIScraper:
             )
             if not test_metadata:
                 break
-            file_content["test_metadata"] += [item.dict() for item in test_metadata.items]
+            file_content["test_metadata"] += [item.model_dump() for item in test_metadata.items]
             next_page_token = test_metadata.next_page_token
             if not next_page_token:
                 break
@@ -270,7 +274,8 @@ class CircleCIScraper:
             CircleCIClientError: If there is an error in the CircleCI API request.
             CircleCIScraperError: If there is an error in downloading the artifacts.
         """
-        test_artifacts: list[Artifact] = []
+        junit_artifacts: list[Artifact] = []
+        coverage_artifacts: list[Artifact] = []
         next_page_token: str | None = None
         while True:
             artifacts: ArtifactGroup = self._client.get_job_artifacts(
@@ -278,20 +283,38 @@ class CircleCIScraper:
             )
             if not artifacts:
                 break
-            test_artifacts += [item for item in artifacts.items if item.path.endswith(".xml")]
+            for item in artifacts.items:
+                filename = Path(item.path).name
+                if filename.endswith(".xml"):
+                    junit_artifacts.append(item)
+                elif re.match(COVERAGE_FILE_REGEX, filename, re.IGNORECASE):
+                    coverage_artifacts.append(item)
             next_page_token = artifacts.next_page_token
             if not next_page_token:
                 break
-        self.export_test_artifacts(repository, workflow_name, job, test_artifacts)
+        if junit_artifacts:
+            self.export_artifacts(
+                repository, workflow_name, self._junit_artifact_dir, job, junit_artifacts
+            )
+        if coverage_artifacts:
+            self.export_artifacts(
+                repository, workflow_name, self._coverage_artifact_dir, job, coverage_artifacts
+            )
 
-    def export_test_artifacts(
-        self, repository: str, workflow_name: str, job: Job, artifacts: list[Artifact]
+    def export_artifacts(
+        self,
+        repository: str,
+        workflow_name: str,
+        artifact_directory: str,
+        job: Job,
+        artifacts: list[Artifact],
     ):
         """Export a given list of test artifacts.
 
         Args:
             repository (str): The repository name.
             workflow_name (str): The workflow name.
+            artifact_directory (str): The destination directory name for artifacts.
             job (Job): The job details.
             artifacts (list[Artifact]): The list of artifacts.
 
@@ -299,24 +322,24 @@ class CircleCIScraper:
             CircleCIClientError: If there is an error in the CircleCI API request.
             CircleCIScraperError: If there is an error in downloading the artifacts.
         """
-        artifact_directory = (
+        artifact_path = (
             Path(self._test_result_dir)
             / repository
             / workflow_name
             / job.name
-            / self._test_artifact_dir
+            / artifact_directory
             / str(job.job_number)
         )
-        if artifacts:
-            artifact_directory.mkdir(parents=True, exist_ok=True)
-        for index, artifact in enumerate(artifacts):
-            file_path = artifact_directory / f"{index}-{Path(artifact.path).name}"
-            if file_path.exists():
-                self.logger.info(f"{file_path} already exists, skipping download.")
-            else:
-                self.download_artifact(str(file_path), artifact.url)
+        if artifact_path.exists():
+            self.logger.info(f"{artifact_path} already exists, skipping download(s).")
+            return
 
-    def download_artifact(self, file_name: str, url: str) -> None:
+        artifact_path.mkdir(parents=True)
+        for index, artifact in enumerate(artifacts):
+            file_path: Path = artifact_path / f"{index}-{Path(artifact.path).name}"
+            self.download_artifact(file_path, artifact.url)
+
+    def download_artifact(self, file_name: Path, url: str) -> None:
         """Download an artifact from the specified URL.
 
         Args:

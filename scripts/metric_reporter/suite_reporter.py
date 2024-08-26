@@ -167,7 +167,7 @@ class SuiteReporter(BaseReporter):
         workflow: str,
         test_suite: str,
         metadata_list: list[CircleCIJobTestMetadata] | None,
-        artifacts_list: list[JUnitXmlJobTestSuites] | None,
+        junit_artifact_list: list[JUnitXmlJobTestSuites] | None,
     ) -> None:
         """Initialize the reporter with the directory containing test result data.
 
@@ -177,12 +177,12 @@ class SuiteReporter(BaseReporter):
             test_suite (str): The test suite name.
             metadata_list (list[CircleCIJobTestMetadata] | None): The metadata from CircleCI test
                                                                   jobs.
-            artifacts_list (list[JUnitXmlJobTestSuites] | None): The test results from JUnit XML
-                                                                 artifacts.
+            junit_artifact_list (list[JUnitXmlJobTestSuites] | None): The test results from JUnit
+                                                                      XML artifacts.
         """
         super().__init__()
         self.results: Sequence[SuiteReporterResult] = self._parse_results(
-            repository, workflow, test_suite, metadata_list, artifacts_list
+            repository, workflow, test_suite, metadata_list, junit_artifact_list
         )
 
     def _parse_results(
@@ -282,6 +282,10 @@ class SuiteReporter(BaseReporter):
             run_times: list[float] = []
             execution_times: list[float] = []
             for suites in artifact.test_suites:
+                # Update date and timestamp at the test_suites level if not already set
+                if not test_suite_result.date and suites.timestamp:
+                    test_suite_result.timestamp = suites.timestamp
+                    test_suite_result.date = suites.timestamp.split("T")[0]
                 run_time: float = 0
                 # A top level test_suites time is not always available. The top level time may
                 # not be equal to the sum of the test case times due to the use of threads/workers.
@@ -289,6 +293,7 @@ class SuiteReporter(BaseReporter):
                     suites.time if suites.time and suites.time > 0 else None
                 )
                 for suite in suites.test_suites:
+                    # Update date and timestamp at the test_suite level if not already set
                     if not test_suite_result.date and suite.timestamp:
                         test_suite_result.timestamp = suite.timestamp
                         test_suite_result.date = suite.timestamp.split("T")[0]

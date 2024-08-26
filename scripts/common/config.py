@@ -20,7 +20,8 @@ class CommonConfig(BaseModel):
 
     test_result_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
     test_metadata_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
-    test_artifact_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
+    junit_artifact_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
+    coverage_artifact_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
 
 
 class InvalidConfigError(BaseError):
@@ -52,7 +53,8 @@ class BaseConfig:
             return CommonConfig(
                 test_result_dir=config_parser.get("common", "test_result_dir"),
                 test_metadata_dir=config_parser.get("common", "test_metadata_dir"),
-                test_artifact_dir=config_parser.get("common", "test_artifact_dir"),
+                junit_artifact_dir=config_parser.get("common", "junit_artifact_dir"),
+                coverage_artifact_dir=config_parser.get("common", "coverage_artifact_dir"),
             )
         except (NoSectionError, NoOptionError, ValidationError) as error:
             error_mapping: dict[type, str] = {

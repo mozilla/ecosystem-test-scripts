@@ -51,7 +51,7 @@ class BaseReporter:
         try:
             report_path.parent.mkdir(parents=True, exist_ok=True)
             if not self.results:
-                self.logger.warning("No data to write to the CSV file.")
+                self.logger.warning(f"No data to write to {report_path}.")
                 return
 
             fieldnames: list[str] = list(self.results[0].dict_with_fieldnames().keys())
