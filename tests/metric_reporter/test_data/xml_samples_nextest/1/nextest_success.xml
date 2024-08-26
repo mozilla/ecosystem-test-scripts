@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="autopush-unit-tests" tests="1" failures="0" errors="0" uuid="4ded7634-4e81-40ac-b3f9-060ffa546238" timestamp="2024-08-21T23:36:28.658+00:00" time="4.287">
+    <testsuite name="autoendpoint::bin/autoendpoint" tests="1" disabled="0" errors="0" failures="0">
+        <testcase name="error::tests::sentry_event_with_extras" classname="autoendpoint::bin/autoendpoint" timestamp="2024-08-21T23:36:36.475+00:00" time="4.287">
+        </testcase>
+    </testsuite>
+</testsuites>

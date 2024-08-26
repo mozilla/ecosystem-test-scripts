@@ -227,6 +227,47 @@ EXPECTED_MOCHA = [
     )
 ]
 
+EXPECTED_NEXTEST = [
+    JUnitXmlJobTestSuites(
+        job=1,
+        test_suites=[
+            JUnitXmlTestSuites(
+                id=None,
+                name="autopush-unit-tests",
+                tests=1,
+                failures=0,
+                skipped=None,
+                errors=0,
+                time=4.287,
+                timestamp="2024-08-21T23:36:28.658+00:00",
+                test_suites=[
+                    JUnitXmlTestSuite(
+                        name="autoendpoint::bin/autoendpoint",
+                        timestamp=None,
+                        hostname=None,
+                        tests=1,
+                        failures=0,
+                        skipped=None,
+                        time=None,
+                        errors=0,
+                        test_cases=[
+                            JUnitXmlTestCase(
+                                name="error::tests::sentry_event_with_extras",
+                                classname="autoendpoint::bin/autoendpoint",
+                                time=4.287,
+                                properties=None,
+                                skipped=None,
+                                failure=None,
+                                system_out=None,
+                            )
+                        ],
+                    )
+                ],
+            )
+        ],
+    )
+]
+
 EXPECTED_PLAYWRIGHT = [
     JUnitXmlJobTestSuites(
         job=1,
@@ -598,11 +639,12 @@ EXPECTED_TAP = [
     [
         ("xml_samples_jest", EXPECTED_JEST),
         ("xml_samples_mocha", EXPECTED_MOCHA),
+        ("xml_samples_nextest", EXPECTED_NEXTEST),
         ("xml_samples_playwright", EXPECTED_PLAYWRIGHT),
         ("xml_samples_pytest", EXPECTED_PYTEST),
         ("xml_samples_tap", EXPECTED_TAP),
     ],
-    ids=["jest", "mocha", "playwright", "pytest", "tap"],
+    ids=["jest", "mocha", "nextest", "playwright", "pytest", "tap"],
 )
 def test_parse(
     test_data_directory: Path,
