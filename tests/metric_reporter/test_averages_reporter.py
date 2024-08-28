@@ -12,8 +12,11 @@ from unittest.mock import MagicMock
 from pytest import LogCaptureFixture
 from pytest_mock import MockerFixture
 
-from scripts.metric_reporter.averages_reporter import AveragesReporter, AveragesReporterResult
-from scripts.metric_reporter.suite_reporter import SuiteReporterResult
+from scripts.metric_reporter.reporter.averages_reporter import (
+    AveragesReporter,
+    AveragesReporterResult,
+)
+from scripts.metric_reporter.reporter.suite_reporter import SuiteReporterResult
 
 SUITE_RESULTS: Sequence[SuiteReporterResult] = [
     SuiteReporterResult(

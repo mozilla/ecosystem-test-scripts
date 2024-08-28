@@ -12,12 +12,12 @@ import pytest
 from pytest import LogCaptureFixture
 from pytest_mock import MockerFixture
 
-from scripts.metric_reporter.circleci_json_parser import (
+from scripts.metric_reporter.parser.circleci_json_parser import (
     CircleCIJobTestMetadata,
     CircleCITestMetadata,
     CircleCIJob,
 )
-from scripts.metric_reporter.junit_xml_parser import (
+from scripts.metric_reporter.parser.junit_xml_parser import (
     JUnitXmlFailure,
     JUnitXmlJobTestSuites,
     JUnitXmlProperty,
@@ -27,7 +27,7 @@ from scripts.metric_reporter.junit_xml_parser import (
     JUnitXmlTestSuite,
     JUnitXmlTestSuites,
 )
-from scripts.metric_reporter.suite_reporter import SuiteReporter, SuiteReporterResult
+from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter, SuiteReporterResult
 
 CIRCLECI_JOB_TEST_METADATA_LIST: list[CircleCIJobTestMetadata] | None = [
     CircleCIJobTestMetadata(

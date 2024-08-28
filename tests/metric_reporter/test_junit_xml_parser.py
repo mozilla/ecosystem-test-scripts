@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.metric_reporter.junit_xml_parser import (
+from scripts.metric_reporter.parser.junit_xml_parser import (
     JUnitXmlFailure,
     JUnitXmlJobTestSuites,
     JUnitXmlParser,

@@ -7,20 +7,20 @@
 import argparse
 import logging
 
-from scripts.metric_reporter.averages_reporter import AveragesReporter
-from scripts.metric_reporter.base_reporter import ReporterError
-from scripts.metric_reporter.circleci_json_parser import (
+from scripts.metric_reporter.reporter.averages_reporter import AveragesReporter
+from scripts.metric_reporter.reporter.base_reporter import ReporterError
+from scripts.metric_reporter.parser.circleci_json_parser import (
     CircleCIJsonParserError,
     CircleCIJsonParser,
     CircleCIJobTestMetadata,
 )
 from scripts.metric_reporter.config import Config, InvalidConfigError
-from scripts.metric_reporter.junit_xml_parser import (
+from scripts.metric_reporter.parser.junit_xml_parser import (
     JUnitXmlJobTestSuites,
     JUnitXmlParser,
     JUnitXmlParserError,
 )
-from scripts.metric_reporter.suite_reporter import SuiteReporter
+from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
 
 # Configure logging
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
