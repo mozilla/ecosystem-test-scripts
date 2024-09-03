@@ -9,8 +9,12 @@ from datetime import datetime, timedelta
 from functools import reduce
 from typing import Any, Sequence
 
-from scripts.metric_reporter.base_reporter import BaseReporter, ReporterResultBase, DATE_FORMAT
-from scripts.metric_reporter.suite_reporter import SuiteReporterResult, Status
+from scripts.metric_reporter.reporter.base_reporter import (
+    BaseReporter,
+    ReporterResultBase,
+    DATE_FORMAT,
+)
+from scripts.metric_reporter.reporter.suite_reporter import SuiteReporterResult, Status
 
 DAYS_1: int = 1
 DAYS_30: int = 30

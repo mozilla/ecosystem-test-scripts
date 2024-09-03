@@ -7,20 +7,18 @@
 import argparse
 import logging
 
-from scripts.metric_reporter.averages_reporter import AveragesReporter
-from scripts.metric_reporter.base_reporter import ReporterError
-from scripts.metric_reporter.circleci_json_parser import (
-    CircleCIJsonParserError,
+from scripts.metric_reporter.config import Config, InvalidConfigError
+from scripts.metric_reporter.parser.base_parser import ParserError
+from scripts.metric_reporter.parser.circleci_json_parser import (
     CircleCIJsonParser,
     CircleCIJobTestMetadata,
 )
-from scripts.metric_reporter.config import Config, InvalidConfigError
-from scripts.metric_reporter.junit_xml_parser import (
-    JUnitXmlJobTestSuites,
-    JUnitXmlParser,
-    JUnitXmlParserError,
-)
-from scripts.metric_reporter.suite_reporter import SuiteReporter
+
+# from scripts.metric_reporter.parser.coverage_json_parser import CoverageJsonParser, CoverageSummary  # TODO Enable with ECTEEN-119
+from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites, JUnitXmlParser
+from scripts.metric_reporter.reporter.averages_reporter import AveragesReporter
+from scripts.metric_reporter.reporter.base_reporter import ReporterError
+from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
 
 # Configure logging
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -37,17 +35,25 @@ def main(config_file: str = "config.ini") -> None:
     try:
         logger.info(f"Starting Metric Reporter with configuration file: {config_file}")
         config = Config(config_file)
+        circleci_parser = CircleCIJsonParser()
+        # coverage_json_parser = CoverageJsonParser()  # TODO Enable with ECTEEN-119
+        junit_xml_parser = JUnitXmlParser()
         for args in config.metric_reporter_args:
             logger.info(f"Reporting for {args.repository} {args.workflow} {args.test_suite}")
             metadata_list: list[CircleCIJobTestMetadata] | None = None
             if args.metadata_path.is_dir():
-                circleci_parser = CircleCIJsonParser()
                 metadata_list = circleci_parser.parse(args.metadata_path)
 
             junit_artifact_list: list[JUnitXmlJobTestSuites] | None = None
             if args.junit_artifact_path.is_dir():
-                junit_xml_parser = JUnitXmlParser()
                 junit_artifact_list = junit_xml_parser.parse(args.junit_artifact_path)
+
+            # TODO Enable with ECTEEN-119
+            # coverage_artifact_list: list[CoverageSummary] | None = None
+            # if args.coverage_artifact_path.is_dir():
+            #     coverage_artifact_list: list[CoverageSummary] = coverage_json_parser.parse(
+            #         args.coverage_artifact_path
+            #     )
 
             suite_reporter = SuiteReporter(
                 args.repository, args.workflow, args.test_suite, metadata_list, junit_artifact_list
@@ -61,10 +67,8 @@ def main(config_file: str = "config.ini") -> None:
         logger.info("Reporting complete")
     except InvalidConfigError as error:
         logger.error(f"Configuration error: {error}")
-    except CircleCIJsonParserError as error:
-        logger.error(f"CircleCI JSON Parsing error: {error}")
-    except JUnitXmlParserError as error:
-        logger.error(f"JUnit XML Parsing error: {error}")
+    except ParserError as error:
+        logger.error(f"Parsing error: {error}")
     except ReporterError as error:
         logger.error(f"Test Suite Reporter error: {error}")
     except Exception as error:

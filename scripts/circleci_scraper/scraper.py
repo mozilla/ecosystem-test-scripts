@@ -248,7 +248,7 @@ class CircleCIScraper:
             / self._test_metadata_dir
         )
         test_metadata_directory.mkdir(parents=True, exist_ok=True)
-        file_path = test_metadata_directory / f"{job.job_number}.json"
+        file_path = test_metadata_directory / f"{job.job_number}_{job.started_at}.json"
         if file_path.exists():
             self.logger.info(f"{file_path} already exists, skipping download.")
         else:
@@ -328,7 +328,7 @@ class CircleCIScraper:
             / workflow_name
             / job.name
             / artifact_directory
-            / str(job.job_number)
+            / f"{str(job.job_number)}_{job.started_at}"
         )
         if artifact_path.exists():
             self.logger.info(f"{artifact_path} already exists, skipping download(s).")

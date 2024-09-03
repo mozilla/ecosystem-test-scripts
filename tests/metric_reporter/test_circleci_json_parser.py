@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.metric_reporter.circleci_json_parser import (
+from scripts.metric_reporter.parser.circleci_json_parser import (
     CircleCIJobTestMetadata,
     CircleCITestMetadata,
     CircleCIJob,

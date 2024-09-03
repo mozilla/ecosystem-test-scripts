@@ -8,14 +8,14 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Sequence
 
-from scripts.metric_reporter.base_reporter import (
+from scripts.metric_reporter.parser.circleci_json_parser import CircleCIJobTestMetadata
+from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites
+from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
     ReporterResultBase,
     DATETIME_FORMAT,
     DATE_FORMAT,
 )
-from scripts.metric_reporter.circleci_json_parser import CircleCIJobTestMetadata
-from scripts.metric_reporter.junit_xml_parser import JUnitXmlJobTestSuites
 
 SUCCESS_RESULTS = {"success", "system-out"}
 FAILURE_RESULT = "failure"

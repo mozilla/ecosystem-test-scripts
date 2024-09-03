@@ -1,0 +1,2769 @@
+{
+  "data": [
+    {
+      "files": [
+        {
+          "filename": "/root/project/autoconnect/autoconnect-common/src/broadcast.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 26,
+              "covered": 22,
+              "percent": 84.61538461538461
+            },
+            "instantiations": {
+              "count": 63,
+              "covered": 31,
+              "percent": 49.2063492063492
+            },
+            "lines": {
+              "count": 254,
+              "covered": 222,
+              "percent": 87.4015748031496
+            },
+            "regions": {
+              "count": 126,
+              "covered": 101,
+              "notcovered": 25,
+              "percent": 80.15873015873017
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-common/src/megaphone.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 9,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 32,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 89,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 73,
+              "covered": 0,
+              "notcovered": 73,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-common/src/protocol.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 4,
+              "percent": 66.66666666666666
+            },
+            "instantiations": {
+              "count": 130,
+              "covered": 8,
+              "percent": 6.153846153846154
+            },
+            "lines": {
+              "count": 15,
+              "covered": 12,
+              "percent": 80.0
+            },
+            "regions": {
+              "count": 15,
+              "covered": 9,
+              "notcovered": 6,
+              "percent": 60.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-common/src/registry.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 9,
+              "covered": 7,
+              "percent": 77.77777777777779
+            },
+            "instantiations": {
+              "count": 25,
+              "covered": 10,
+              "percent": 40.0
+            },
+            "lines": {
+              "count": 52,
+              "covered": 32,
+              "percent": 61.53846153846154
+            },
+            "regions": {
+              "count": 51,
+              "covered": 26,
+              "notcovered": 25,
+              "percent": 50.98039215686274
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-common/src/test_support.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 6,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 12,
+              "covered": 6,
+              "percent": 50.0
+            },
+            "lines": {
+              "count": 28,
+              "covered": 28,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 10,
+              "covered": 10,
+              "notcovered": 0,
+              "percent": 100.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-settings/src/app_state.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 11,
+              "covered": 4,
+              "percent": 36.36363636363637
+            },
+            "instantiations": {
+              "count": 22,
+              "covered": 4,
+              "percent": 18.181818181818183
+            },
+            "lines": {
+              "count": 93,
+              "covered": 60,
+              "percent": 64.51612903225806
+            },
+            "regions": {
+              "count": 47,
+              "covered": 23,
+              "notcovered": 24,
+              "percent": 48.93617021276596
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-settings/src/lib.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 20,
+              "covered": 14,
+              "percent": 70.0
+            },
+            "instantiations": {
+              "count": 81,
+              "covered": 20,
+              "percent": 24.69135802469136
+            },
+            "lines": {
+              "count": 194,
+              "covered": 159,
+              "percent": 81.95876288659794
+            },
+            "regions": {
+              "count": 99,
+              "covered": 61,
+              "notcovered": 38,
+              "percent": 61.61616161616162
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-web/src/dockerflow.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 14,
+              "covered": 1,
+              "percent": 7.142857142857142
+            },
+            "instantiations": {
+              "count": 14,
+              "covered": 1,
+              "percent": 7.142857142857142
+            },
+            "lines": {
+              "count": 68,
+              "covered": 12,
+              "percent": 17.647058823529413
+            },
+            "regions": {
+              "count": 37,
+              "covered": 1,
+              "notcovered": 36,
+              "percent": 2.702702702702702
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-web/src/error.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 5,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 7,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 24,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 15,
+              "covered": 0,
+              "notcovered": 15,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-web/src/lib.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 2,
+              "covered": 1,
+              "percent": 50.0
+            },
+            "instantiations": {
+              "count": 2,
+              "covered": 1,
+              "percent": 50.0
+            },
+            "lines": {
+              "count": 11,
+              "covered": 6,
+              "percent": 54.54545454545454
+            },
+            "regions": {
+              "count": 2,
+              "covered": 1,
+              "notcovered": 1,
+              "percent": 50.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-web/src/routes.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 2,
+              "percent": 33.33333333333333
+            },
+            "instantiations": {
+              "count": 6,
+              "covered": 2,
+              "percent": 33.33333333333333
+            },
+            "lines": {
+              "count": 32,
+              "covered": 8,
+              "percent": 25.0
+            },
+            "regions": {
+              "count": 23,
+              "covered": 3,
+              "notcovered": 20,
+              "percent": 13.043478260869565
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-web/src/test.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 15,
+              "covered": 15,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 22,
+              "covered": 22,
+              "percent": 100.0
+            },
+            "lines": {
+              "count": 25,
+              "covered": 24,
+              "percent": 96.0
+            },
+            "regions": {
+              "count": 31,
+              "covered": 30,
+              "notcovered": 1,
+              "percent": 96.7741935483871
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/autoconnect-ws-sm/src/error.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 14,
+              "covered": 13,
+              "percent": 92.85714285714286
+            },
+            "instantiations": {
+              "count": 38,
+              "covered": 19,
+              "percent": 50.0
+            },
+            "lines": {
+              "count": 60,
+              "covered": 50,
+              "percent": 83.33333333333334
+            },
+            "regions": {
+              "count": 42,
+              "covered": 33,
+              "notcovered": 9,
+              "percent": 78.57142857142857
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/autoconnect-ws-sm/src/identified/mod.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 29,
+              "covered": 25,
+              "percent": 86.20689655172413
+            },
+            "instantiations": {
+              "count": 56,
+              "covered": 34,
+              "percent": 60.714285714285715
+            },
+            "lines": {
+              "count": 208,
+              "covered": 135,
+              "percent": 64.90384615384616
+            },
+            "regions": {
+              "count": 83,
+              "covered": 45,
+              "notcovered": 38,
+              "percent": 54.21686746987952
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/autoconnect-ws-sm/src/identified/on_client_msg.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 21,
+              "covered": 3,
+              "percent": 14.285714285714285
+            },
+            "instantiations": {
+              "count": 64,
+              "covered": 5,
+              "percent": 7.8125
+            },
+            "lines": {
+              "count": 210,
+              "covered": 13,
+              "percent": 6.190476190476191
+            },
+            "regions": {
+              "count": 158,
+              "covered": 8,
+              "notcovered": 150,
+              "percent": 5.063291139240507
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/autoconnect-ws-sm/src/identified/on_server_notif.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 20,
+              "covered": 16,
+              "percent": 80.0
+            },
+            "instantiations": {
+              "count": 58,
+              "covered": 26,
+              "percent": 44.827586206896555
+            },
+            "lines": {
+              "count": 204,
+              "covered": 136,
+              "percent": 66.66666666666666
+            },
+            "regions": {
+              "count": 125,
+              "covered": 74,
+              "notcovered": 51,
+              "percent": 59.2
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/autoconnect-ws-sm/src/unidentified.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 26,
+              "covered": 24,
+              "percent": 92.3076923076923
+            },
+            "instantiations": {
+              "count": 50,
+              "covered": 36,
+              "percent": 72.0
+            },
+            "lines": {
+              "count": 261,
+              "covered": 241,
+              "percent": 92.33716475095785
+            },
+            "regions": {
+              "count": 102,
+              "covered": 76,
+              "notcovered": 26,
+              "percent": 74.50980392156865
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/src/error.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 16,
+              "covered": 14,
+              "percent": 87.5
+            },
+            "instantiations": {
+              "count": 48,
+              "covered": 25,
+              "percent": 52.083333333333336
+            },
+            "lines": {
+              "count": 73,
+              "covered": 55,
+              "percent": 75.34246575342466
+            },
+            "regions": {
+              "count": 52,
+              "covered": 37,
+              "notcovered": 15,
+              "percent": 71.15384615384616
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/src/handler.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 10,
+              "covered": 10,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 48,
+              "covered": 40,
+              "percent": 83.33333333333334
+            },
+            "lines": {
+              "count": 85,
+              "covered": 81,
+              "percent": 95.29411764705881
+            },
+            "regions": {
+              "count": 76,
+              "covered": 62,
+              "notcovered": 14,
+              "percent": 81.57894736842105
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/src/lib.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 2,
+              "covered": 2,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 5,
+              "covered": 2,
+              "percent": 40.0
+            },
+            "lines": {
+              "count": 17,
+              "covered": 17,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 7,
+              "covered": 6,
+              "notcovered": 1,
+              "percent": 85.71428571428571
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/src/ping.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 10,
+              "covered": 10,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 20,
+              "covered": 20,
+              "percent": 100.0
+            },
+            "lines": {
+              "count": 52,
+              "covered": 51,
+              "percent": 98.07692307692307
+            },
+            "regions": {
+              "count": 48,
+              "covered": 41,
+              "notcovered": 7,
+              "percent": 85.41666666666666
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/src/session.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 5,
+              "percent": 83.33333333333334
+            },
+            "instantiations": {
+              "count": 426,
+              "covered": 75,
+              "percent": 17.6056338028169
+            },
+            "lines": {
+              "count": 16,
+              "covered": 13,
+              "percent": 81.25
+            },
+            "regions": {
+              "count": 24,
+              "covered": 12,
+              "notcovered": 12,
+              "percent": 50.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/autoconnect-ws/src/test.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 16,
+              "covered": 16,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 21,
+              "covered": 21,
+              "percent": 100.0
+            },
+            "lines": {
+              "count": 19,
+              "covered": 19,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 22,
+              "covered": 22,
+              "notcovered": 0,
+              "percent": 100.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoconnect/src/main.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 9,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 17,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 22,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 14,
+              "covered": 0,
+              "notcovered": 14,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/auth.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 1,
+              "covered": 1,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 1,
+              "covered": 1,
+              "percent": 100.0
+            },
+            "lines": {
+              "count": 6,
+              "covered": 6,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 12,
+              "covered": 8,
+              "notcovered": 4,
+              "percent": 66.66666666666666
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/error.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 26,
+              "covered": 13,
+              "percent": 50.0
+            },
+            "instantiations": {
+              "count": 40,
+              "covered": 21,
+              "percent": 52.5
+            },
+            "lines": {
+              "count": 219,
+              "covered": 92,
+              "percent": 42.00913242009132
+            },
+            "regions": {
+              "count": 136,
+              "covered": 38,
+              "notcovered": 98,
+              "percent": 27.941176470588236
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/authorization_check.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 11,
+              "covered": 6,
+              "percent": 54.54545454545454
+            },
+            "instantiations": {
+              "count": 11,
+              "covered": 6,
+              "percent": 54.54545454545454
+            },
+            "lines": {
+              "count": 88,
+              "covered": 60,
+              "percent": 68.18181818181817
+            },
+            "regions": {
+              "count": 52,
+              "covered": 26,
+              "notcovered": 26,
+              "percent": 50.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/message_id.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 11,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 11,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 92,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 48,
+              "covered": 0,
+              "notcovered": 48,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/new_channel_data.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 1,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 8,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 1,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 3,
+              "covered": 0,
+              "notcovered": 3,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/notification.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 7,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 7,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 107,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 53,
+              "covered": 0,
+              "notcovered": 53,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/notification_headers.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 27,
+              "covered": 22,
+              "percent": 81.48148148148148
+            },
+            "instantiations": {
+              "count": 28,
+              "covered": 23,
+              "percent": 82.14285714285714
+            },
+            "lines": {
+              "count": 292,
+              "covered": 250,
+              "percent": 85.61643835616438
+            },
+            "regions": {
+              "count": 125,
+              "covered": 101,
+              "notcovered": 24,
+              "percent": 80.80000000000001
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/registration_path_args.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 1,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 1,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 18,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 7,
+              "covered": 0,
+              "notcovered": 7,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/registration_path_args_with_uaid.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 3,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 3,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 25,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 18,
+              "covered": 0,
+              "notcovered": 18,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/router_data_input.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 3,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 10,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 21,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 22,
+              "covered": 0,
+              "notcovered": 22,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/routers.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 4,
+              "covered": 1,
+              "percent": 25.0
+            },
+            "instantiations": {
+              "count": 4,
+              "covered": 1,
+              "percent": 25.0
+            },
+            "lines": {
+              "count": 39,
+              "covered": 5,
+              "percent": 12.82051282051282
+            },
+            "regions": {
+              "count": 22,
+              "covered": 4,
+              "notcovered": 18,
+              "percent": 18.181818181818183
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/subscription.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 32,
+              "covered": 15,
+              "percent": 46.875
+            },
+            "instantiations": {
+              "count": 53,
+              "covered": 15,
+              "percent": 28.30188679245283
+            },
+            "lines": {
+              "count": 446,
+              "covered": 275,
+              "percent": 61.659192825112115
+            },
+            "regions": {
+              "count": 199,
+              "covered": 60,
+              "notcovered": 139,
+              "percent": 30.150753768844215
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/token_info.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 2,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 2,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 23,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 13,
+              "covered": 0,
+              "notcovered": 13,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/extractors/user.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 6,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 46,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 37,
+              "covered": 0,
+              "notcovered": 37,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/headers/crypto_key.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 6,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 6,
+              "covered": 6,
+              "percent": 100.0
+            },
+            "lines": {
+              "count": 50,
+              "covered": 50,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 32,
+              "covered": 32,
+              "notcovered": 0,
+              "percent": 100.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/headers/util.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 4,
+              "covered": 4,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 4,
+              "covered": 4,
+              "percent": 100.0
+            },
+            "lines": {
+              "count": 12,
+              "covered": 12,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 9,
+              "covered": 8,
+              "notcovered": 1,
+              "percent": 88.88888888888889
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/headers/vapid.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 16,
+              "covered": 6,
+              "percent": 37.5
+            },
+            "instantiations": {
+              "count": 26,
+              "covered": 10,
+              "percent": 38.46153846153847
+            },
+            "lines": {
+              "count": 133,
+              "covered": 73,
+              "percent": 54.88721804511278
+            },
+            "regions": {
+              "count": 94,
+              "covered": 37,
+              "notcovered": 57,
+              "percent": 39.361702127659576
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/main.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 4,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 12,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 4,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 7,
+              "covered": 0,
+              "notcovered": 7,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/metrics.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 12,
+              "covered": 5,
+              "percent": 41.66666666666667
+            },
+            "instantiations": {
+              "count": 12,
+              "covered": 5,
+              "percent": 41.66666666666667
+            },
+            "lines": {
+              "count": 109,
+              "covered": 34,
+              "percent": 31.19266055045872
+            },
+            "regions": {
+              "count": 56,
+              "covered": 24,
+              "notcovered": 32,
+              "percent": 42.857142857142854
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/apns/error.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 7,
+              "covered": 1,
+              "percent": 14.285714285714285
+            },
+            "instantiations": {
+              "count": 10,
+              "covered": 1,
+              "percent": 10.0
+            },
+            "lines": {
+              "count": 30,
+              "covered": 3,
+              "percent": 10.0
+            },
+            "regions": {
+              "count": 26,
+              "covered": 1,
+              "notcovered": 25,
+              "percent": 3.8461538461538463
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/apns/router.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 42,
+              "covered": 29,
+              "percent": 69.04761904761905
+            },
+            "instantiations": {
+              "count": 57,
+              "covered": 36,
+              "percent": 63.1578947368421
+            },
+            "lines": {
+              "count": 691,
+              "covered": 511,
+              "percent": 73.9507959479016
+            },
+            "regions": {
+              "count": 296,
+              "covered": 138,
+              "notcovered": 158,
+              "percent": 46.62162162162162
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/apns/settings.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 4,
+              "covered": 1,
+              "percent": 25.0
+            },
+            "instantiations": {
+              "count": 18,
+              "covered": 1,
+              "percent": 5.555555555555555
+            },
+            "lines": {
+              "count": 13,
+              "covered": 8,
+              "percent": 61.53846153846154
+            },
+            "regions": {
+              "count": 8,
+              "covered": 1,
+              "notcovered": 7,
+              "percent": 12.5
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/common.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 9,
+              "covered": 8,
+              "percent": 88.88888888888889
+            },
+            "instantiations": {
+              "count": 9,
+              "covered": 8,
+              "percent": 88.88888888888889
+            },
+            "lines": {
+              "count": 206,
+              "covered": 122,
+              "percent": 59.22330097087378
+            },
+            "regions": {
+              "count": 44,
+              "covered": 23,
+              "notcovered": 21,
+              "percent": 52.27272727272727
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/fcm/client.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 25,
+              "covered": 22,
+              "percent": 88.0
+            },
+            "instantiations": {
+              "count": 39,
+              "covered": 26,
+              "percent": 66.66666666666666
+            },
+            "lines": {
+              "count": 430,
+              "covered": 397,
+              "percent": 92.32558139534883
+            },
+            "regions": {
+              "count": 198,
+              "covered": 140,
+              "notcovered": 58,
+              "percent": 70.70707070707071
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/fcm/error.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 7,
+              "covered": 1,
+              "percent": 14.285714285714285
+            },
+            "instantiations": {
+              "count": 10,
+              "covered": 1,
+              "percent": 10.0
+            },
+            "lines": {
+              "count": 33,
+              "covered": 3,
+              "percent": 9.090909090909092
+            },
+            "regions": {
+              "count": 26,
+              "covered": 1,
+              "notcovered": 25,
+              "percent": 3.8461538461538463
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/fcm/router.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 22,
+              "covered": 20,
+              "percent": 90.9090909090909
+            },
+            "instantiations": {
+              "count": 23,
+              "covered": 21,
+              "percent": 91.30434782608695
+            },
+            "lines": {
+              "count": 440,
+              "covered": 401,
+              "percent": 91.13636363636364
+            },
+            "regions": {
+              "count": 165,
+              "covered": 122,
+              "notcovered": 43,
+              "percent": 73.93939393939394
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/fcm/settings.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 4,
+              "covered": 4,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 18,
+              "covered": 8,
+              "percent": 44.44444444444444
+            },
+            "lines": {
+              "count": 14,
+              "covered": 14,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 8,
+              "covered": 6,
+              "notcovered": 2,
+              "percent": 75.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/mod.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 9,
+              "covered": 4,
+              "percent": 44.44444444444444
+            },
+            "instantiations": {
+              "count": 12,
+              "covered": 4,
+              "percent": 33.33333333333333
+            },
+            "lines": {
+              "count": 80,
+              "covered": 24,
+              "percent": 30.0
+            },
+            "regions": {
+              "count": 59,
+              "covered": 10,
+              "notcovered": 49,
+              "percent": 16.94915254237288
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routers/webpush.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 21,
+              "covered": 5,
+              "percent": 23.809523809523807
+            },
+            "instantiations": {
+              "count": 22,
+              "covered": 5,
+              "percent": 22.727272727272727
+            },
+            "lines": {
+              "count": 269,
+              "covered": 43,
+              "percent": 15.985130111524162
+            },
+            "regions": {
+              "count": 97,
+              "covered": 10,
+              "notcovered": 87,
+              "percent": 10.309278350515465
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routes/health.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 12,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 12,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 61,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 26,
+              "covered": 0,
+              "notcovered": 26,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routes/registration.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 15,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 15,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 158,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 96,
+              "covered": 0,
+              "notcovered": 96,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/routes/webpush.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 6,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 33,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 21,
+              "covered": 0,
+              "notcovered": 21,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/server.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 3,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 3,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 133,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 34,
+              "covered": 0,
+              "notcovered": 34,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autoendpoint/src/settings.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 13,
+              "covered": 10,
+              "percent": 76.92307692307693
+            },
+            "instantiations": {
+              "count": 20,
+              "covered": 12,
+              "percent": 60.0
+            },
+            "lines": {
+              "count": 161,
+              "covered": 132,
+              "percent": 81.98757763975155
+            },
+            "regions": {
+              "count": 58,
+              "covered": 38,
+              "notcovered": 20,
+              "percent": 65.51724137931035
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/bigtable/bigtable_client/cell.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 2,
+              "covered": 1,
+              "percent": 50.0
+            },
+            "instantiations": {
+              "count": 4,
+              "covered": 1,
+              "percent": 25.0
+            },
+            "lines": {
+              "count": 20,
+              "covered": 10,
+              "percent": 50.0
+            },
+            "regions": {
+              "count": 2,
+              "covered": 1,
+              "notcovered": 1,
+              "percent": 50.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/bigtable/bigtable_client/error.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 10,
+              "covered": 2,
+              "percent": 20.0
+            },
+            "instantiations": {
+              "count": 22,
+              "covered": 2,
+              "percent": 9.090909090909092
+            },
+            "lines": {
+              "count": 103,
+              "covered": 9,
+              "percent": 8.737864077669903
+            },
+            "regions": {
+              "count": 92,
+              "covered": 8,
+              "notcovered": 84,
+              "percent": 8.695652173913043
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/bigtable/bigtable_client/merge.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 11,
+              "covered": 9,
+              "percent": 81.81818181818183
+            },
+            "instantiations": {
+              "count": 22,
+              "covered": 9,
+              "percent": 40.909090909090914
+            },
+            "lines": {
+              "count": 312,
+              "covered": 182,
+              "percent": 58.333333333333336
+            },
+            "regions": {
+              "count": 148,
+              "covered": 79,
+              "notcovered": 69,
+              "percent": 53.37837837837838
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/bigtable/bigtable_client/metadata.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 7,
+              "covered": 7,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 12,
+              "covered": 12,
+              "percent": 100.0
+            },
+            "lines": {
+              "count": 66,
+              "covered": 66,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 30,
+              "covered": 26,
+              "notcovered": 4,
+              "percent": 86.66666666666667
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/bigtable/bigtable_client/mod.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 110,
+              "covered": 84,
+              "percent": 76.36363636363637
+            },
+            "instantiations": {
+              "count": 253,
+              "covered": 109,
+              "percent": 43.083003952569165
+            },
+            "lines": {
+              "count": 1150,
+              "covered": 945,
+              "percent": 82.17391304347827
+            },
+            "regions": {
+              "count": 615,
+              "covered": 386,
+              "notcovered": 229,
+              "percent": 62.764227642276424
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/bigtable/bigtable_client/row.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 6,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 12,
+              "covered": 6,
+              "percent": 50.0
+            },
+            "lines": {
+              "count": 23,
+              "covered": 23,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 12,
+              "covered": 12,
+              "notcovered": 0,
+              "percent": 100.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/bigtable/mod.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 12,
+              "covered": 11,
+              "percent": 91.66666666666666
+            },
+            "instantiations": {
+              "count": 65,
+              "covered": 22,
+              "percent": 33.84615384615385
+            },
+            "lines": {
+              "count": 103,
+              "covered": 96,
+              "percent": 93.20388349514563
+            },
+            "regions": {
+              "count": 51,
+              "covered": 43,
+              "notcovered": 8,
+              "percent": 84.31372549019608
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/bigtable/pool.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 21,
+              "covered": 10,
+              "percent": 47.61904761904761
+            },
+            "instantiations": {
+              "count": 46,
+              "covered": 14,
+              "percent": 30.434782608695656
+            },
+            "lines": {
+              "count": 171,
+              "covered": 122,
+              "percent": 71.34502923976608
+            },
+            "regions": {
+              "count": 120,
+              "covered": 65,
+              "notcovered": 55,
+              "percent": 54.166666666666664
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/client.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 3,
+              "covered": 2,
+              "percent": 66.66666666666666
+            },
+            "instantiations": {
+              "count": 2086,
+              "covered": 200,
+              "percent": 9.587727708533079
+            },
+            "lines": {
+              "count": 7,
+              "covered": 4,
+              "percent": 57.14285714285714
+            },
+            "regions": {
+              "count": 4,
+              "covered": 3,
+              "notcovered": 1,
+              "percent": 75.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/error.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 6,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 16,
+              "covered": 7,
+              "percent": 43.75
+            },
+            "lines": {
+              "count": 31,
+              "covered": 21,
+              "percent": 67.74193548387096
+            },
+            "regions": {
+              "count": 27,
+              "covered": 18,
+              "notcovered": 9,
+              "percent": 66.66666666666666
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/mock.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 21,
+              "covered": 8,
+              "percent": 38.095238095238095
+            },
+            "instantiations": {
+              "count": 78,
+              "covered": 14,
+              "percent": 17.94871794871795
+            },
+            "lines": {
+              "count": 67,
+              "covered": 26,
+              "percent": 38.80597014925373
+            },
+            "regions": {
+              "count": 75,
+              "covered": 20,
+              "notcovered": 55,
+              "percent": 26.666666666666668
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/mod.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 19,
+              "covered": 7,
+              "percent": 36.84210526315789
+            },
+            "instantiations": {
+              "count": 107,
+              "covered": 20,
+              "percent": 18.69158878504673
+            },
+            "lines": {
+              "count": 151,
+              "covered": 81,
+              "percent": 53.64238410596026
+            },
+            "regions": {
+              "count": 84,
+              "covered": 36,
+              "notcovered": 48,
+              "percent": 42.857142857142854
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/models.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 10,
+              "covered": 3,
+              "percent": 30.0
+            },
+            "instantiations": {
+              "count": 31,
+              "covered": 3,
+              "percent": 9.67741935483871
+            },
+            "lines": {
+              "count": 43,
+              "covered": 22,
+              "percent": 51.162790697674424
+            },
+            "regions": {
+              "count": 26,
+              "covered": 13,
+              "notcovered": 13,
+              "percent": 50.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/reporter.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 3,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 6,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 31,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 11,
+              "covered": 0,
+              "notcovered": 11,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/db/routing.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 2,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 4,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 10,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 8,
+              "covered": 0,
+              "notcovered": 8,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/endpoint.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 5,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "instantiations": {
+              "count": 10,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "lines": {
+              "count": 37,
+              "covered": 0,
+              "percent": 0.0
+            },
+            "regions": {
+              "count": 36,
+              "covered": 0,
+              "notcovered": 36,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/errors.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 20,
+              "covered": 5,
+              "percent": 25.0
+            },
+            "instantiations": {
+              "count": 82,
+              "covered": 13,
+              "percent": 15.853658536585366
+            },
+            "lines": {
+              "count": 83,
+              "covered": 16,
+              "percent": 19.27710843373494
+            },
+            "regions": {
+              "count": 41,
+              "covered": 5,
+              "notcovered": 36,
+              "percent": 12.195121951219512
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/logging.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 4,
+              "covered": 1,
+              "percent": 25.0
+            },
+            "instantiations": {
+              "count": 8,
+              "covered": 1,
+              "percent": 12.5
+            },
+            "lines": {
+              "count": 41,
+              "covered": 7,
+              "percent": 17.073170731707318
+            },
+            "regions": {
+              "count": 9,
+              "covered": 1,
+              "notcovered": 8,
+              "percent": 11.111111111111112
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/metrics.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 2,
+              "covered": 1,
+              "percent": 50.0
+            },
+            "instantiations": {
+              "count": 4,
+              "covered": 1,
+              "percent": 25.0
+            },
+            "lines": {
+              "count": 16,
+              "covered": 14,
+              "percent": 87.5
+            },
+            "regions": {
+              "count": 19,
+              "covered": 14,
+              "notcovered": 5,
+              "percent": 73.68421052631578
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/middleware/sentry.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 10,
+              "covered": 7,
+              "percent": 70.0
+            },
+            "instantiations": {
+              "count": 27,
+              "covered": 7,
+              "percent": 25.925925925925924
+            },
+            "lines": {
+              "count": 112,
+              "covered": 65,
+              "percent": 58.035714285714285
+            },
+            "regions": {
+              "count": 65,
+              "covered": 21,
+              "notcovered": 44,
+              "percent": 32.30769230769231
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/notification.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 4,
+              "covered": 2,
+              "percent": 50.0
+            },
+            "instantiations": {
+              "count": 22,
+              "covered": 2,
+              "percent": 9.090909090909092
+            },
+            "lines": {
+              "count": 19,
+              "covered": 13,
+              "percent": 68.42105263157895
+            },
+            "regions": {
+              "count": 17,
+              "covered": 11,
+              "notcovered": 6,
+              "percent": 64.70588235294117
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/sentry.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 5,
+              "covered": 3,
+              "percent": 60.0
+            },
+            "instantiations": {
+              "count": 11,
+              "covered": 4,
+              "percent": 36.36363636363637
+            },
+            "lines": {
+              "count": 62,
+              "covered": 50,
+              "percent": 80.64516129032258
+            },
+            "regions": {
+              "count": 25,
+              "covered": 20,
+              "notcovered": 5,
+              "percent": 80.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/tags.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 12,
+              "covered": 2,
+              "percent": 16.666666666666664
+            },
+            "instantiations": {
+              "count": 24,
+              "covered": 2,
+              "percent": 8.333333333333332
+            },
+            "lines": {
+              "count": 81,
+              "covered": 11,
+              "percent": 13.580246913580249
+            },
+            "regions": {
+              "count": 52,
+              "covered": 2,
+              "notcovered": 50,
+              "percent": 3.8461538461538463
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/test_support.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 1,
+              "covered": 1,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 2,
+              "covered": 1,
+              "percent": 50.0
+            },
+            "lines": {
+              "count": 5,
+              "covered": 5,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 1,
+              "covered": 1,
+              "notcovered": 0,
+              "percent": 100.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/util/mod.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 8,
+              "covered": 5,
+              "percent": 62.5
+            },
+            "instantiations": {
+              "count": 19,
+              "covered": 5,
+              "percent": 26.31578947368421
+            },
+            "lines": {
+              "count": 34,
+              "covered": 21,
+              "percent": 61.76470588235294
+            },
+            "regions": {
+              "count": 24,
+              "covered": 14,
+              "notcovered": 10,
+              "percent": 58.333333333333336
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/util/timing.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 3,
+              "covered": 3,
+              "percent": 100.0
+            },
+            "instantiations": {
+              "count": 6,
+              "covered": 4,
+              "percent": 66.66666666666666
+            },
+            "lines": {
+              "count": 10,
+              "covered": 10,
+              "percent": 100.0
+            },
+            "regions": {
+              "count": 3,
+              "covered": 3,
+              "notcovered": 0,
+              "percent": 100.0
+            }
+          }
+        },
+        {
+          "filename": "/root/project/autopush-common/src/util/user_agent.rs",
+          "summary": {
+            "branches": {
+              "count": 0,
+              "covered": 0,
+              "notcovered": 0,
+              "percent": 0.0
+            },
+            "functions": {
+              "count": 6,
+              "covered": 5,
+              "percent": 83.33333333333334
+            },
+            "instantiations": {
+              "count": 8,
+              "covered": 6,
+              "percent": 75.0
+            },
+            "lines": {
+              "count": 58,
+              "covered": 53,
+              "percent": 91.37931034482759
+            },
+            "regions": {
+              "count": 35,
+              "covered": 29,
+              "notcovered": 6,
+              "percent": 82.85714285714286
+            }
+          }
+        }
+      ],
+      "totals": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 1007,
+          "covered": 589,
+          "percent": 58.490566037735846
+        },
+        "instantiations": {
+          "count": 4773,
+          "covered": 1088,
+          "percent": 22.79488791116698
+        },
+        "lines": {
+          "count": 9441,
+          "covered": 5761,
+          "percent": 61.0210782756064
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 5021,
+          "covered": 2340,
+          "notcovered": 2681,
+          "percent": 46.60426209918343
+        }
+      }
+    }
+  ],
+  "type": "llvm.coverage.json.export",
+  "version": "2.0.1",
+  "cargo_llvm_cov": {
+    "version": "0.6.11",
+    "manifest_path": "/root/project/Cargo.toml"
+  }
+}

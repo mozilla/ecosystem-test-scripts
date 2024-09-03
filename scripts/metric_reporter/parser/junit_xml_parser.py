@@ -12,7 +12,7 @@ from typing import Any
 import defusedxml.ElementTree as ElementTree
 from pydantic import BaseModel, ValidationError
 
-from scripts.common.error import BaseError
+from scripts.metric_reporter.parser.base_parser import ParserError, JOB_DIRECTORY_PATTERN
 
 
 class JUnitXmlProperty(BaseModel):
@@ -89,12 +89,6 @@ class JUnitXmlJobTestSuites(BaseModel):
     test_suites: list[JUnitXmlTestSuites]
 
 
-class JUnitXmlParserError(BaseError):
-    """Custom exception for errors raised by the JUnit XML parser."""
-
-    pass
-
-
 class JUnitXmlParser:
     """Parses JUnit XML files."""
 
@@ -120,7 +114,7 @@ class JUnitXmlParser:
             else:
                 error_msg = f"Could not parse XML file, {xml_file_path}, unexpected tag: {tag}"
                 self.logger.error(error_msg)
-                raise JUnitXmlParserError(error_msg)
+                raise ParserError(error_msg)
         return test_case_dict
 
     def _parse_test_suite(self, test_suite, xml_file_path: Path) -> dict[str, Any]:
@@ -140,12 +134,15 @@ class JUnitXmlParser:
             list[JUnitXmlJobTestSuites]: A list of parsed `JUnitXMLJobTestSuites` objects.
 
         Raises:
-            JUnitXmlParserError: If there is an error reading or parsing the XML files.
+            ParserError: If there is an error reading or parsing the XML files.
         """
         artifact_list: list[JUnitXmlJobTestSuites] = []
         job_paths: list[Path] = sorted(artifact_path.iterdir())
         for job_path in job_paths:
-            job_number = int(job_path.name)
+            if match := JOB_DIRECTORY_PATTERN.match(job_path.name):
+                job_number = int(match.group("job_number"))
+            else:
+                raise ParserError(f"Unexpected job_path format: {job_path.name}")
             test_suites_list: list[JUnitXmlTestSuites] = []
             artifact_file_paths: list[Path] = sorted(job_path.glob("*.xml"))
             for artifact_file_path in artifact_file_paths:
@@ -174,7 +171,7 @@ class JUnitXmlParser:
                         m for t, m in error_mapping.items() if isinstance(error, t)
                     )
                     self.logger.error(error_msg, exc_info=error)
-                    raise JUnitXmlParserError(error_msg) from error
+                    raise ParserError(error_msg) from error
             artifact_list.append(
                 JUnitXmlJobTestSuites(job=job_number, test_suites=test_suites_list)
             )
