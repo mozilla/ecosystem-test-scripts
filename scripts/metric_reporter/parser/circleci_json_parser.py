@@ -11,7 +11,7 @@ from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
-from scripts.common.error import BaseError
+from scripts.metric_reporter.parser.base_parser import ParserError
 
 
 class CircleCIJob(BaseModel):
@@ -46,12 +46,6 @@ class CircleCIJobTestMetadata(BaseModel):
     test_metadata: list[CircleCITestMetadata] | None = None
 
 
-class CircleCIJsonParserError(BaseError):
-    """Custom exception for errors raised by the CircleCI JSON parser."""
-
-    pass
-
-
 class CircleCIJsonParser:
     """Parses CircleCI JSON test metadata files."""
 
@@ -67,8 +61,8 @@ class CircleCIJsonParser:
             list[CircleCIJobTestMetadata]: A list of CircleCIJobTestMetadata objects.
 
         Raises:
-            CircleCIJsonParserError: If there are errors reading files, or if there are issues with
-                                     parsing the JSON data.
+            ParserError: If there are errors reading files, or if there are issues with parsing the
+                         JSON data.
         """
         metadata_list: list[CircleCIJobTestMetadata] = []
         metadata_file_paths: list[Path] = sorted(metadata_path.iterdir())
@@ -87,5 +81,5 @@ class CircleCIJsonParser:
                 }
                 error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
                 self.logger.error(error_msg, exc_info=error)
-                raise CircleCIJsonParserError(error_msg) from error
+                raise ParserError(error_msg) from error
         return metadata_list
