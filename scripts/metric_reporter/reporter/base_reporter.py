@@ -8,8 +8,9 @@ import csv
 import logging
 from pathlib import Path
 from typing import Any, Sequence
-from pydantic import BaseModel
 
+from dateutil import parser
+from pydantic import BaseModel
 
 DATE_FORMAT = "%Y-%m-%d"
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -38,6 +39,14 @@ class BaseReporter:
 
     logger = logging.getLogger(__name__)
     results: Sequence[ReporterResultBase] = []
+
+    @staticmethod
+    def _extract_date(timestamp: str) -> str:
+        try:
+            datetime = parser.parse(timestamp)
+            return datetime.strftime(DATE_FORMAT)
+        except (ValueError, TypeError) as error:
+            raise ReporterError(f"Invalid timestamp format: {timestamp}") from error
 
     def output_csv(self, report_path: Path) -> None:
         """Output the results to a CSV file.

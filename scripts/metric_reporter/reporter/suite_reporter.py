@@ -266,8 +266,8 @@ class SuiteReporter(BaseReporter):
             results[metadata.job.job_number] = test_suite_result
         return results
 
-    @staticmethod
     def _parse_artifacts(
+        self,
         repository: str,
         workflow: str,
         test_suite: str,
@@ -285,7 +285,7 @@ class SuiteReporter(BaseReporter):
                 # Update date and timestamp at the test_suites level if not already set
                 if not test_suite_result.date and suites.timestamp:
                     test_suite_result.timestamp = suites.timestamp
-                    test_suite_result.date = suites.timestamp.split("T")[0]
+                    test_suite_result.date = self._extract_date(suites.timestamp)
                 run_time: float = 0
                 # A top level test_suites time is not always available. The top level time may
                 # not be equal to the sum of the test case times due to the use of threads/workers.
@@ -296,7 +296,7 @@ class SuiteReporter(BaseReporter):
                     # Update date and timestamp at the test_suite level if not already set
                     if not test_suite_result.date and suite.timestamp:
                         test_suite_result.timestamp = suite.timestamp
-                        test_suite_result.date = suite.timestamp.split("T")[0]
+                        test_suite_result.date = self._extract_date(suite.timestamp)
 
                     # Mocha test reporting has been known to inaccurately total the number of tests
                     # in the 'tests' attribute, so we count the number of test cases

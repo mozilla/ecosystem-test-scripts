@@ -25,6 +25,7 @@ class MetricReporterArgs(BaseModel):
     coverage_artifact_path: Path
     averages_csv_report_path: Path
     results_csv_report_path: Path
+    coverage_csv_report_path: Path
 
 
 class MetricReporterConfig(BaseModel):
@@ -113,6 +114,10 @@ class Config(BaseConfig):
                             results_csv_report_path=(
                                 Path(self.metric_reporter_config.reports_dir)
                                 / f"{repository}_{test_suite}_results.csv"
+                            ),
+                            coverage_csv_report_path=(
+                                Path(self.metric_reporter_config.reports_dir)
+                                / f"{repository}_{test_suite}_coverage.csv"
                             ),
                         )
                         test_metric_args_list.append(test_metric_args)
