@@ -21,7 +21,8 @@ pipelines = [
             "Integration Test - Servers (nightly)",
             "Integration Test - Servers - Auth (nightly)",
             "Integration Test - Servers - Auth V2 (nightly)",
-            "Functional Tests - Playwright (nightly)"
+            "Chromium Functional Tests - Playwright (nightly)",
+            "Firefox Functional Tests - Playwright (nightly)"
           ],
           "stage_smoke_tests": [
             "Smoke Test Stage - Playwright"
