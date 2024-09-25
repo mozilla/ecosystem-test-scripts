@@ -65,7 +65,7 @@ class CircleCIJsonParser:
                          JSON data.
         """
         metadata_list: list[CircleCIJobTestMetadata] = []
-        metadata_file_paths: list[Path] = sorted(metadata_path.iterdir())
+        metadata_file_paths: list[Path] = sorted(metadata_path.glob("*.json"))
         for metadata_file_path in metadata_file_paths:
             self.logger.info(f"Parsing {metadata_file_path}")
             try:
