@@ -77,7 +77,6 @@ follows:
 | \> 10m    | Slow - The test suite may require optimization             |
 | <= 10m    | Fast - The test suite runs within an acceptable time frame |
 
-
 ## Coverage Metrics
 
 _Supported Coverage Frameworks:_ [pytest-cov][8], [llvm-cov][9]
@@ -99,6 +98,7 @@ needs:
 | < 60%     | Low - Coverage should be improved                                                                                                                                           |
 
 ## Skip Rates
+
 _Supported Test Frameworks:_ [jest][1], [mocha][2], [nextest][3], [playwright][4], [pytest][5]\
 _Supported CI:_ [CircleCI][7]
 
@@ -117,11 +117,11 @@ follows:
 | 1% - 2%   | Caution - Test coverage is at risk, and the suite may become prone to silent failures |
 | <= 1%     | Healthy - Most of the test suite is running, ensuring comprehensive coverage          |
 
-
 Note: Playwright offers both `skipme` and `fixme` annotations, allowing for further refinement of
 this metric.
 
 ## Retry Rates
+
 _Supported Test Frameworks:_ [playwright][4]
 
 Retry rates track how often tests are re-executed following a failure. While retries can help
