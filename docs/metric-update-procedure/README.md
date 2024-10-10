@@ -69,10 +69,26 @@ To update the latest graphs and values for development teams, import each report
 - For `Import location`, select `Replace current sheet`, for `Separator type,` select
   `Detect automatically`, leave the `Convert text to numbers, dates, and formulas` box
    checked, and click `Import data.` The Google Sheet should now reflect the latest data.
-  
-3.3  If the report being imported is a results or coverage report. Convert the type of the date
+- If the report being imported is a results or coverage report. Convert the type of the date
      column to 'plain text' so that the graphs display at an even cadence. 
-- Highlight the `Date` column and in the top menu par select `Format > Number > Plain text`
+  - Highlight the `Date` column and in the top menu select `Format > Number > Plain text`
+
+3.3 Update Trend Table Dates
+
+- At the beginning of each week, in the Weekly Trends table:
+  - Update the `End` date to the current monday date
+  - Update the `Start` date to the last monday date
+  - Increment the week number
+  - **Example:**
+    - For week 40 in 2024, the `Start` value is 2024-09-30 and the `End` value is 2024-10-07
+
+- At the end of the quarter, in the Quarterly Trends table
+  - Update the `End` date to the last date of the quarter
+  - Update the `Start` date to the first date of the quarter
+  - Increment the quarter number
+  - **Example:** 
+    - For Q3 in 2024, the `Start` value is 2024-07-01 and the `End` value is 2024-09-30
+
 
 ## 4. Backup the latest `test_result_dir` to the ETE team folder
 
