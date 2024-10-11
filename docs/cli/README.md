@@ -18,6 +18,7 @@
 - [`install`](#install) -- Install dependencies.
 - [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
 - [`run_metric_reporter`](#run_metric_reporter) -- Run the Test Metric Reporter.
+- [`run_google_sheet_uploader`](#run_google_sheet_uploader) -- Run the Test Metric Reporter.
 - [`test`](#test) -- Run tests.
 - [`test_coverage`](#test_coverage) -- Run tests with coverage reporting.
 - [`test_coverage_html`](#test_coverage_html) -- Run tests and generate HTML coverage report.
@@ -191,3 +192,13 @@ make run_metric_reporter
 #### SEE ALSO
 
 - [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
+
+### `run_google_sheet_uploader`
+
+Run the Google Sheet Uploader.
+
+#### USAGE
+
+```sh
+make run_google_sheet_uploader
+```
