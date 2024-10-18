@@ -103,7 +103,7 @@ mappings = [
                 },
                 {
                     "file_name": "fxa_firefox_functional_tests_playwright_nightly_results.csv",
-                    "tab_name": "Nightly Integration Frontends Averages"
+                    "tab_name": "Nightly Firefox Functional Results"
                 },
                 {
                     "file_name": "fxa_integration_test_frontends_nightly_averages.csv",
@@ -115,7 +115,7 @@ mappings = [
                 },
                 {
                     "file_name": "fxa_integration_test_libraries_nightly_averages.csv",
-                    "tab_name": "Nightly Integration Libraries Avergaes"
+                    "tab_name": "Nightly Integration Libraries Averages"
                 },
                  {
                     "file_name": "fxa_integration_test_libraries_nightly_results.csv",
