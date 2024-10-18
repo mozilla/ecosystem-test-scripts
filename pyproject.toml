@@ -24,7 +24,7 @@ lint.ignore = ["D105", "D107", "D203", "D205", "D400"]
 lint.extend-ignore = ["E203"]
 # Ignore specific issues per file:
 # F401 - Module imported but unused in __init__.py
-lint.per-file-ignores = {"__init__.py" = ["F401"]}
+lint.per-file-ignores = { "__init__.py" = ["F401"] }
 # Enforce PEP 257 conventions for docstrings
 lint.pydocstyle = { convention = "pep257" }
 
@@ -74,6 +74,12 @@ defusedxml = "^0.7.1"
 pydantic = "^2.9.0"
 python-dateutil = "^2.9.0.post0"
 types-python-dateutil = "^2.9.0.20240906"
+
+[tool.poetry.group.google_sheet_uploader.dependencies]
+pandas = "^2.2.3"
+pydantic = "^2.9.0"
+google-api-python-client = "^2.149.0"
+google-auth = "^2.35.0"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.9"

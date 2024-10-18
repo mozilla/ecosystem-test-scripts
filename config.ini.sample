@@ -60,3 +60,154 @@ days_of_data = 2
 
 [metric_reporter]
 reports_dir = reports
+
+[google_sheet_uploader]
+reports_dir = reports
+service_account_file = google_sheets_key.json
+mappings = [
+        {
+            "sheet_id": "1abjtg2e-PHm8JDP5A629KFVA-eBc8I5VtFPcz_UCDQs",
+            "tabs": [
+                {
+                    "file_name": "autopushrs_integration_tests_averages.csv",
+                    "tab_name": "Integration Averages"
+                },
+                {
+                    "file_name": "autopushrs_integration_tests_results.csv",
+                    "tab_name": "Integration Results"
+                },
+                {
+                    "file_name": "autopushrs_rust_unit_tests_averages.csv",
+                    "tab_name": "Unit Averages"
+                },
+                {
+                    "file_name": "autopushrs_rust_unit_tests_coverage.csv",
+                    "tab_name": "Unit Coverage"
+                },
+                {
+                    "file_name": "autopushrs_rust_unit_tests_results.csv",
+                    "tab_name": "Unit Results"
+                }
+            ]
+        },
+        {
+            "sheet_id": "1qKwxsSI2RNo-qKZflETtBbyZ9b0ZUB_id2SL17_MmYo",
+            "tabs": [
+                {
+                    "file_name": "fxa_chromium_functional_tests_playwright_nightly_results.csv",
+                    "tab_name": "Nightly Chromium Functional Results"
+                },
+                {
+                    "file_name": "fxa_firefox_functional_tests_playwright_nightly_averages.csv",
+                    "tab_name": "Nightly Firefox Functional Averages"
+                },
+                {
+                    "file_name": "fxa_firefox_functional_tests_playwright_nightly_results.csv",
+                    "tab_name": "Nightly Integration Frontends Averages"
+                },
+                {
+                    "file_name": "fxa_integration_test_frontends_nightly_averages.csv",
+                    "tab_name": "Nightly Integration Frontends Averages"
+                },
+                {
+                    "file_name": "fxa_integration_test_frontends_nightly_results.csv",
+                    "tab_name": "Nightly Integration Frontends Results"
+                },
+                {
+                    "file_name": "fxa_integration_test_libraries_nightly_averages.csv",
+                    "tab_name": "Nightly Integration Libraries Avergaes"
+                },
+                 {
+                    "file_name": "fxa_integration_test_libraries_nightly_results.csv",
+                    "tab_name": "Nightly Integration Libraries Results"
+                },
+                {
+                    "file_name": "fxa_integration_test_servers_auth_nightly_averages.csv",
+                    "tab_name": "Nightly Integration Servers Auth Averages"
+                },
+                {
+                    "file_name": "fxa_integration_test_servers_auth_nightly_results.csv",
+                    "tab_name": "Nightly Integration Servers Auth Results"
+                },
+                {
+                    "file_name": "fxa_integration_test_servers_auth_v2_nightly_averages.csv",
+                    "tab_name": "Nightly Integration Servers Auth v2 Averages"
+                },
+                {
+                    "file_name": "fxa_integration_test_servers_auth_v2_nightly_results.csv",
+                    "tab_name": "Nightly Integration Servers Auth v2 Results"
+                },
+                {
+                    "file_name": "fxa_integration_test_servers_nightly_averages.csv",
+                    "tab_name": "Nightly Integration Servers Averages"
+                },
+                {
+                    "file_name": "fxa_integration_test_servers_nightly_results.csv",
+                    "tab_name": "Nightly Integration Servers Results"
+                },
+                {
+                    "file_name": "fxa_smoke_test_production_playwright_averages.csv",
+                    "tab_name": "Smoke Production Averages"
+                },
+                {
+                    "file_name": "fxa_smoke_test_production_playwright_results.csv",
+                    "sheet_id": "1qKwxsSI2RNo-qKZflETtBbyZ9b0ZUB_id2SL17_MmYo",
+                    "tab_name": "Smoke Production Results"
+                },
+                {
+                    "file_name": "fxa_smoke_test_stage_playwright_averages.csv",
+                    "tab_name": "Smoke Stage Averages"
+                },
+                {
+                    "file_name": "fxa_smoke_test_stage_playwright_results.csv",
+                    "tab_name": "Smoke Stage Results"
+                },
+                {
+                    "file_name": "fxa_unit_test_nightly_averages.csv",
+                    "tab_name": "Nightly Unit Averages"
+                },
+                {
+                    "file_name": "fxa_unit_test_nightly_results.csv",
+                    "tab_name": "Nightly Unit Results"
+                }
+            ]
+        },
+        {
+            "sheet_id": "1dZjfFVoYYPHmStCbyQkWXfBy9yvL10-g6OLQ3nU_25o",
+            "tabs": [
+                {
+                    "file_name": "merinopy_contract_tests_averages.csv",
+                    "tab_name": "Contract Averages"
+                },
+                {
+                    "file_name": "merinopy_contract_tests_results.csv",
+                    "tab_name": "Contract Results"
+                },
+                {
+                    "file_name": "merinopy_integration_tests_averages.csv",
+                    "tab_name": "Integration Averages"
+                },
+                {
+                    "file_name": "merinopy_integration_tests_coverage.csv",
+                    "tab_name": "Integration Coverage"
+                },
+                {
+                    "file_name": "merinopy_integration_tests_results.csv",
+                    "tab_name": "Integration Results"
+                },
+                {
+                    "file_name": "merinopy_unit_tests_averages.csv",
+                    "tab_name": "Unit Averages"
+                },
+                {
+                    "file_name": "merinopy_unit_tests_coverage.csv",
+                    "tab_name": "Unit Coverage"
+                },
+                {
+                    "file_name": "merinopy_unit_tests_results.csv",
+                    "tab_name": "Unit Results"
+                }
+            ]
+        }
+    ]
+;

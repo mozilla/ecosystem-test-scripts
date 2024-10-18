@@ -175,3 +175,6 @@ reports/
 
 # Documentation
 book/
+
+# Google Sheets Uploader
+google_sheets_key.json
