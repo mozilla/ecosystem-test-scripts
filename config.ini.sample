@@ -151,7 +151,6 @@ mappings = [
                 },
                 {
                     "file_name": "fxa_smoke_test_production_playwright_results.csv",
-                    "sheet_id": "1qKwxsSI2RNo-qKZflETtBbyZ9b0ZUB_id2SL17_MmYo",
                     "tab_name": "Smoke Production Results"
                 },
                 {
