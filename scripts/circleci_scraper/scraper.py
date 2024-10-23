@@ -30,6 +30,8 @@ from scripts.common.config import CommonConfig
 from scripts.common.error import BaseError
 
 COVERAGE_FILE_REGEX = r".*cov.*\.json$"
+CANCELED_JOB_STATUS = "canceled"
+RUNNING_JOB_STATUS = "running"
 
 
 class CircleCIScraperError(BaseError):
@@ -181,6 +183,13 @@ class CircleCIScraper:
                         logging.warning(
                             f"Skipping data for workflow {workflow.id} because the job number is "
                             f"missing for {organization}>{repository}>{workflow.name}>{job.name}"
+                        )
+                        continue
+                    if job.status in [CANCELED_JOB_STATUS, RUNNING_JOB_STATUS]:
+                        logging.warning(
+                            f"Skipping data for workflow {workflow.id}, "
+                            f"{organization}>{repository}>{workflow.name}>{job.name} because the"
+                            " job is in progress or cancelled."
                         )
                         continue
                     self.export_test_metadata_by_job(organization, repository, workflow.name, job)
