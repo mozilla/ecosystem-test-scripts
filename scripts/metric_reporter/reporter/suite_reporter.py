@@ -21,6 +21,7 @@ SUCCESS_RESULTS = {"success", "system-out"}
 FAILURE_RESULT = "failure"
 SKIPPED_RESULT = "skipped"
 CANCELED_JOB_STATUS = "canceled"
+RUNNING_JOB_STATUS = "running"
 
 
 class Status(Enum):
@@ -225,8 +226,8 @@ class SuiteReporter(BaseReporter):
 
         return sorted_results
 
-    @staticmethod
     def _parse_metadata(
+        self,
         repository: str,
         workflow: str,
         test_suite: str,
@@ -235,6 +236,13 @@ class SuiteReporter(BaseReporter):
         results: dict[int, SuiteReporterResult] = {}
         for metadata in metadata_list:
             if not metadata.test_metadata or metadata.job.status == CANCELED_JOB_STATUS:
+                continue
+
+            if metadata.job.status == RUNNING_JOB_STATUS:
+                self.logger.warning(
+                    f"Files from job {repository}/{workflow}/{test_suite}/{metadata.job.job_number}"
+                    " are incomplete. Please delete them and re-scrape."
+                )
                 continue
 
             started_at = datetime.strptime(metadata.job.started_at, DATETIME_FORMAT)
