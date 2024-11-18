@@ -93,6 +93,10 @@ mappings = [
         {
             "sheet_id": "1qKwxsSI2RNo-qKZflETtBbyZ9b0ZUB_id2SL17_MmYo",
             "tabs": [
+               {
+                    "file_name": "fxa_chromium_functional_tests_playwright_nightly_averages.csv",
+                    "tab_name": "Nightly Chromium Functional Averages"
+                },
                 {
                     "file_name": "fxa_chromium_functional_tests_playwright_nightly_results.csv",
                     "tab_name": "Nightly Chromium Functional Results"
