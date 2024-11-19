@@ -49,8 +49,7 @@ pipelines = [
         "workflows": {
           "main-workflow": [
             "unit-tests",
-            "integration-tests",
-            "contract-tests"
+            "integration-tests"
           ]
         }
       }
@@ -174,14 +173,6 @@ mappings = [
         {
             "sheet_id": "1dZjfFVoYYPHmStCbyQkWXfBy9yvL10-g6OLQ3nU_25o",
             "tabs": [
-                {
-                    "file_name": "merinopy_contract_tests_averages.csv",
-                    "tab_name": "Contract Averages"
-                },
-                {
-                    "file_name": "merinopy_contract_tests_results.csv",
-                    "tab_name": "Contract Results"
-                },
                 {
                     "file_name": "merinopy_integration_tests_averages.csv",
                     "tab_name": "Integration Averages"
