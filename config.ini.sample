@@ -57,9 +57,6 @@ pipelines = [
 ;(optional) Get data starting from x days past from now (default: all available data)
 days_of_data = 2
 
-[metric_reporter]
-reports_dir = reports
-
 [google_sheet_uploader]
 reports_dir = reports
 service_account_file = google_sheets_key.json
@@ -200,4 +197,61 @@ mappings = [
             ]
         }
     ]
+;
+
+[metric_reporter]
+reports_dir = reports
+
+[report_merger]
+reports_dir = reports
+merged_reports_dir = merged_reports
+mappings = {
+        "autopushrs_averages": [
+            "autopushrs_integration_tests_averages.csv",
+            "autopushrs_rust_unit_tests_averages.csv"
+        ],
+        "autopushrs_results": [
+            "autopushrs_integration_tests_results.csv",
+            "autopushrs_rust_unit_tests_results.csv"
+        ],
+        "autopushrs_coverage": [
+            "autopushrs_rust_unit_tests_coverage.csv"
+        ],
+       "fxa_averages": [
+            "fxa_chromium_functional_tests_playwright_nightly_averages.csv",
+            "fxa_firefox_functional_tests_playwright_nightly_averages.csv",
+            "fxa_integration_test_frontends_nightly_averages.csv",
+            "fxa_integration_test_libraries_nightly_averages.csv",
+            "fxa_integration_test_servers_auth_nightly_averages.csv",
+            "fxa_integration_test_servers_auth_v2_nightly_averages.csv",
+            "fxa_integration_test_servers_nightly_averages.csv",
+            "fxa_smoke_test_production_playwright_averages.csv",
+            "fxa_smoke_test_stage_playwright_averages.csv",
+            "fxa_unit_test_nightly_averages.csv"
+        ],
+        "fxa_results": [
+            "fxa_chromium_functional_tests_playwright_nightly_results.csv",
+            "fxa_firefox_functional_tests_playwright_nightly_results.csv",
+            "fxa_integration_test_frontends_nightly_results.csv",
+            "fxa_integration_test_libraries_nightly_results.csv",
+            "fxa_integration_test_servers_auth_nightly_results.csv",
+            "fxa_integration_test_servers_auth_v2_nightly_results.csv",
+            "fxa_integration_test_servers_nightly_results.csv",
+            "fxa_smoke_test_production_playwright_results.csv",
+            "fxa_smoke_test_stage_playwright_results.csv",
+            "fxa_unit_test_nightly_results.csv"
+        ],
+       "merinopy_averages": [
+            "merinopy_integration_tests_averages.csv",
+            "merinopy_unit_tests_averages.csv"
+        ],
+        "merinopy_results": [
+            "merinopy_integration_tests_results.csv",
+            "merinopy_unit_tests_results.csv"
+        ],
+        "merinopy_coverage": [
+            "merinopy_integration_tests_coverage.csv",
+            "merinopy_unit_tests_coverage.csv"
+        ]
+    }
 ;

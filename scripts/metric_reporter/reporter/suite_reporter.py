@@ -151,11 +151,11 @@ class SuiteReporterResult(ReporterResultBase):
             "Unknown": self.unknown,
             "Retry Count": self.retry,
             "Total": self.total,
-            "Success Rate (%)": self.success_rate,
-            "Failure Rate (%)": self.failure_rate,
-            "Skipped Rate (%)": self.skipped_rate,
-            "Fixme Rate (%)": self.fixme_rate,
-            "Unknown Rate (%)": self.unknown_rate,
+            "Success Rate": self.success_rate,
+            "Failure Rate": self.failure_rate,
+            "Skipped Rate": self.skipped_rate,
+            "Fixme Rate": self.fixme_rate,
+            "Unknown Rate": self.unknown_rate,
         }
 
 

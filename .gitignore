@@ -172,6 +172,7 @@ cython_debug/
 config.ini
 raw_data/
 reports/
+merged_reports/
 
 # Documentation
 book/
