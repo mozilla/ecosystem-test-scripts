@@ -10,43 +10,11 @@ The sheets are typically updated on Monday mornings (North America ET/PT) to ens
 available for team check-in meetings. The process of updating all three Google Sheets can take up
 to 10 minutes.
 
-## First set up (just has to be done once)
-
-### Prepare the auto-uploader to Google Sheets
-
-#### Step 1:Navigate to the ETE Google Cloud Project
-* Go to the [Google Cloud Console](https://console.cloud.google.com/apis/dashboard?project=ecosystem-test-eng).
-
-#### Step 2: Enable the Google Sheets API
-* In the Cloud Console, navigate to APIs & Services > Library.
-* Search for Google Sheets API and click on it.
-* Click Enable.
-
-#### Step 3: Create Credentials
-* Go to APIs & Services > Credentials.
-* Click on Create Credentials and select Service Account.
-* Provide a name and description, then click Create and Continue.
-* For Service account permissions, you can skip this step or assign roles as needed, then click Done.
-* After creating the service account, click on it to open its details.
-* Go to the Keys tab and click Add Key > Create New Key.
-* Select JSON and click Create. A JSON file will be downloaded.
-* Save it in the root directory of the project.
-
-#### Step 4: Share Google Sheets with the Service Account
-Your service account has an email like `your-service-account@your-project.iam.gserviceaccount.com`. You need to share the Google Sheets with this email:
-
-* Open each Google Sheet you want to access.
-* Click Share.
-* Add the service account's email with Editor permissions.
-
-#### Step 5: Preparing the `config.ini`
-The `config.ini.sample` already has the right Google IDs for the sheet and the tab names.
-It expects the Google API key (JSON file) in the root folder with the name `google_sheets_key.json`.
-
 ## Prerequisites
 
 Before updating the test metrics, ensure that:
 
+- Your development environment is setup with proper permissions (see [Developer Setup][4]).
 - You are on the latest version of the `main` branch
 - Your `config.ini` file in the root directory is up to date
 - You have the latest raw data in the ecosystem-test-scripts root directory.
@@ -85,21 +53,27 @@ _**Notes**:_
 - Coverage reports are produced only for Autopush-rs unit tests and Merino-py unit and integration
   tests.
 
-## 3. Import CSVs to Google Spreadsheets
+## 3. Import CSVs to Google Spreadsheets & Update Trend Table Dates
 
-To import the generated CSVs into the 3 different Google Spreadsheets, execute the following make command:
+### 3.1 Import CSVs to Google Spreadsheets
+
+To import the generated CSVs into the 3 different Google Spreadsheets, execute the following make
+command:
 
 ```shell
 make run_google_sheet_uploader
 ```
 
-This will go through the `reports` folder and takes every CSV file and imports them into the right spreadsheet and tab. This will happen based on the mapping in the `config.ini` file.
+This will go through the `reports` folder and import the CSV files into the right Google spreadsheet
+and tab. This will happen based on the mapping in the `config.ini` file.
 
-- If the report being imported is a results or coverage report. Convert the type of the date
-     column to 'plain text' so that the graphs display at an even cadence.
+_**Notes**:_
+
+- If the report being imported is a results or coverage report. It may be necessary to convert the
+  type of the date column to 'plain text' so that the graphs display at an even cadence.
   - Highlight the `Date` column and in the top menu select `Format > Number > Plain text`
 
-3.3 Update Trend Table Dates
+### 3.2 Update Trend Table Dates
 
 - At the beginning of each week, in the Weekly Trends table:
   - Update the `End` date to the current monday date
@@ -126,3 +100,4 @@ located in the [ETE team folder][0].
 [1]: https://docs.google.com/spreadsheets/d/1abjtg2e-PHm8JDP5A629KFVA-eBc8I5VtFPcz_UCDQs/edit?usp=drive_link
 [2]: https://docs.google.com/spreadsheets/d/1qKwxsSI2RNo-qKZflETtBbyZ9b0ZUB_id2SL17_MmYo/edit?usp=drive_link
 [3]: https://docs.google.com/spreadsheets/d/1dZjfFVoYYPHmStCbyQkWXfBy9yvL10-g6OLQ3nU_25o/edit?usp=drive_link
+[4]: ../developer-guides/developer_setup.md

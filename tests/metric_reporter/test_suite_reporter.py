@@ -582,7 +582,7 @@ EXPECTED_ARTIFACT_AND_METADATA_RESULTS: list[SuiteReporterResult] = [
 ]
 
 EXPECTED_ARTIFACT_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
+    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate,Failure Rate,Skipped Rate,Fixme Rate,Unknown Rate\r\n"
     "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,1.1,,1.1,0,1,0,0,0,1,1,0.0,100.0,0.0,0.0,0.0\r\n"
     "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,1.2,,1.2,0,0,1,1,0,0,1,0.0,0.0,100.0,100.0,0.0\r\n"
     "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,1.3,,1.3,1,0,0,0,0,1,1,100.0,0.0,0.0,0.0,0.0\r\n"
@@ -591,7 +591,7 @@ EXPECTED_ARTIFACT_CSV: str = (
 )
 
 EXPECTED_METADATA_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
+    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate,Failure Rate,Skipped Rate,Fixme Rate,Unknown Rate\r\n"
     "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,,3600.0,1.1,0,1,0,0,0,0,1,0.0,100.0,0.0,0.0,0.0\r\n"
     "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,,3600.0,1.2,0,0,1,0,0,0,1,0.0,0.0,100.0,0.0,0.0\r\n"
     "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,,3600.0,1.3,1,0,0,0,0,0,1,100.0,0.0,0.0,0.0,0.0\r\n"
@@ -601,7 +601,7 @@ EXPECTED_METADATA_CSV: str = (
 )
 
 EXPECTED_ARTIFACT_AND_METADATA_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate (%),Failure Rate (%),Skipped Rate (%),Fixme Rate (%),Unknown Rate (%)\r\n"
+    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate,Failure Rate,Skipped Rate,Fixme Rate,Unknown Rate\r\n"
     "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,1.1,3600.0,1.1,0,1,0,0,0,1,1,0.0,100.0,0.0,0.0,0.0\r\n"
     "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,1.2,3600.0,1.2,0,0,1,1,0,0,1,0.0,0.0,100.0,100.0,0.0\r\n"
     "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,1.3,3600.0,1.3,1,0,0,0,0,1,1,100.0,0.0,0.0,0.0,0.0\r\n"

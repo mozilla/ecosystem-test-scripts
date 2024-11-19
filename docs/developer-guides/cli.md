@@ -1,15 +1,5 @@
 # Command Line Tool
 
-## REQUIREMENTS
-
-- Personal [CircleCI API token](https://circleci.com/docs/managing-api-tokens/)
-- Python 3
-- Grit and determination
-
-## INSTALLATION
-
-- TODO
-
 ## COMMANDS
 
 - [`check`](#check) -- Run linting, formatting, security, and type checks.
@@ -17,8 +7,9 @@
 - [`format`](#format) -- Apply formatting.
 - [`install`](#install) -- Install dependencies.
 - [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
-- [`run_metric_reporter`](#run_metric_reporter) -- Run the Test Metric Reporter.
 - [`run_google_sheet_uploader`](#run_google_sheet_uploader) -- Run the Test Metric Reporter.
+- [`run_metric_reporter`](#run_metric_reporter) -- Run the Test Metric Reporter.
+- [`run_report_merger`](#run_report_merger) -- Run the Report Merger.
 - [`test`](#test) -- Run tests.
 - [`test_coverage`](#test_coverage) -- Run tests with coverage reporting.
 - [`test_coverage_html`](#test_coverage_html) -- Run tests and generate HTML coverage report.
@@ -179,6 +170,18 @@ If you have the previous day's data stored locally, the cached data will be used
 
 ---
 
+### `run_google_sheet_uploader`
+
+Run the Google Sheet Uploader.
+
+#### USAGE
+
+```sh
+make run_google_sheet_uploader
+```
+
+---
+
 ### `run_metric_reporter`
 
 Run the Test Metric Reporter.
@@ -193,12 +196,14 @@ make run_metric_reporter
 
 - [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
 
-### `run_google_sheet_uploader`
+---
 
-Run the Google Sheet Uploader.
+### `run_report_merger`
+
+Run the Report Merger.
 
 #### USAGE
 
 ```sh
-make run_google_sheet_uploader
+make run_report_merger
 ```
