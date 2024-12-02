@@ -32,6 +32,9 @@ class MetricReporterConfig(BaseModel):
     """Model for Metric Reporter configuration."""
 
     reports_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
+    gcp_project_id: str
+    bigquery_dataset_name: str
+    bigquery_service_account_file: str
 
 
 class Config(BaseConfig):
@@ -57,7 +60,19 @@ class Config(BaseConfig):
     def _parse_metric_reporter_config(self) -> MetricReporterConfig:
         try:
             reports_dir: str = self.config_parser.get("metric_reporter", "reports_dir")
-            return MetricReporterConfig(reports_dir=reports_dir)
+            gcp_project_id: str = self.config_parser.get("metric_reporter", "gcp_project_id")
+            bigquery_dataset_name: str = self.config_parser.get(
+                "metric_reporter", "bigquery_dataset_name"
+            )
+            bigquery_service_account_file: str = self.config_parser.get(
+                "metric_reporter", "bigquery_service_account_file"
+            )
+            return MetricReporterConfig(
+                reports_dir=reports_dir,
+                gcp_project_id=gcp_project_id,
+                bigquery_dataset_name=bigquery_dataset_name,
+                bigquery_service_account_file=bigquery_service_account_file,
+            )
         except (NoSectionError, NoOptionError, ValidationError) as error:
             error_mapping: dict[type, str] = {
                 NoSectionError: "The 'metric_reporter' section is missing",

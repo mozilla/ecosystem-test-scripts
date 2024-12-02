@@ -103,7 +103,7 @@ PYTEST_REPORT_RESULTS: list[CoverageReporterResult] = [
         workflow="main",
         test_suite="suite",
         date="2024-08-29",
-        timestamp="2024-08-29T17:43:41.679830",
+        timestamp="2024-08-29T17:43:41Z",
         job=1,
         line_count=3782,
         line_covered=3138,
@@ -118,7 +118,7 @@ PYTEST_REPORT_RESULTS: list[CoverageReporterResult] = [
 ]
 PYTEST_CSV: str = (
     "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Line Count,Line Covered,Line Not Covered,Line Excluded,Line Percent,Function Count,Function Covered,Function Not Covered,Function Percent,Branch Count,Branch Covered,Branch Not Covered,Branch Percent\r\n"
-    "repo,main,suite,2024-08-29,2024-08-29T17:43:41.679830,1,3782,3138,644,217,82.01058201058201,,,,,943,737,206,78.15482502651113\r\n"
+    "repo,main,suite,2024-08-29,2024-08-29T17:43:41Z,1,3782,3138,644,217,82.01058201058201,,,,,943,737,206,78.15482502651113\r\n"
 )
 
 

@@ -21,11 +21,12 @@ from scripts.metric_reporter.parser.coverage_json_parser import (
 from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites, JUnitXmlParser
 from scripts.metric_reporter.reporter.averages_reporter import AveragesReporter
 from scripts.metric_reporter.reporter.base_reporter import ReporterError
+from scripts.metric_reporter.reporter.bigquery_client import BigQueryClient
 from scripts.metric_reporter.reporter.coverage_reporter import CoverageReporter
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
 
 # Configure logging
-logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -42,34 +43,48 @@ def main(config_file: str = "config.ini") -> None:
         circleci_parser = CircleCIJsonParser()
         coverage_json_parser = CoverageJsonParser()
         junit_xml_parser = JUnitXmlParser()
+        bigquery_client = BigQueryClient(
+            config.metric_reporter_config.gcp_project_id,
+            config.metric_reporter_config.bigquery_dataset_name,
+            config.metric_reporter_config.bigquery_service_account_file,
+        )
         for args in config.metric_reporter_args:
             logger.info(f"Reporting for {args.repository} {args.workflow} {args.test_suite}")
+
+            # Parse files
             metadata_list: list[CircleCIJobTestMetadata] | None = None
             if args.metadata_path.is_dir():
                 metadata_list = circleci_parser.parse(args.metadata_path)
-
             junit_artifact_list: list[JUnitXmlJobTestSuites] | None = None
             if args.junit_artifact_path.is_dir():
                 junit_artifact_list = junit_xml_parser.parse(args.junit_artifact_path)
-
             coverage_artifact_list: list[LlvmCovReport | PytestReport] | None = None
             if args.coverage_artifact_path.is_dir():
                 coverage_artifact_list = coverage_json_parser.parse(args.coverage_artifact_path)
 
+            # Create reporters
             suite_reporter = SuiteReporter(
                 args.repository, args.workflow, args.test_suite, metadata_list, junit_artifact_list
             )
-            suite_reporter.output_csv(args.results_csv_report_path)
-
             averages_reporter = AveragesReporter(
                 args.repository, args.workflow, args.test_suite, suite_reporter.results
             )
-            averages_reporter.output_csv(args.averages_csv_report_path)
-
             coverage_reporter = CoverageReporter(
                 args.repository, args.workflow, args.test_suite, coverage_artifact_list
             )
+
+            # Output CSV files
+            # TODO make outputing csv optional
+            averages_reporter.output_csv(args.averages_csv_report_path)
             coverage_reporter.output_csv(args.coverage_csv_report_path)
+            suite_reporter.output_csv(args.results_csv_report_path)
+
+            # Update BigQuery dataset tables
+            # TODO make updating tables optional
+            averages_reporter.update_table(bigquery_client)
+            coverage_reporter.update_table(bigquery_client)
+            suite_reporter.update_table(bigquery_client)
+
         logger.info("Reporting complete")
     except InvalidConfigError as error:
         logger.error(f"Configuration error: {error}")

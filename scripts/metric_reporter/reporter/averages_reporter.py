@@ -5,15 +5,16 @@
 """Module for reporting test suite average results from CircleCI metadata."""
 
 import operator
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from functools import reduce
 from typing import Any, Sequence
 
+from scripts.metric_reporter.constants import DATE_FORMAT
 from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
     ReporterResultBase,
-    DATE_FORMAT,
 )
+from scripts.metric_reporter.reporter.bigquery_client import BigQueryClient
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporterResult, Status
 
 DAYS_1: int = 1
@@ -103,7 +104,38 @@ class AveragesReporter(BaseReporter):
             suite_results (Sequence[SuiteReporterResult]): Test suite results.
         """
         super().__init__()
-        self.results = self._parse_results(repository, workflow, test_suite, suite_results)
+        self.repository = repository
+        self.results: list[AveragesReporterResult] = self._parse_results(
+            repository, workflow, test_suite, suite_results
+        )
+
+    def update_table(self, client: BigQueryClient) -> None:
+        """Update the BigQuery table.
+
+        Args:
+            client (BigQueryClient): The client to interact with BigQuery.
+        """
+        table_name = f"{self.repository}_averages"
+
+        # TODO handle BigQueryError
+        last_update: date | None = client.get_averages_last_update_date(table_name)
+        if not last_update:
+            self.logger.warning(f"There are no results to update for {table_name}.")
+            return
+
+        # Filter results that occur after the last update timestamp for any of the end dates
+        new_results = [
+            r
+            for r in self.results
+            if datetime.strptime(r.stop_date_30, DATE_FORMAT).date() > last_update
+            or datetime.strptime(r.stop_date_60, DATE_FORMAT).date() > last_update
+            or datetime.strptime(r.stop_date_90, DATE_FORMAT).date() > last_update
+        ]
+
+        # TODO update the BigQuery table
+        # Log the new results for now
+        for result in new_results:
+            self.logger.info(f"New result to update: {result.dict_with_fieldnames()}")
 
     def _parse_results(
         self,
@@ -119,6 +151,15 @@ class AveragesReporter(BaseReporter):
         # Assumes that suite_results is sorted
         first_date: str | None = suite_results[0].date
         last_date: str | None = suite_results[-1].date
+        # Adjust last_date if it's today's date, all the information for the day may not be
+        # available to calculate a proper average.
+        if (
+            last_date
+            and last_date == datetime.now().strftime(DATE_FORMAT)
+            and len(suite_results) > 1
+        ):
+            last_date = suite_results[-2].date
+
         if not first_date or not last_date:
             return results
 

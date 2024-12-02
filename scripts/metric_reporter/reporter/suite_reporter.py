@@ -8,14 +8,14 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Sequence
 
+from scripts.metric_reporter.constants import DATE_FORMAT, DATETIME_FORMAT
 from scripts.metric_reporter.parser.circleci_json_parser import CircleCIJobTestMetadata
 from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites
 from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
     ReporterResultBase,
-    DATETIME_FORMAT,
-    DATE_FORMAT,
 )
+from scripts.metric_reporter.reporter.bigquery_client import BigQueryClient
 
 SUCCESS_RESULTS = {"success", "system-out"}
 FAILURE_RESULT = "failure"
@@ -182,9 +182,36 @@ class SuiteReporter(BaseReporter):
                                                                       XML artifacts.
         """
         super().__init__()
+        self.repository = repository
         self.results: Sequence[SuiteReporterResult] = self._parse_results(
             repository, workflow, test_suite, metadata_list, junit_artifact_list
         )
+
+    def update_table(self, client: BigQueryClient) -> None:
+        """Update the BigQuery table.
+
+        Args:
+            client (BigQueryClient): The client to interact with BigQuery.
+        """
+        table_name = f"{self.repository}_results"
+
+        # TODO handle BigQueryError
+        last_update: datetime | None = client.get_last_update_timestamp(table_name)
+        if not last_update:
+            self.logger.warning(f"There are no results to update for {table_name}.")
+            return
+
+        # Filter results that occur after the last update timestamp
+        new_results = [
+            r
+            for r in self.results
+            if r.timestamp and datetime.strptime(r.timestamp, DATETIME_FORMAT) > last_update
+        ]
+
+        # TODO update the BigQuery table
+        # Log the new results for now
+        for result in new_results:
+            self.logger.info(f"New result to update: {result.dict_with_fieldnames()}")
 
     def _parse_results(
         self,

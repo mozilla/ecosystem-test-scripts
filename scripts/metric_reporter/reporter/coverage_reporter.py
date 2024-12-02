@@ -4,8 +4,10 @@
 
 """Module for reporting test suite coverage results."""
 
+from datetime import datetime
 from typing import Any, Sequence
 
+from scripts.metric_reporter.constants import DATETIME_FORMAT, ISO_DATETIME_FORMAT
 from scripts.metric_reporter.parser.coverage_json_parser import (
     LlvmCovReport,
     LlvmCovTotals,
@@ -18,6 +20,7 @@ from scripts.metric_reporter.reporter.base_reporter import (
     ReporterResultBase,
     ReporterError,
 )
+from scripts.metric_reporter.reporter.bigquery_client import BigQueryClient
 
 
 class CoverageReporterResult(ReporterResultBase):
@@ -96,9 +99,36 @@ class CoverageReporter(BaseReporter):
                                                                          from test suites.
         """
         super().__init__()
+        self.repository = repository
         self.results: Sequence[CoverageReporterResult] = self._parse_results(
             repository, workflow, test_suite, coverage_artifact_list
         )
+
+    def update_table(self, client: BigQueryClient) -> None:
+        """Update the BigQuery table.
+
+        Args:
+            client (BigQueryClient): The client to interact with BigQuery.
+        """
+        table_name = f"{self.repository}_results"
+
+        # TODO handle BigQueryError
+        last_update: datetime | None = client.get_last_update_timestamp(table_name)
+        if not last_update:
+            self.logger.warning(f"There are no results to update for {table_name}.")
+            return
+
+        # Filter results that occur after the last update timestamp
+        new_results = [
+            r
+            for r in self.results
+            if r.timestamp and datetime.strptime(r.timestamp, DATETIME_FORMAT) > last_update
+        ]
+
+        # TODO update the BigQuery table
+        # Log the new results for now
+        for result in new_results:
+            self.logger.info(f"New result to update: {result.dict_with_fieldnames()}")
 
     def _parse_results(
         self,
@@ -163,12 +193,22 @@ class CoverageReporter(BaseReporter):
     ) -> CoverageReporterResult:
         totals: PytestTotals = pytest_report.totals
         meta: PytestMeta = pytest_report.meta
+
+        # Standardize Timestamp format
+        timestamp: str | None = (
+            pytest_report.job_timestamp
+            if pytest_report.job_timestamp
+            else datetime.strptime(meta.timestamp, ISO_DATETIME_FORMAT).strftime(DATETIME_FORMAT)
+            if meta.timestamp
+            else None
+        )
+
         return CoverageReporterResult(
             repository=repository,
             workflow=workflow,
             test_suite=test_suite,
-            timestamp=meta.timestamp,
-            date=self._extract_date(meta.timestamp) if meta.timestamp else None,
+            timestamp=timestamp,
+            date=self._extract_date(timestamp) if timestamp else None,
             job=pytest_report.job_number,
             line_count=totals.num_statements,
             line_covered=totals.covered_lines,
