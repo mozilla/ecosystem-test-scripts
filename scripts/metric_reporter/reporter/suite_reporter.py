@@ -8,14 +8,16 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Sequence
 
+from google.api_core.exceptions import GoogleAPIError, NotFound
+
 from scripts.metric_reporter.constants import DATE_FORMAT, DATETIME_FORMAT
 from scripts.metric_reporter.parser.circleci_json_parser import CircleCIJobTestMetadata
 from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites
 from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
     ReporterResultBase,
+    ReporterError,
 )
-from scripts.metric_reporter.reporter.bigquery_client import BigQueryClient
 
 SUCCESS_RESULTS = {"success", "system-out"}
 FAILURE_RESULT = "failure"
@@ -187,22 +189,25 @@ class SuiteReporter(BaseReporter):
             repository, workflow, test_suite, metadata_list, junit_artifact_list
         )
 
-    def update_table(self, client: BigQueryClient) -> None:
+    def update_table(self, client, project_id: str, dataset_name: str) -> None:
         """Update the BigQuery table.
 
         Args:
-            client (BigQueryClient): The client to interact with BigQuery.
+            client (TODO): The client to interact with BigQuery.
+            project_id (str): The BigQuery project ID.
+            dataset_name (str): The BigQuery dataset name.
         """
         table_name = f"{self.repository}_results"
 
-        # TODO handle BigQueryError
-        last_update: datetime | None = client.get_last_update_timestamp(table_name)
+        last_update: datetime | None = self._get_last_update(
+            client, project_id, dataset_name, table_name
+        )
         if not last_update:
             self.logger.warning(f"There are no results to update for {table_name}.")
             return
 
         # Filter results that occur after the last update timestamp
-        new_results = [
+        new_results: Sequence[SuiteReporterResult] = [
             r
             for r in self.results
             if r.timestamp and datetime.strptime(r.timestamp, DATETIME_FORMAT) > last_update
@@ -212,6 +217,37 @@ class SuiteReporter(BaseReporter):
         # Log the new results for now
         for result in new_results:
             self.logger.info(f"New result to update: {result.dict_with_fieldnames()}")
+
+    def _get_last_update(
+        self, client, project_id: str, dataset_name: str, table_name: str
+    ) -> datetime | None:
+        """Get the timestamp of the last update in the specified suite results table.
+
+        Args:
+            table_name (str): The name of the table to query.
+
+        Returns:
+            datetime | None: The timestamp of the last row in the table, or None if the table is empty.
+        """
+        query = f"""
+            SELECT FORMAT_TIMESTAMP('{DATETIME_FORMAT}', MAX(`Timestamp`)) as last_update 
+            FROM `{project_id}.{dataset_name}.{table_name}`
+        """  # nosec
+        try:
+            query_job = client.query(query)
+            result = query_job.result()
+            for row in result:
+                last_update: str | None = row["last_update"]
+                return datetime.strptime(last_update, DATETIME_FORMAT) if last_update else None
+            return None
+        except (GoogleAPIError, NotFound) as error:
+            error_mapping: dict[type, str] = {
+                GoogleAPIError: f"Error executing query: {query}",
+                NotFound: f"Dataset or Table not found for query: {query}",
+            }
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            self.logger.error(error_msg, exc_info=error)
+            raise ReporterError(error_msg) from error
 
     def _parse_results(
         self,

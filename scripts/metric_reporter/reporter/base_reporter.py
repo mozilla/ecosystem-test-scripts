@@ -13,7 +13,6 @@ from dateutil import parser
 from pydantic import BaseModel
 
 from scripts.metric_reporter.constants import DATE_FORMAT
-from scripts.metric_reporter.reporter.bigquery_client import BigQueryClient
 
 
 class ReporterResultBase(BaseModel):
@@ -80,11 +79,13 @@ class BaseReporter:
             self.logger.error(error_msg, exc_info=error)
             raise ReporterError(error_msg) from error
 
-    def update_table(self, client: BigQueryClient) -> None:
+    def update_table(self, client, project_id: str, dataset_name: str) -> None:
         """Update the BigQuery table.
 
         Args:
-            client (BigQueryClient): The client to interact with BigQuery.
+            client (TODO): The client to interact with BigQuery.
+            project_id (str): The BigQuery project ID.
+            dataset_name (str): The BigQuery dataset name.
 
         Raises:
             NotImplementedError: If the method is not implemented by a subclass.

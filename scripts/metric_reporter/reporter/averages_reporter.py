@@ -9,12 +9,14 @@ from datetime import date, datetime, timedelta
 from functools import reduce
 from typing import Any, Sequence
 
+from google.api_core.exceptions import GoogleAPIError, NotFound
+
 from scripts.metric_reporter.constants import DATE_FORMAT
 from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
     ReporterResultBase,
+    ReporterError,
 )
-from scripts.metric_reporter.reporter.bigquery_client import BigQueryClient
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporterResult, Status
 
 DAYS_1: int = 1
@@ -109,22 +111,27 @@ class AveragesReporter(BaseReporter):
             repository, workflow, test_suite, suite_results
         )
 
-    def update_table(self, client: BigQueryClient) -> None:
+    def update_table(self, client, project_id: str, dataset_name: str) -> None:
         """Update the BigQuery table.
 
         Args:
-            client (BigQueryClient): The client to interact with BigQuery.
+            client (TODO): The client to interact with BigQuery.
+            project_id (str): The BigQuery project ID.
+            dataset_name (str): The BigQuery dataset name.
         """
         table_name = f"{self.repository}_averages"
 
-        # TODO handle BigQueryError
-        last_update: date | None = client.get_averages_last_update_date(table_name)
+        last_update: date | None = self._get_last_update(
+            client, project_id, dataset_name, table_name
+        )
         if not last_update:
-            self.logger.warning(f"There are no results to update for {table_name}.")
+            self.logger.warning(
+                f"There are no results to update for {project_id}.{dataset_name}.{table_name}."
+            )
             return
 
         # Filter results that occur after the last update timestamp for any of the end dates
-        new_results = [
+        new_results: list[AveragesReporterResult] = [
             r
             for r in self.results
             if datetime.strptime(r.stop_date_30, DATE_FORMAT).date() > last_update
@@ -136,6 +143,40 @@ class AveragesReporter(BaseReporter):
         # Log the new results for now
         for result in new_results:
             self.logger.info(f"New result to update: {result.dict_with_fieldnames()}")
+
+    def _get_last_update(
+        self, client, project_id: str, dataset_name: str, table_name: str
+    ) -> date | None:
+        """Get the date of the last update in the specified averages table.
+
+        Args:
+            client (TODO): The client to interact with BigQuery.
+            project_id (str): The BigQuery project ID.
+            dataset_name (str): The BigQuery dataset name.
+            table_name (str): The name of the table to query.
+
+        Returns:
+            datetime | None: The date of the last row in the table, or None if the table is empty.
+        """
+        query = f"""
+            SELECT GREATEST(MAX(`End Date 30`), MAX(`End Date 60`), MAX(`End Date 90`)) as last_update 
+            FROM `{project_id}.{dataset_name}.{table_name}`
+        """  # nosec
+        try:
+            query_job = client.query(query)
+            result = query_job.result()
+            for row in result:
+                last_update: date | None = row["last_update"]
+                return last_update
+            return None
+        except (GoogleAPIError, NotFound) as error:
+            error_mapping: dict[type, str] = {
+                GoogleAPIError: f"Error executing query: {query}",
+                NotFound: f"Dataset or Table not found for query: {query}",
+            }
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            self.logger.error(error_msg, exc_info=error)
+            raise ReporterError(error_msg) from error
 
     def _parse_results(
         self,

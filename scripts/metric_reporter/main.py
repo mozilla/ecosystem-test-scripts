@@ -7,6 +7,9 @@
 import argparse
 import logging
 
+from google.cloud import bigquery
+from google.oauth2 import service_account
+
 from scripts.metric_reporter.config import Config, InvalidConfigError
 from scripts.metric_reporter.parser.base_parser import ParserError
 from scripts.metric_reporter.parser.circleci_json_parser import (
@@ -21,7 +24,6 @@ from scripts.metric_reporter.parser.coverage_json_parser import (
 from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites, JUnitXmlParser
 from scripts.metric_reporter.reporter.averages_reporter import AveragesReporter
 from scripts.metric_reporter.reporter.base_reporter import ReporterError
-from scripts.metric_reporter.reporter.bigquery_client import BigQueryClient
 from scripts.metric_reporter.reporter.coverage_reporter import CoverageReporter
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
 
@@ -43,11 +45,15 @@ def main(config_file: str = "config.ini") -> None:
         circleci_parser = CircleCIJsonParser()
         coverage_json_parser = CoverageJsonParser()
         junit_xml_parser = JUnitXmlParser()
-        bigquery_client = BigQueryClient(
-            config.metric_reporter_config.gcp_project_id,
-            config.metric_reporter_config.bigquery_dataset_name,
-            config.metric_reporter_config.bigquery_service_account_file,
+        gcp_project_id: str = config.metric_reporter_config.gcp_project_id
+        bigquery_dataset_name: str = config.metric_reporter_config.bigquery_dataset_name
+        bigquery_service_account_file: str = (
+            config.metric_reporter_config.bigquery_service_account_file
         )
+        credentials = service_account.Credentials.from_service_account_file(
+            bigquery_service_account_file
+        )  # type: ignore
+        bigquery_client = bigquery.Client(credentials=credentials, project=gcp_project_id)
         for args in config.metric_reporter_args:
             logger.info(f"Reporting for {args.repository} {args.workflow} {args.test_suite}")
 
@@ -81,9 +87,9 @@ def main(config_file: str = "config.ini") -> None:
 
             # Update BigQuery dataset tables
             # TODO make updating tables optional
-            averages_reporter.update_table(bigquery_client)
-            coverage_reporter.update_table(bigquery_client)
-            suite_reporter.update_table(bigquery_client)
+            averages_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
+            coverage_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
+            suite_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
 
         logger.info("Reporting complete")
     except InvalidConfigError as error:
