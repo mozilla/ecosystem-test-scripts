@@ -28,32 +28,50 @@ from scripts.metric_reporter.reporter.coverage_reporter import CoverageReporter
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
-def main(config_file: str = "config.ini") -> None:
+def main(
+    config_file: str = "config.ini",
+    output_csv: bool | None = None,
+    update_bigquery: bool | None = None,
+) -> None:
     """Run the Metric Reporter.
 
     Args:
         config_file (str): Path to the configuration file.
-                           Defaults to 'ecosystem-test-scripts/config.ini'.
+        output_csv (bool | None): Whether to output CSV files. Overrides config file if provided.
+        update_bigquery (bool | None): Whether to update BigQuery tables. Overrides config file if provided.
     """
     try:
         logger.info(f"Starting Metric Reporter with configuration file: {config_file}")
         config = Config(config_file)
-        circleci_parser = CircleCIJsonParser()
-        coverage_json_parser = CoverageJsonParser()
-        junit_xml_parser = JUnitXmlParser()
         gcp_project_id: str = config.metric_reporter_config.gcp_project_id
         bigquery_dataset_name: str = config.metric_reporter_config.bigquery_dataset_name
         bigquery_service_account_file: str = (
             config.metric_reporter_config.bigquery_service_account_file
         )
+        output_csv = (
+            output_csv if output_csv is not None else config.metric_reporter_config.output_csv
+        )
+        update_bigquery = (
+            update_bigquery
+            if update_bigquery is not None
+            else config.metric_reporter_config.update_bigquery
+        )
+
+        # Create Parsers
+        circleci_parser = CircleCIJsonParser()
+        coverage_json_parser = CoverageJsonParser()
+        junit_xml_parser = JUnitXmlParser()
+
+        # Create BigQuery client
         credentials = service_account.Credentials.from_service_account_file(
             bigquery_service_account_file
         )  # type: ignore
         bigquery_client = bigquery.Client(credentials=credentials, project=gcp_project_id)
+
         for args in config.metric_reporter_args:
             logger.info(f"Reporting for {args.repository} {args.workflow} {args.test_suite}")
 
@@ -79,17 +97,26 @@ def main(config_file: str = "config.ini") -> None:
                 args.repository, args.workflow, args.test_suite, coverage_artifact_list
             )
 
-            # Output CSV files
-            # TODO make outputing csv optional
-            averages_reporter.output_csv(args.averages_csv_report_path)
-            coverage_reporter.output_csv(args.coverage_csv_report_path)
-            suite_reporter.output_csv(args.results_csv_report_path)
+            if not output_csv and not update_bigquery:
+                logger.warning(
+                    "The metric reporter will not perform any action. Use the --output_csv or --update_bigquery flags."
+                )
 
-            # Update BigQuery dataset tables
-            # TODO make updating tables optional
-            averages_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
-            coverage_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
-            suite_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
+            # Output CSV files if opted-in
+            if output_csv:
+                averages_reporter.output_csv(args.averages_csv_report_path)
+                coverage_reporter.output_csv(args.coverage_csv_report_path)
+                suite_reporter.output_csv(args.results_csv_report_path)
+
+            # Update BigQuery dataset tables if opted-in
+            if update_bigquery:
+                averages_reporter.update_table(
+                    bigquery_client, gcp_project_id, bigquery_dataset_name
+                )
+                coverage_reporter.update_table(
+                    bigquery_client, gcp_project_id, bigquery_dataset_name
+                )
+                suite_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
 
         logger.info("Reporting complete")
     except InvalidConfigError as error:
@@ -105,5 +132,11 @@ def main(config_file: str = "config.ini") -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the Metric Reporter")
     parser.add_argument("--config", help="Path to the config.ini file", default="config.ini")
+    parser.add_argument("--output_csv", help="Output CSV files", type=bool, default=None)
+    parser.add_argument("--update_bigquery", help="Update BigQuery tables", type=bool, default=None)
     parser_args = parser.parse_args()
-    main(parser_args.config)
+    main(
+        parser_args.config,
+        output_csv=parser_args.output_csv,
+        update_bigquery=parser_args.update_bigquery,
+    )
