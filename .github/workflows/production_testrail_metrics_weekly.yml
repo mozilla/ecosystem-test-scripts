@@ -12,13 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out source repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          repository: mozilla-mobile/testops-dashboard
       - name: Setup python
         uses: actions/setup-python@v1
       - name: Establish Cloud SQL Proxy
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: '${{ secrets.GCLOUD_AUTH }}'
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Install requirements
         run: pip install -r requirements.txt
       - name: Set env vars
