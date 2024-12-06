@@ -1,0 +1,47 @@
+name: Ecosystem TestRail metrics WEEKLY
+
+# Sat. @4am UTC
+on:
+  schedule:
+    - cron:  "0 4 * * 6" 
+  workflow_dispatch:
+jobs:
+  deploy:
+    name: Ecosystem TestRail metrics (WEEKLY)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v4
+        with:
+          repository: mozilla-mobile/testops-dashboard
+      - name: Setup python
+        uses: actions/setup-python@v1
+      - name: Authenticate to Google
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Enable cloud SQL proxy to temp instance
+        run: |
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.7.0/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          nohup ./cloud-sql-proxy ${{ secrets.CLOUD_SQL_CONNECTION_NAME }} > cloud-sql-proxy.out 2> cloud-sql-proxy.err < /dev/null &
+          echo $!
+          echo CLOUD_SQL_PROXY_PID=$(echo $!) >> $GITHUB_ENV
+      - name: Install requirements
+        run: pip install -r requirements.txt
+      - name: Set env vars
+        run: |
+            echo "CLOUD_SQL_DATABASE_USERNAME=${{ secrets.CLOUD_SQL_DATABASE_USERNAME }}" >> $GITHUB_ENV
+            echo "CLOUD_SQL_DATABASE_PASSWORD=${{ secrets.CLOUD_SQL_DATABASE_PASSWORD }}" >> $GITHUB_ENV
+            echo "CLOUD_SQL_DATABASE_NAME=stage-test-metrics" >> $GITHUB_ENV
+            echo "CLOUD_SQL_DATABASE_PORT=${{ secrets.CLOUD_SQL_DATABASE_PORT }}" >> $GITHUB_ENV
+            echo "TESTRAIL_HOST=${{ secrets.TESTRAIL_HOST }}" >> $GITHUB_ENV
+            echo "TESTRAIL_USERNAME=${{ secrets.TESTRAIL_USERNAME }}" >> $GITHUB_ENV
+            echo "TESTRAIL_PASSWORD=${{ secrets.TESTRAIL_PASSWORD }}" >> $GITHUB_ENV
+      - name: Update DB - test coverage
+        run: python ./__main__.py --report-type test-case-coverage --platform ecosystem --project ${{ vars.ECOSYSTEM_PROJECTS }}
+      - name: Set job log URL
+        if: always()
+        run: echo "JOB_LOG_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
