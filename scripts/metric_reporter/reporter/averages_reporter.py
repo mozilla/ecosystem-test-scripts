@@ -122,6 +122,13 @@ class AveragesReporter(BaseReporter):
         """
         table_id = f"{project_id}.{dataset_name}.{self.repository}_averages"
 
+        if not self.results:
+            self.logger.warning(
+                f"There are no averages for {self.repository}/{self.workflow}/{self.test_suite} to "
+                f"add to {table_id}."
+            )
+            return
+
         last_update: date | None = self._get_last_update(client, table_id)
 
         # If no 'last_update' insert all results, else insert results that occur after the last
@@ -139,8 +146,8 @@ class AveragesReporter(BaseReporter):
         )
         if not new_results:
             self.logger.warning(
-                f"There are no averages for {self.repository}/{self.workflow}/{self.test_suite} to "
-                f"add to {table_id}."
+                f"There are no new averages for {self.repository}/{self.workflow}/{self.test_suite}"
+                f" to add to {table_id}."
             )
             return
 

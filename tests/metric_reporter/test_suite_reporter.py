@@ -6,6 +6,7 @@
 
 import logging
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -610,6 +611,153 @@ EXPECTED_ARTIFACT_AND_METADATA_CSV: str = (
     "repo,main,suite,2024-01-06,2024-01-06T00:00:00Z,6,unknown,,3600.0,1.6,0,0,0,0,1,0,1,0.0,0.0,0.0,0.0,100.0\r\n"
 )
 
+EXPECTED_ARTIFACT_AND_METADATA_JSON: list[dict[str, Any]] = [
+    {
+        "Repository": "repo",
+        "Workflow": "main",
+        "Test Suite": "suite",
+        "Date": "2024-01-01",
+        "Timestamp": "2024-01-01T00:00:00Z",
+        "Job Number": 1,
+        "Status": "failed",
+        "Execution Time": 1.1,
+        "Job Time": 3600.0,
+        "Run Time": 1.1,
+        "Success": 0,
+        "Failure": 1,
+        "Skipped": 0,
+        "Fixme": 0,
+        "Unknown": 0,
+        "Retry Count": 1,
+        "Total": 1,
+        "Success Rate": 0.0,
+        "Failure Rate": 100.0,
+        "Skipped Rate": 0.0,
+        "Fixme Rate": 0.0,
+        "Unknown Rate": 0.0,
+    },
+    {
+        "Repository": "repo",
+        "Workflow": "main",
+        "Test Suite": "suite",
+        "Date": "2024-01-02",
+        "Timestamp": "2024-01-02T00:00:00Z",
+        "Job Number": 2,
+        "Status": "success",
+        "Execution Time": 1.2,
+        "Job Time": 3600.0,
+        "Run Time": 1.2,
+        "Success": 0,
+        "Failure": 0,
+        "Skipped": 1,
+        "Fixme": 1,
+        "Unknown": 0,
+        "Retry Count": 0,
+        "Total": 1,
+        "Success Rate": 0.0,
+        "Failure Rate": 0.0,
+        "Skipped Rate": 100.0,
+        "Fixme Rate": 100.0,
+        "Unknown Rate": 0.0,
+    },
+    {
+        "Repository": "repo",
+        "Workflow": "main",
+        "Test Suite": "suite",
+        "Date": "2024-01-03",
+        "Timestamp": "2024-01-03T00:00:00Z",
+        "Job Number": 3,
+        "Status": "success",
+        "Execution Time": 1.3,
+        "Job Time": 3600.0,
+        "Run Time": 1.3,
+        "Success": 1,
+        "Failure": 0,
+        "Skipped": 0,
+        "Fixme": 0,
+        "Unknown": 0,
+        "Retry Count": 1,
+        "Total": 1,
+        "Success Rate": 100.0,
+        "Failure Rate": 0.0,
+        "Skipped Rate": 0.0,
+        "Fixme Rate": 0.0,
+        "Unknown Rate": 0.0,
+    },
+    {
+        "Repository": "repo",
+        "Workflow": "main",
+        "Test Suite": "suite",
+        "Date": "2024-01-04",
+        "Timestamp": "2024-01-04T00:00:00Z",
+        "Job Number": 4,
+        "Status": "success",
+        "Execution Time": 1.4,
+        "Job Time": 3600.0,
+        "Run Time": 1.4,
+        "Success": 0,
+        "Failure": 0,
+        "Skipped": 1,
+        "Fixme": 0,
+        "Unknown": 0,
+        "Retry Count": 0,
+        "Total": 1,
+        "Success Rate": 0.0,
+        "Failure Rate": 0.0,
+        "Skipped Rate": 100.0,
+        "Fixme Rate": 0.0,
+        "Unknown Rate": 0.0,
+    },
+    {
+        "Repository": "repo",
+        "Workflow": "main",
+        "Test Suite": "suite",
+        "Date": "2024-01-05",
+        "Timestamp": "2024-01-05T00:00:00Z",
+        "Job Number": 5,
+        "Status": "success",
+        "Execution Time": 1.5,
+        "Job Time": 3600.0,
+        "Run Time": 1.5,
+        "Success": 1,
+        "Failure": 0,
+        "Skipped": 0,
+        "Fixme": 0,
+        "Unknown": 0,
+        "Retry Count": 0,
+        "Total": 1,
+        "Success Rate": 100.0,
+        "Failure Rate": 0.0,
+        "Skipped Rate": 0.0,
+        "Fixme Rate": 0.0,
+        "Unknown Rate": 0.0,
+    },
+    {
+        "Repository": "repo",
+        "Workflow": "main",
+        "Test Suite": "suite",
+        "Date": "2024-01-06",
+        "Timestamp": "2024-01-06T00:00:00Z",
+        "Job Number": 6,
+        "Status": "unknown",
+        "Execution Time": None,
+        "Job Time": 3600.0,
+        "Run Time": 1.6,
+        "Success": 0,
+        "Failure": 0,
+        "Skipped": 0,
+        "Fixme": 0,
+        "Unknown": 1,
+        "Retry Count": 0,
+        "Total": 1,
+        "Success Rate": 0.0,
+        "Failure Rate": 0.0,
+        "Skipped Rate": 0.0,
+        "Fixme Rate": 0.0,
+        "Unknown Rate": 100.0,
+    },
+]
+
 
 @pytest.mark.parametrize(
     "metadata_list, artifact_list, expected_results",
@@ -673,7 +821,7 @@ def test_suite_reporter_output_csv(
     artifact_list: list[JUnitXmlJobTestSuites] | None,
     expected_csv: str,
 ) -> None:
-    """Test SuiteReporter output_results_csv method with test results.
+    """Test SuiteReporter output_csv method with test results.
 
     Args:
         test_data_directory (Path): Test data directory for the Metric Reporter.
@@ -703,7 +851,7 @@ def test_suite_reporter_output_csv(
 def test_suite_reporter_output_csv_with_empty_test_results(
     test_data_directory: Path, caplog: LogCaptureFixture, mocker: MockerFixture
 ) -> None:
-    """Test SuiteReporter output_results_csv method with no test results.
+    """Test SuiteReporter output_csv method with no test results.
 
     Args:
         test_data_directory (Path): Test data directory for the Metric Reporter.
@@ -727,4 +875,146 @@ def test_suite_reporter_output_csv_with_empty_test_results(
         reporter.output_csv(report_path)
 
         mock_open.assert_not_called()
+        assert expected_log in caplog.text
+
+
+def test_suite_reporter_update_table_with_new_test_results(
+    test_data_directory: Path, mocker: MockerFixture
+) -> None:
+    """Test SuiteReporter update_table method with new test results.
+
+    Args:
+        test_data_directory (Path): Test data directory for the Metric Reporter.
+        mocker (MockerFixture): pytest_mock fixture for mocking.
+    """
+    repository = "repo"
+    workflow = "main"
+    test_suite = "suite"
+    metadata_list: list[CircleCIJobTestMetadata] | None = CIRCLECI_JOB_TEST_METADATA_LIST
+    artifact_list: list[JUnitXmlJobTestSuites] | None = JUNIT_XML_JOB_TEST_SUITES_LIST
+    project_id = "project"
+    dataset_name = "dataset"
+    reporter = SuiteReporter(repository, workflow, test_suite, metadata_list, artifact_list)
+
+    get_last_update_query_mock = mocker.MagicMock()
+    get_last_update_query_mock.result.return_value = [{"last_update": "2023-01-01T00:00:00Z"}]
+    check_rows_exist_query_mock = mocker.MagicMock()
+    check_rows_exist_query_mock.result.return_value = []
+    client_mock = mocker.MagicMock()
+    client_mock.query.side_effect = [get_last_update_query_mock, check_rows_exist_query_mock]
+    client_mock.insert_rows_json.return_value = []
+
+    expected_table_id = f"{project_id}.{dataset_name}.{repository}_results"
+
+    reporter.update_table(client_mock, project_id, dataset_name)
+
+    client_mock.insert_rows_json.assert_called_once_with(
+        expected_table_id, EXPECTED_ARTIFACT_AND_METADATA_JSON
+    )
+
+
+def test_suite_reporter_update_table_with_new_test_results_and_a_detected_duplication(
+    test_data_directory: Path, caplog: LogCaptureFixture, mocker: MockerFixture
+) -> None:
+    """Test SuiteReporter update_table method with new test results, but a duplicate is found before
+       insertion.
+
+    Args:
+        test_data_directory (Path): Test data directory for the Metric Reporter.
+        caplog (LogCaptureFixture): pytest fixture for capturing log output.
+        mocker (MockerFixture): pytest_mock fixture for mocking.
+    """
+    repository = "repo"
+    workflow = "main"
+    test_suite = "suite"
+    metadata_list: list[CircleCIJobTestMetadata] | None = CIRCLECI_JOB_TEST_METADATA_LIST
+    artifact_list: list[JUnitXmlJobTestSuites] | None = JUNIT_XML_JOB_TEST_SUITES_LIST
+    project_id = "project"
+    dataset_name = "dataset"
+    reporter = SuiteReporter(repository, workflow, test_suite, metadata_list, artifact_list)
+
+    get_last_update_query_mock = mocker.MagicMock()
+    get_last_update_query_mock.result.return_value = [{"last_update": "2024-01-05T00:00:00Z"}]
+    check_rows_exist_query_mock = mocker.MagicMock()
+    check_rows_exist_query_mock.result.return_value = [{"1": 1}]
+    client_mock = mocker.MagicMock()
+    client_mock.query.side_effect = [get_last_update_query_mock, check_rows_exist_query_mock]
+
+    expected_log = (
+        f"Detected one or more results from "
+        f"{repository}/{workflow}/{test_suite} already exist in table "
+        f"{project_id}.{dataset_name}.{repository}_results. Aborting insert."
+    )
+
+    with caplog.at_level(logging.WARNING):
+        reporter.update_table(client_mock, project_id, dataset_name)
+
+        assert expected_log in caplog.text
+
+
+def test_suite_reporter_update_table_without_new_test_results(
+    test_data_directory: Path, caplog: LogCaptureFixture, mocker: MockerFixture
+) -> None:
+    """Test SuiteReporter update_table method with old test results.
+
+    Args:
+        test_data_directory (Path): Test data directory for the Metric Reporter.
+        caplog (LogCaptureFixture): pytest fixture for capturing log output.
+        mocker (MockerFixture): pytest_mock fixture for mocking.
+    """
+    repository = "repo"
+    workflow = "main"
+    test_suite = "suite"
+    metadata_list: list[CircleCIJobTestMetadata] | None = CIRCLECI_JOB_TEST_METADATA_LIST
+    artifact_list: list[JUnitXmlJobTestSuites] | None = JUNIT_XML_JOB_TEST_SUITES_LIST
+    project_id = "project"
+    dataset_name = "dataset"
+    reporter = SuiteReporter(repository, workflow, test_suite, metadata_list, artifact_list)
+
+    get_last_update_query_mock = mocker.MagicMock()
+    get_last_update_query_mock.result.return_value = [{"last_update": "2024-01-06T00:00:00Z"}]
+    mock_client = mocker.MagicMock()
+    mock_client.query.return_value = get_last_update_query_mock
+
+    expected_log = (
+        f"There are no new results for {repository}/{workflow}/{test_suite} to add to "
+        f"{project_id}.{dataset_name}.{repository}_results."
+    )
+
+    with caplog.at_level(logging.INFO):
+        reporter.update_table(mock_client, project_id, dataset_name)
+
+        assert expected_log in caplog.text
+
+
+def test_suite_reporter_update_table_with_empty_test_results(
+    test_data_directory: Path, caplog: LogCaptureFixture, mocker: MockerFixture
+) -> None:
+    """Test SuiteReporter update_table method with no test results.
+
+    Args:
+        test_data_directory (Path): Test data directory for the Metric Reporter.
+        caplog (LogCaptureFixture): pytest fixture for capturing log output.
+        mocker (MockerFixture): pytest_mock fixture for mocking.
+    """
+    repository = "repo"
+    workflow = "main"
+    test_suite = "suite"
+    project_id = "project"
+    dataset_name = "dataset"
+    metadata_list: list[CircleCIJobTestMetadata] | None = None
+    artifact_list: list[JUnitXmlJobTestSuites] | None = None
+    reporter = SuiteReporter(repository, workflow, test_suite, metadata_list, artifact_list)
+
+    client_mock = mocker.MagicMock()
+
+    expected_log = (
+        f"There are no results for {repository}/{workflow}/{test_suite} to add to "
+        f"{project_id}.{dataset_name}.{repository}_results."
+    )
+
+    with caplog.at_level(logging.INFO):
+        reporter.update_table(client_mock, project_id, dataset_name)
+
+        assert client_mock.mock_calls == [], "Expected no interactions with the mock client."
         assert expected_log in caplog.text

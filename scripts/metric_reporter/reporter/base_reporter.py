@@ -83,7 +83,7 @@ class BaseReporter:
         """Update the BigQuery table.
 
         Args:
-            client (TODO): The client to interact with BigQuery.
+            client (Client): The client to interact with BigQuery.
             project_id (str): The BigQuery project ID.
             dataset_name (str): The BigQuery dataset name.
 
