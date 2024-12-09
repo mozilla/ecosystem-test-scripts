@@ -9,7 +9,8 @@ from datetime import date, datetime, timedelta
 from functools import reduce
 from typing import Any, Sequence
 
-from google.api_core.exceptions import GoogleAPIError, NotFound
+from google.api_core.exceptions import GoogleAPIError
+from google.cloud.bigquery import Client, QueryJobConfig, ScalarQueryParameter
 
 from scripts.metric_reporter.constants import DATE_FORMAT
 from scripts.metric_reporter.reporter.base_reporter import (
@@ -107,72 +108,164 @@ class AveragesReporter(BaseReporter):
         """
         super().__init__()
         self.repository = repository
-        self.results: list[AveragesReporterResult] = self._parse_results(
-            repository, workflow, test_suite, suite_results
-        )
+        self.workflow = workflow
+        self.test_suite = test_suite
+        self.results: list[AveragesReporterResult] = self._parse_results(suite_results)
 
-    def update_table(self, client, project_id: str, dataset_name: str) -> None:
+    def update_table(self, client: Client, project_id: str, dataset_name: str) -> None:
         """Update the BigQuery table.
 
         Args:
-            client (TODO): The client to interact with BigQuery.
+            client: The client to interact with BigQuery.
             project_id (str): The BigQuery project ID.
             dataset_name (str): The BigQuery dataset name.
         """
-        table_name = f"{self.repository}_averages"
+        table_id = f"{project_id}.{dataset_name}.{self.repository}_averages"
 
-        last_update: date | None = self._get_last_update(
-            client, project_id, dataset_name, table_name
+        last_update: date | None = self._get_last_update(client, table_id)
+
+        # If no 'last_update' insert all results, else insert results that occur after the last
+        # update end date
+        new_results: list[AveragesReporterResult] = (
+            self.results
+            if not last_update
+            else [
+                r
+                for r in self.results
+                if datetime.strptime(r.stop_date_30, DATE_FORMAT).date() > last_update
+                or datetime.strptime(r.stop_date_60, DATE_FORMAT).date() > last_update
+                or datetime.strptime(r.stop_date_90, DATE_FORMAT).date() > last_update
+            ]
         )
-        if not last_update:
+        if not new_results:
             self.logger.warning(
-                f"There are no results to update for {project_id}.{dataset_name}.{table_name}."
+                f"There are no averages for {self.repository}/{self.workflow}/{self.test_suite} to "
+                f"add to {table_id}."
             )
             return
 
-        # Filter results that occur after the last update timestamp for any of the end dates
-        new_results: list[AveragesReporterResult] = [
-            r
-            for r in self.results
-            if datetime.strptime(r.stop_date_30, DATE_FORMAT).date() > last_update
-            or datetime.strptime(r.stop_date_60, DATE_FORMAT).date() > last_update
-            or datetime.strptime(r.stop_date_90, DATE_FORMAT).date() > last_update
-        ]
+        self._insert_rows(client, table_id, new_results)
 
-        # TODO update the BigQuery table
-        # Log the new results for now
-        for result in new_results:
-            self.logger.info(f"New result to update: {result.dict_with_fieldnames()}")
+    def _check_rows_exist(
+        self, client: Client, table_id: str, results: Sequence[AveragesReporterResult]
+    ) -> bool:
+        conditions = []
+        query_parameters = []
+        for idx, result in enumerate(results):
+            param_prefix = f"p{idx}"
+            conditions.append(
+                f"""(
+                    Repository = @{param_prefix}_repository
+                    AND Workflow = @{param_prefix}_workflow
+                    AND `Test Suite` = @{param_prefix}_test_suite
+                    AND `End Date 30` = @{param_prefix}_end_date_30
+                    AND `End Date 60` = @{param_prefix}_end_date_60
+                    AND `End Date 90` = @{param_prefix}_end_date_90
+                )"""
+            )
+            query_parameters.extend(
+                [
+                    ScalarQueryParameter(
+                        f"{param_prefix}_repository", "STRING", result.repository
+                    ),
+                    ScalarQueryParameter(f"{param_prefix}_workflow", "STRING", result.workflow),
+                    ScalarQueryParameter(
+                        f"{param_prefix}_test_suite", "STRING", result.test_suite
+                    ),
+                    ScalarQueryParameter(
+                        f"{param_prefix}_end_date_30", "DATE", result.stop_date_30
+                    ),
+                    ScalarQueryParameter(
+                        f"{param_prefix}_end_date_60", "DATE", result.stop_date_60
+                    ),
+                    ScalarQueryParameter(
+                        f"{param_prefix}_end_date_90", "DATE", result.stop_date_90
+                    ),
+                ]
+            )
 
-    def _get_last_update(
-        self, client, project_id: str, dataset_name: str, table_name: str
-    ) -> date | None:
-        """Get the date of the last update in the specified averages table.
+        where_clause = " OR ".join(conditions)
+        query = f"""
+            SELECT 1
+            FROM `{table_id}`
+            WHERE {where_clause}
+            LIMIT 1
+        """  # nosec
+        job_config = QueryJobConfig(query_parameters=query_parameters)
+        try:
+            query_job = client.query(query, job_config=job_config)
+            return any(query_job.result())
+        except (GoogleAPIError, TypeError, ValueError) as error:
+            error_mapping: dict[type, str] = {
+                GoogleAPIError: f"Error executing query: {query}",
+                TypeError: f"The query, {query}, has an invalid format or type",
+                ValueError: f"The table name {table_id} is invalid",
+            }
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            self.logger.error(error_msg, exc_info=error)
+            raise ReporterError(error_msg) from error
 
-        Args:
-            client (TODO): The client to interact with BigQuery.
-            project_id (str): The BigQuery project ID.
-            dataset_name (str): The BigQuery dataset name.
-            table_name (str): The name of the table to query.
-
-        Returns:
-            datetime | None: The date of the last row in the table, or None if the table is empty.
-        """
+    def _get_last_update(self, client: Client, table_id: str) -> date | None:
         query = f"""
             SELECT GREATEST(MAX(`End Date 30`), MAX(`End Date 60`), MAX(`End Date 90`)) as last_update 
-            FROM `{project_id}.{dataset_name}.{table_name}`
+            FROM `{table_id}`
+            WHERE Repository = @repository AND Workflow = @workflow AND `Test Suite` = @test_suite
         """  # nosec
+        query_parameters = [
+            ScalarQueryParameter("repository", "STRING", self.repository),
+            ScalarQueryParameter("workflow", "STRING", self.workflow),
+            ScalarQueryParameter("test_suite", "STRING", self.test_suite),
+        ]
+        job_config = QueryJobConfig(query_parameters=query_parameters)
         try:
-            query_job = client.query(query)
+            query_job = client.query(query, job_config=job_config)
             result = query_job.result()
             for row in result:
                 last_update: date | None = row["last_update"]
                 return last_update
             return None
-        except (GoogleAPIError, NotFound) as error:
+        except (GoogleAPIError, TypeError, ValueError) as error:
             error_mapping: dict[type, str] = {
                 GoogleAPIError: f"Error executing query: {query}",
-                NotFound: f"Dataset or Table not found for query: {query}",
+                TypeError: f"The query, {query}, has an invalid format or type",
+                ValueError: f"The table name {table_id} is invalid",
+            }
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            self.logger.error(error_msg, exc_info=error)
+            raise ReporterError(error_msg) from error
+
+    def _insert_rows(
+        self, client: Client, table_id: str, results: list[AveragesReporterResult]
+    ) -> None:
+        results_exist: bool = self._check_rows_exist(client, table_id, results)
+        if results_exist:
+            self.logger.warn(
+                f"Detected one or more results from "
+                f"{self.repository}/{self.workflow}/{self.test_suite} already exist in table "
+                f"{table_id}. Aborting insert."
+            )
+            return
+
+        try:
+            json_rows: list[dict[str, Any]] = [
+                results.dict_with_fieldnames() for results in results
+            ]
+            errors = client.insert_rows_json(table_id, json_rows)
+            if errors:
+                client_error_msg: str = (
+                    f"Failed to insert rows from "
+                    f"{self.repository}/{self.workflow}/{self.test_suite} into {table_id}: {errors}"
+                )
+                self.logger.error(client_error_msg)
+                raise ReporterError(client_error_msg)
+            self.logger.info(
+                f"Inserted {len(results)} from "
+                f"{self.repository}/{self.workflow}/{self.test_suite} into {table_id}."
+            )
+        except (TypeError, ValueError) as error:
+            error_mapping: dict[type, str] = {
+                TypeError: f"data is an improper format for insertion in {table_id}",
+                ValueError: f"The table name {table_id} is invalid",
             }
             error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
@@ -180,9 +273,6 @@ class AveragesReporter(BaseReporter):
 
     def _parse_results(
         self,
-        repository: str,
-        workflow: str,
-        test_suite: str,
         suite_results: Sequence[SuiteReporterResult],
     ) -> list[AveragesReporterResult]:
         results: list[AveragesReporterResult] = []
@@ -209,9 +299,9 @@ class AveragesReporter(BaseReporter):
 
         while last_datetime >= first_datetime + timedelta(days=DAYS_30):
             averages_result_dict: dict[str, Any] = {
-                "repository": repository,
-                "workflow": workflow,
-                "test_suite": test_suite,
+                "repository": self.repository,
+                "workflow": self.workflow,
+                "test_suite": self.test_suite,
                 **self._calculate_averages(suite_results, last_datetime, DAYS_30),
                 **self._calculate_averages(suite_results, last_datetime, DAYS_60),
                 **self._calculate_averages(suite_results, last_datetime, DAYS_90),

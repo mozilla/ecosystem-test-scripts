@@ -8,7 +8,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Sequence
 
-from google.cloud.bigquery import ScalarQueryParameter, Client, QueryJobConfig, ArrayQueryParameter
+from google.api_core.exceptions import GoogleAPIError
+from google.cloud.bigquery import ArrayQueryParameter, Client, QueryJobConfig, ScalarQueryParameter
 
 from scripts.metric_reporter.constants import DATE_FORMAT, DATETIME_FORMAT
 from scripts.metric_reporter.parser.circleci_json_parser import CircleCIJobTestMetadata
@@ -203,7 +204,8 @@ class SuiteReporter(BaseReporter):
 
         last_update: datetime | None = self._get_last_update(client, table_id)
 
-        # If no 'last_update' insert all results, else insert new results only
+        # If no 'last_update' insert all results, else insert results that occur after the last
+        # update timestamp
         new_results: Sequence[SuiteReporterResult] = (
             self.results
             if not last_update
@@ -216,7 +218,7 @@ class SuiteReporter(BaseReporter):
         if not new_results:
             self.logger.warning(
                 f"There are no results for {self.repository}/{self.workflow}/{self.test_suite} to "
-                f"update to {table_id}."
+                f"add to {table_id}."
             )
             return
 
@@ -232,13 +234,14 @@ class SuiteReporter(BaseReporter):
             LIMIT 1
         """  # nosec
         jobs: list[int] = [result.job for result in results]
-        query_params = [ArrayQueryParameter("job_numbers", "INT64", jobs)]
-        job_config = QueryJobConfig(query_parameters=query_params)
+        query_parameters = [ArrayQueryParameter("job_numbers", "INT64", jobs)]
+        job_config = QueryJobConfig(query_parameters=query_parameters)
         try:
             query_job = client.query(query, job_config=job_config)
             return any(query_job.result())
-        except (TypeError, ValueError) as error:
+        except (GoogleAPIError, TypeError, ValueError) as error:
             error_mapping: dict[type, str] = {
+                GoogleAPIError: f"Error executing query: {query}",
                 TypeError: f"The query, {query}, has an invalid format or type",
                 ValueError: f"The table name {table_id} is invalid",
             }
@@ -252,23 +255,22 @@ class SuiteReporter(BaseReporter):
             FROM `{table_id}`
             WHERE Repository = @repository AND Workflow = @workflow AND `Test Suite` = @test_suite
         """  # nosec
-        query_params = [
+        query_parameters = [
             ScalarQueryParameter("repository", "STRING", self.repository),
             ScalarQueryParameter("workflow", "STRING", self.workflow),
             ScalarQueryParameter("test_suite", "STRING", self.test_suite),
         ]
-
+        job_config = QueryJobConfig(query_parameters=query_parameters)
         try:
-            query_job = client.query(
-                query, job_config=QueryJobConfig(query_parameters=query_params)
-            )
+            query_job = client.query(query, job_config=job_config)
             result = query_job.result()
             for row in result:
                 last_update: str | None = row["last_update"]
                 return datetime.strptime(last_update, DATETIME_FORMAT) if last_update else None
             return None
-        except (TypeError, ValueError) as error:
+        except (GoogleAPIError, TypeError, ValueError) as error:
             error_mapping: dict[type, str] = {
+                GoogleAPIError: f"Error executing query: {query}",
                 TypeError: f"The query, {query}, has an invalid format or type",
                 ValueError: f"The table name {table_id} is invalid",
             }
