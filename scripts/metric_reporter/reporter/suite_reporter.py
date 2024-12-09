@@ -8,7 +8,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Sequence
 
-from google.api_core.exceptions import GoogleAPIError, NotFound
+from google.cloud import bigquery
+from google.cloud.bigquery import ScalarQueryParameter, Client, QueryJobConfig
 
 from scripts.metric_reporter.constants import DATE_FORMAT, DATETIME_FORMAT
 from scripts.metric_reporter.parser.circleci_json_parser import CircleCIJobTestMetadata
@@ -185,65 +186,129 @@ class SuiteReporter(BaseReporter):
         """
         super().__init__()
         self.repository = repository
+        self.workflow = workflow
+        self.test_suite = test_suite
         self.results: Sequence[SuiteReporterResult] = self._parse_results(
-            repository, workflow, test_suite, metadata_list, junit_artifact_list
+            metadata_list, junit_artifact_list
         )
 
-    def update_table(self, client, project_id: str, dataset_name: str) -> None:
-        """Update the BigQuery table.
+    def update_table(self, client: Client, project_id: str, dataset_name: str) -> None:
+        """Update the BigQuery table with new results.
 
         Args:
-            client (TODO): The client to interact with BigQuery.
+            client (Client): The BigQuery client to interact with BigQuery.
             project_id (str): The BigQuery project ID.
             dataset_name (str): The BigQuery dataset name.
         """
-        table_name = f"{self.repository}_results"
+        table_id = f"{project_id}.{dataset_name}.{self.repository}_results"
 
-        last_update: datetime | None = self._get_last_update(
-            client, project_id, dataset_name, table_name
+        last_update: datetime | None = self._get_last_update(client, table_id)
+
+        # If no 'last_update' insert all results, else insert new results only
+        new_results: Sequence[SuiteReporterResult] = (
+            self.results
+            if not last_update
+            else [
+                r
+                for r in self.results
+                if r.timestamp and datetime.strptime(r.timestamp, DATETIME_FORMAT) > last_update
+            ]
         )
-        if not last_update:
-            self.logger.warning(f"There are no results to update for {table_name}.")
+        if not new_results:
+            self.logger.warning(
+                f"There are no results for {self.repository}/{self.workflow}/{self.test_suite} to "
+                f"update to {table_id}."
+            )
             return
 
-        # Filter results that occur after the last update timestamp
-        new_results: Sequence[SuiteReporterResult] = [
-            r
-            for r in self.results
-            if r.timestamp and datetime.strptime(r.timestamp, DATETIME_FORMAT) > last_update
+        self._insert_rows(client, table_id, new_results)
+
+    def _check_rows_exist(
+        self, client: Client, table_id: str, results: Sequence[SuiteReporterResult]
+    ) -> bool:
+        query = f"""
+            SELECT 1
+            FROM `{table_id}`
+            WHERE `Job Number` IN UNNEST(@job_numbers)
+            LIMIT 1
+        """  # nosec
+        jobs: list[int] = [result.job for result in results]
+        query_params = [bigquery.ArrayQueryParameter("job_numbers", "INT64", jobs)]
+        job_config = bigquery.QueryJobConfig(query_parameters=query_params)
+        try:
+            query_job = client.query(query, job_config=job_config)
+            return any(query_job.result())
+        except (TypeError, ValueError) as error:
+            error_mapping: dict[type, str] = {
+                TypeError: f"The query, {query}, has an invalid format or type",
+                ValueError: f"The table name {table_id} is invalid",
+            }
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            self.logger.error(error_msg, exc_info=error)
+            raise ReporterError(error_msg) from error
+
+    def _get_last_update(self, client: Client, table_id: str) -> datetime | None:
+        query = f"""
+            SELECT FORMAT_TIMESTAMP('{DATETIME_FORMAT}', MAX(`Timestamp`)) as last_update
+            FROM `{table_id}`
+            WHERE Repository = @repository AND Workflow = @workflow AND `Test Suite` = @test_suite
+        """  # nosec
+        query_params = [
+            ScalarQueryParameter("repository", "STRING", self.repository),
+            ScalarQueryParameter("workflow", "STRING", self.workflow),
+            ScalarQueryParameter("test_suite", "STRING", self.test_suite),
         ]
 
-        # TODO update the BigQuery table
-        # Log the new results for now
-        for result in new_results:
-            self.logger.info(f"New result to update: {result.dict_with_fieldnames()}")
-
-    def _get_last_update(
-        self, client, project_id: str, dataset_name: str, table_name: str
-    ) -> datetime | None:
-        """Get the timestamp of the last update in the specified suite results table.
-
-        Args:
-            table_name (str): The name of the table to query.
-
-        Returns:
-            datetime | None: The timestamp of the last row in the table, or None if the table is empty.
-        """
-        query = f"""
-            SELECT FORMAT_TIMESTAMP('{DATETIME_FORMAT}', MAX(`Timestamp`)) as last_update 
-            FROM `{project_id}.{dataset_name}.{table_name}`
-        """  # nosec
         try:
-            query_job = client.query(query)
+            query_job = client.query(
+                query, job_config=QueryJobConfig(query_parameters=query_params)
+            )
             result = query_job.result()
             for row in result:
                 last_update: str | None = row["last_update"]
                 return datetime.strptime(last_update, DATETIME_FORMAT) if last_update else None
             return None
-        except (GoogleAPIError, NotFound) as error:
+        except (TypeError, ValueError) as error:
             error_mapping: dict[type, str] = {
-                GoogleAPIError: f"Error executing query: {query}",
-                NotFound: f"Dataset or Table not found for query: {query}",
+                TypeError: f"The query, {query}, has an invalid format or type",
+                ValueError: f"The table name {table_id} is invalid",
+            }
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            self.logger.error(error_msg, exc_info=error)
+            raise ReporterError(error_msg) from error
+
+    def _insert_rows(
+        self, client: Client, table_id: str, results: Sequence[SuiteReporterResult]
+    ) -> None:
+        results_exist: bool = self._check_rows_exist(client, table_id, results)
+        if results_exist:
+            self.logger.warn(
+                f"Detected one or more results from "
+                f"{self.repository}/{self.workflow}/{self.test_suite} already exist in table "
+                f"{table_id}. Aborting insert."
+            )
+            return
+
+        try:
+            json_rows: list[dict[str, Any]] = [
+                results.dict_with_fieldnames() for results in results
+            ]
+            errors = client.insert_rows_json(table_id, json_rows)
+            if errors:
+                client_error_msg: str = (
+                    f"Failed to insert rows from "
+                    f"{self.repository}/{self.workflow}/{self.test_suite} into {table_id}: {errors}"
+                )
+                self.logger.error(client_error_msg)
+                raise ReporterError(client_error_msg)
+            self.logger.info(
+                f"Inserted {len(results)} from "
+                f"{self.repository}/{self.workflow}/{self.test_suite} into {table_id}."
+            )
+        except (TypeError, ValueError) as error:
+            error_mapping: dict[type, str] = {
+                TypeError: f"data is an improper format for insertion in {table_id}",
+                ValueError: f"The table name {table_id} is invalid",
             }
             error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
@@ -251,23 +316,16 @@ class SuiteReporter(BaseReporter):
 
     def _parse_results(
         self,
-        repository: str,
-        workflow: str,
-        test_suite: str,
         metadata_list: list[CircleCIJobTestMetadata] | None,
         artifacts_list: list[JUnitXmlJobTestSuites] | None,
     ) -> list[SuiteReporterResult]:
         metadata_results_dict: dict[int, SuiteReporterResult] = {}
         if metadata_list:
-            metadata_results_dict = self._parse_metadata(
-                repository, workflow, test_suite, metadata_list
-            )
+            metadata_results_dict = self._parse_metadata(metadata_list)
 
         artifact_results_dict: dict[int, SuiteReporterResult] = {}
         if artifacts_list:
-            artifact_results_dict = self._parse_artifacts(
-                repository, workflow, test_suite, artifacts_list
-            )
+            artifact_results_dict = self._parse_artifacts(artifacts_list)
 
         # Reconcile data preferring artifact results except for date, timestamp and
         # job_time from metadata
@@ -290,11 +348,7 @@ class SuiteReporter(BaseReporter):
         return sorted_results
 
     def _parse_metadata(
-        self,
-        repository: str,
-        workflow: str,
-        test_suite: str,
-        metadata_list: list[CircleCIJobTestMetadata],
+        self, metadata_list: list[CircleCIJobTestMetadata]
     ) -> dict[int, SuiteReporterResult]:
         results: dict[int, SuiteReporterResult] = {}
         for metadata in metadata_list:
@@ -303,7 +357,8 @@ class SuiteReporter(BaseReporter):
 
             if metadata.job.status == RUNNING_JOB_STATUS:
                 self.logger.warning(
-                    f"Files from job {repository}/{workflow}/{test_suite}/{metadata.job.job_number}"
+                    f"Files from job "
+                    f"{self.repository}/{self.workflow}/{self.test_suite}/{metadata.job.job_number}"
                     " are incomplete. Please delete them and re-scrape."
                 )
                 continue
@@ -312,9 +367,9 @@ class SuiteReporter(BaseReporter):
             stopped_at = datetime.strptime(metadata.job.stopped_at, DATETIME_FORMAT)
             job_time = (stopped_at - started_at).total_seconds()
             test_suite_result = SuiteReporterResult(
-                repository=repository,
-                workflow=workflow,
-                test_suite=test_suite,
+                repository=self.repository,
+                workflow=self.workflow,
+                test_suite=self.test_suite,
                 job=metadata.job.job_number,
                 date=started_at.strftime(DATE_FORMAT),
                 timestamp=metadata.job.started_at,
@@ -338,16 +393,15 @@ class SuiteReporter(BaseReporter):
         return results
 
     def _parse_artifacts(
-        self,
-        repository: str,
-        workflow: str,
-        test_suite: str,
-        artifacts_list: list[JUnitXmlJobTestSuites],
+        self, artifacts_list: list[JUnitXmlJobTestSuites]
     ) -> dict[int, SuiteReporterResult]:
         results: dict[int, SuiteReporterResult] = {}
         for artifact in artifacts_list:
             test_suite_result = SuiteReporterResult(
-                repository=repository, workflow=workflow, test_suite=test_suite, job=artifact.job
+                repository=self.repository,
+                workflow=self.workflow,
+                test_suite=self.test_suite,
+                job=artifact.job,
             )
 
             run_times: list[float] = []

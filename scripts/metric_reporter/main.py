@@ -133,7 +133,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the Metric Reporter")
     parser.add_argument("--config", help="Path to the config.ini file", default="config.ini")
     parser.add_argument("--output_csv", help="Output CSV files", type=bool, default=None)
-    parser.add_argument("--update_bigquery", help="Update BigQuery tables", type=bool, default=None)
+    parser.add_argument(
+        "--update_bigquery", help="Update BigQuery tables", type=bool, default=None
+    )
     parser_args = parser.parse_args()
     main(
         parser_args.config,
