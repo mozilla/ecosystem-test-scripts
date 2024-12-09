@@ -7,7 +7,7 @@
 from datetime import datetime
 from typing import Any, Sequence
 
-from google.api_core.exceptions import GoogleAPIError, NotFound
+from google.cloud.bigquery import Client, ArrayQueryParameter, QueryJobConfig, ScalarQueryParameter
 
 from scripts.metric_reporter.constants import DATETIME_FORMAT, ISO_DATETIME_FORMAT
 from scripts.metric_reporter.parser.coverage_json_parser import (
@@ -101,65 +101,129 @@ class CoverageReporter(BaseReporter):
         """
         super().__init__()
         self.repository = repository
+        self.workflow = workflow
+        self.test_suite = test_suite
         self.results: Sequence[CoverageReporterResult] = self._parse_results(
-            repository, workflow, test_suite, coverage_artifact_list
+            coverage_artifact_list
         )
 
-    def update_table(self, client, project_id: str, dataset_name: str) -> None:
-        """Update the BigQuery table.
+    def update_table(self, client: Client, project_id: str, dataset_name: str) -> None:
+        """Update the BigQuery table with new results.
 
         Args:
-            client (TODO): The client to interact with BigQuery.
+            client (Client): The BigQuery client to interact with BigQuery.
             project_id (str): The BigQuery project ID.
             dataset_name (str): The BigQuery dataset name.
         """
-        table_name = f"{self.repository}_results"
+        table_id = f"{project_id}.{dataset_name}.{self.repository}_coverage"
 
-        last_update: datetime | None = self._get_last_update(
-            client, project_id, dataset_name, table_name
+        last_update: datetime | None = self._get_last_update(client, table_id)
+
+        # If no 'last_update' insert all results, else insert new results only
+        new_results: Sequence[CoverageReporterResult] = (
+            self.results
+            if not last_update
+            else [
+                r
+                for r in self.results
+                if r.timestamp and datetime.strptime(r.timestamp, DATETIME_FORMAT) > last_update
+            ]
         )
-        if not last_update:
-            self.logger.warning(f"There are no results to update for {table_name}.")
+        if not new_results:
+            self.logger.warning(
+                f"There are no results for {self.repository}/{self.workflow}/{self.test_suite} to "
+                f"update to {table_id}."
+            )
             return
 
-        # Filter results that occur after the last update timestamp
-        new_results: Sequence[CoverageReporterResult] = [
-            r
-            for r in self.results
-            if r.timestamp and datetime.strptime(r.timestamp, DATETIME_FORMAT) > last_update
+        self._insert_rows(client, table_id, new_results)
+
+    def _check_rows_exist(
+        self, client: Client, table_id: str, results: Sequence[CoverageReporterResult]
+    ) -> bool:
+        query = f"""
+            SELECT 1
+            FROM `{table_id}`
+            WHERE `Job Number` IN UNNEST(@job_numbers)
+            LIMIT 1
+        """  # nosec
+        jobs: list[int] = [result.job for result in results]
+        query_params = [ArrayQueryParameter("job_numbers", "INT64", jobs)]
+        job_config = QueryJobConfig(query_parameters=query_params)
+        try:
+            query_job = client.query(query, job_config=job_config)
+            return any(query_job.result())
+        except (TypeError, ValueError) as error:
+            error_mapping: dict[type, str] = {
+                TypeError: f"The query, {query}, has an invalid format or type",
+                ValueError: f"The table name {table_id} is invalid",
+            }
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            self.logger.error(error_msg, exc_info=error)
+            raise ReporterError(error_msg) from error
+
+    def _get_last_update(self, client: Client, table_id: str) -> datetime | None:
+        query = f"""
+            SELECT FORMAT_TIMESTAMP('{DATETIME_FORMAT}', MAX(`Timestamp`)) as last_update
+            FROM `{table_id}`
+            WHERE Repository = @repository AND Workflow = @workflow AND `Test Suite` = @test_suite
+        """  # nosec
+        query_params = [
+            ScalarQueryParameter("repository", "STRING", self.repository),
+            ScalarQueryParameter("workflow", "STRING", self.workflow),
+            ScalarQueryParameter("test_suite", "STRING", self.test_suite),
         ]
 
-        # TODO update the BigQuery table
-        # Log the new results for now
-        for result in new_results:
-            self.logger.info(f"New result to update: {result.dict_with_fieldnames()}")
-
-    def _get_last_update(
-        self, client, project_id: str, dataset_name: str, table_name: str
-    ) -> datetime | None:
-        """Get the timestamp of the last update in the specified coverage table.
-
-        Args:
-            table_name (str): The name of the table to query.
-
-        Returns:
-            datetime | None: The timestamp of the last row in the table, or None if the table is empty.
-        """
-        query = f"""
-            SELECT FORMAT_TIMESTAMP('{DATETIME_FORMAT}', MAX(`Timestamp`)) as last_update 
-            FROM `{project_id}.{dataset_name}.{table_name}`
-        """  # nosec
         try:
-            query_job = client.query(query)
+            query_job = client.query(
+                query, job_config=QueryJobConfig(query_parameters=query_params)
+            )
             result = query_job.result()
             for row in result:
                 last_update: str | None = row["last_update"]
                 return datetime.strptime(last_update, DATETIME_FORMAT) if last_update else None
             return None
-        except (GoogleAPIError, NotFound) as error:
+        except (TypeError, ValueError) as error:
             error_mapping: dict[type, str] = {
-                GoogleAPIError: f"Error executing query: {query}",
-                NotFound: f"Dataset or Table not found for query: {query}",
+                TypeError: f"The query, {query}, has an invalid format or type",
+                ValueError: f"The table name {table_id} is invalid",
+            }
+            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            self.logger.error(error_msg, exc_info=error)
+            raise ReporterError(error_msg) from error
+
+    def _insert_rows(
+        self, client: Client, table_id: str, results: Sequence[CoverageReporterResult]
+    ) -> None:
+        results_exist: bool = self._check_rows_exist(client, table_id, results)
+        if results_exist:
+            self.logger.warn(
+                f"Detected one or more results from "
+                f"{self.repository}/{self.workflow}/{self.test_suite} already exist in table "
+                f"{table_id}. Aborting insert."
+            )
+            return
+
+        try:
+            json_rows: list[dict[str, Any]] = [
+                results.dict_with_fieldnames() for results in results
+            ]
+            errors = client.insert_rows_json(table_id, json_rows)
+            if errors:
+                client_error_msg: str = (
+                    f"Failed to insert rows from "
+                    f"{self.repository}/{self.workflow}/{self.test_suite} into {table_id}: {errors}"
+                )
+                self.logger.error(client_error_msg)
+                raise ReporterError(client_error_msg)
+            self.logger.info(
+                f"Inserted {len(results)} from "
+                f"{self.repository}/{self.workflow}/{self.test_suite} into {table_id}."
+            )
+        except (TypeError, ValueError) as error:
+            error_mapping: dict[type, str] = {
+                TypeError: f"data is an improper format for insertion in {table_id}",
+                ValueError: f"The table name {table_id} is invalid",
             }
             error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
@@ -167,9 +231,6 @@ class CoverageReporter(BaseReporter):
 
     def _parse_results(
         self,
-        repository: str,
-        workflow: str,
-        test_suite: str,
         coverage_artifact_list: list[LlvmCovReport | PytestReport] | None,
     ) -> Sequence[CoverageReporterResult]:
         if coverage_artifact_list is None:
@@ -178,30 +239,24 @@ class CoverageReporter(BaseReporter):
         results: list[CoverageReporterResult] = []
         for artifact in coverage_artifact_list:
             if isinstance(artifact, LlvmCovReport):
-                results.append(
-                    self._parse_llvm_cov_report(repository, workflow, test_suite, artifact)
-                )
+                results.append(self._parse_llvm_cov_report(artifact))
             elif isinstance(artifact, PytestReport):
-                results.append(
-                    self._parse_pytest_report(repository, workflow, test_suite, artifact)
-                )
+                results.append(self._parse_pytest_report(artifact))
             else:
                 raise ReporterError(f"Unknown coverage type: {type(artifact)}")
         return results
 
-    def _parse_llvm_cov_report(
-        self, repository: str, workflow: str, test_suite: str, llvm_cov_report: LlvmCovReport
-    ) -> CoverageReporterResult:
+    def _parse_llvm_cov_report(self, llvm_cov_report: LlvmCovReport) -> CoverageReporterResult:
         if not len(llvm_cov_report.data) == 1:
             raise ReporterError(
-                f"The coverage report for {repository}-{workflow}-{test_suite} has an unexpected "
-                f"number of items in 'data'."
+                f"The coverage report for {self.repository}-{self.workflow}-{self.test_suite} "
+                f"has an unexpected number of items in 'data'."
             )
         totals: LlvmCovTotals = llvm_cov_report.data[0].totals
         return CoverageReporterResult(
-            repository=repository,
-            workflow=workflow,
-            test_suite=test_suite,
+            repository=self.repository,
+            workflow=self.workflow,
+            test_suite=self.test_suite,
             timestamp=llvm_cov_report.job_timestamp,
             date=(
                 self._extract_date(llvm_cov_report.job_timestamp)
@@ -223,9 +278,7 @@ class CoverageReporter(BaseReporter):
             branch_percent=totals.branches.percent,
         )
 
-    def _parse_pytest_report(
-        self, repository: str, workflow: str, test_suite: str, pytest_report: PytestReport
-    ) -> CoverageReporterResult:
+    def _parse_pytest_report(self, pytest_report: PytestReport) -> CoverageReporterResult:
         totals: PytestTotals = pytest_report.totals
         meta: PytestMeta = pytest_report.meta
 
@@ -239,9 +292,9 @@ class CoverageReporter(BaseReporter):
         )
 
         return CoverageReporterResult(
-            repository=repository,
-            workflow=workflow,
-            test_suite=test_suite,
+            repository=self.repository,
+            workflow=self.workflow,
+            test_suite=self.test_suite,
             timestamp=timestamp,
             date=self._extract_date(timestamp) if timestamp else None,
             job=pytest_report.job_number,

@@ -8,8 +8,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Sequence
 
-from google.cloud import bigquery
-from google.cloud.bigquery import ScalarQueryParameter, Client, QueryJobConfig
+from google.cloud.bigquery import ScalarQueryParameter, Client, QueryJobConfig, ArrayQueryParameter
 
 from scripts.metric_reporter.constants import DATE_FORMAT, DATETIME_FORMAT
 from scripts.metric_reporter.parser.circleci_json_parser import CircleCIJobTestMetadata
@@ -233,8 +232,8 @@ class SuiteReporter(BaseReporter):
             LIMIT 1
         """  # nosec
         jobs: list[int] = [result.job for result in results]
-        query_params = [bigquery.ArrayQueryParameter("job_numbers", "INT64", jobs)]
-        job_config = bigquery.QueryJobConfig(query_parameters=query_params)
+        query_params = [ArrayQueryParameter("job_numbers", "INT64", jobs)]
+        job_config = QueryJobConfig(query_parameters=query_params)
         try:
             query_job = client.query(query, job_config=job_config)
             return any(query_job.result())
