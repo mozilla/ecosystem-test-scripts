@@ -3,13 +3,13 @@
 Below are step-by-step instructions on how to set up a development environment in order to be able
 to successfully contribute to and execute the ecosystem test scripts.
 
-# 1. Clone the ecosystem-test-scripts repository
+## 1. Clone the ecosystem-test-scripts repository
 
 The ecosystem test scripts are hosted on the [Mozilla Github][0] and can be cloned using the method
 of your choice (see [Cloning a repository][1]). Contributors should follow the
 [Contributing Guidelines][2] and [Community Participation Guidelines][3] for the repository.
 
-# 2. Create a CircleCI API Token
+## 2. Create a CircleCI API Token
 
 In order to execute the `circleci_scraper` script, a personal CircleCI API Token is needed. To
 create a token, follow the [creating a personal api token][4] CircleCI instructions. Store the key
@@ -17,7 +17,7 @@ value in a safe place.
 
 **DO NOT SHARE YOUR CIRCLECI API TOKEN**
 
-# 3. Copy the Google Sheet Service Account JSON Key
+## 3. Copy the Google Sheet Service Account JSON Key
 
 The `google_sheet_uploader` script is set up using the [ecosystem-test-eng GCP project][5] with the
 [metric-gsheet service account][6]. In order to execute the `google_sheet_uploader` script, a
@@ -25,7 +25,7 @@ key for this service account, in the form of a JSON file, needs to be copied fro
 Ecosystem Test Engineering Team Vault into the root directory of the `ecosystem-test-scripts`
 project.
 
-# 4. Set up the config.ini
+## 4. Set up the config.ini
 
 All settings for the `ecosystem-test-scripts` are defined in the `config.ini` file. To set up a 
 local `config.ini` file:
@@ -35,14 +35,14 @@ local `config.ini` file:
 4.2 Under the `[circleci_scraper]` section of the file, set the `token` value to the CircleCI API
     key created in step 2
 
-# 5. Copy the latest raw data locally
+## 5. Copy the latest raw data locally
 
 By default, CircleCI has a retention policy of 30 days for artifacts and 90 days for uploaded test
 results; However, we have over a years worth of data gathered for some projects. In order to produce
 reports with full trend data and reduce scraping time, copy the latest `raw_data` from the
 [ETE team folder][7] to the root directory of the `ecosystem-test-scripts` project.
 
-# 6. Set up the python virtual environment
+## 6. Set up the python virtual environment
 
 This project uses [Poetry][10] for dependency management in conjunction with a pyproject.toml file.
 While you can use virtualenv to set up the dev environment, it is recommended to use [pyenv][8] and 
@@ -59,7 +59,7 @@ For more information on Make commands, run:
 make help
 ```
 
-# 7. Start Developing!
+## 7. Start Developing!
 
 [0]: https://github.com/mozilla/ecosystem-test-scripts/
 [1]: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository
