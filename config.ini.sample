@@ -205,6 +205,11 @@ mappings = [
 
 [metric_reporter]
 reports_dir = reports
+gcp_project_id = ecosystem-test-eng
+bigquery_dataset_name = test_metrics
+bigquery_service_account_file = metric_reporter_key.json
+output_csv = True
+update_bigquery = True
 
 [report_merger]
 reports_dir = reports
