@@ -99,8 +99,8 @@ def main(
 
             if not output_csv and not update_bigquery:
                 logger.warning(
-                    "The metric reporter will not perform any action. Use the --output_csv or"
-                    " --update_bigquery flags."
+                    "The metric reporter will not perform any action. Use the --output-csv or"
+                    " --update-bigquery flags."
                 )
                 return
 
@@ -134,9 +134,9 @@ def main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the Metric Reporter")
     parser.add_argument("--config", help="Path to the config.ini file", default="config.ini")
-    parser.add_argument("--output_csv", help="Output CSV files", type=bool, default=None)
+    parser.add_argument("--output-csv", help="Output CSV files", type=bool, default=None)
     parser.add_argument(
-        "--update_bigquery", help="Update BigQuery tables", type=bool, default=None
+        "--update-bigquery", help="Update BigQuery tables", type=bool, default=None
     )
     parser_args = parser.parse_args()
     main(
