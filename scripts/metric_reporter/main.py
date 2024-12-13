@@ -99,8 +99,10 @@ def main(
 
             if not output_csv and not update_bigquery:
                 logger.warning(
-                    "The metric reporter will not perform any action. Use the --output_csv or --update_bigquery flags."
+                    "The metric reporter will not perform any action. Use the --output_csv or"
+                    " --update_bigquery flags."
                 )
+                return
 
             # Output CSV files if opted-in
             if output_csv:
