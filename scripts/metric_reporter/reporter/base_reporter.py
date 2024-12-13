@@ -90,4 +90,4 @@ class BaseReporter:
         Raises:
             NotImplementedError: If the method is not implemented by a subclass.
         """
-        raise NotImplementedError("Subclasses must implement the `update_bigtable` method.")
+        raise NotImplementedError("Subclasses must implement the `update_table` method.")
