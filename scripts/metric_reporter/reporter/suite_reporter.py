@@ -310,7 +310,7 @@ class SuiteReporter(BaseReporter):
                 self.logger.error(client_error_msg)
                 raise ReporterError(client_error_msg)
             self.logger.info(
-                f"Inserted {len(results)} from "
+                f"Inserted {len(results)} results from "
                 f"{self.repository}/{self.workflow}/{self.test_suite} into {table_id}."
             )
         except (TypeError, ValueError) as error:
