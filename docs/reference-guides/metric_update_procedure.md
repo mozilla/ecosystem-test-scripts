@@ -2,10 +2,10 @@
 
 Please follow the steps below to update the following Looker Dashboards and Google Sheets:
 
-- [Looker Dashboards][1]
-- [Autopush-rs Metrics][2]
-- [FxA Metrics][3]
-- [Merino-py Metrics][4]
+- [ETE Looker Dashboards][ETE Looker Dashboards]
+- [Autopush-rs Metrics][Autopush-rs GSheets]
+- [FxA Metrics][FxA GSheets]
+- [Merino-py Metrics][Merino-py GSheets]
 
 The dashboards and sheets are typically updated on Monday mornings (North America ET/PT) to ensure
 the values are available for team check-in meetings. The process of updating the dashboards and
@@ -15,13 +15,13 @@ sheets can take up to 10 minutes.
 
 Before updating the test metrics, ensure that:
 
-- Your development environment is setup with proper permissions (see [Developer Setup][5]).
+- Your development environment is setup with proper permissions (see [Developer Setup][Developer Setup Guide]).
 - You are on the latest version of the `main` branch
-- Your `config.ini` file in the root directory is up to date
+- Your `config.ini` file in the root directory is up-to-date
 - You have the latest raw data in the ecosystem-test-scripts root directory.
   - The raw data should be found in the `test_result_dir` specified in the config.ini file and is
     typically named `raw_data`.
-  - The latest raw data is available in the [ETE team folder][6]
+  - The latest raw data is available in the [ETE team folder][ETE Drive]
 
 ## 1. Scrape for New Raw Test Data
 
@@ -95,12 +95,12 @@ _**Notes**:_
 ## 4. Backup the latest `test_result_dir` to the ETE team folder
 
 Compress the contents of the `test_result_dir`, typically called 'raw_data,' and replace the file
-located in the [ETE team folder][0].
+located in the [ETE team folder][ETE Drive].
 
 
-[1]: https://mozilla.cloud.looker.com/boards/140
-[2]: https://docs.google.com/spreadsheets/d/1abjtg2e-PHm8JDP5A629KFVA-eBc8I5VtFPcz_UCDQs/edit?usp=drive_link
-[3]: https://docs.google.com/spreadsheets/d/1qKwxsSI2RNo-qKZflETtBbyZ9b0ZUB_id2SL17_MmYo/edit?usp=drive_link
-[4]: https://docs.google.com/spreadsheets/d/1dZjfFVoYYPHmStCbyQkWXfBy9yvL10-g6OLQ3nU_25o/edit?usp=drive_link
-[5]: ../developer-guides/developer_setup.md
-[6]: https://drive.google.com/drive/folders/1N4YW97gEH6gmdlfDNtuGxUsdo2EKkCAi
+[Autopush-rs GSheets]: https://docs.google.com/spreadsheets/d/1abjtg2e-PHm8JDP5A629KFVA-eBc8I5VtFPcz_UCDQs/edit?usp=drive_link
+[Developer Setup Guide]: ../developer-guides/developer_setup.md
+[ETE Drive]: https://drive.google.com/drive/folders/1N4YW97gEH6gmdlfDNtuGxUsdo2EKkCAi
+[ETE Looker Dashboards]: https://mozilla.cloud.looker.com/boards/140
+[FxA GSheets]: https://docs.google.com/spreadsheets/d/1qKwxsSI2RNo-qKZflETtBbyZ9b0ZUB_id2SL17_MmYo/edit?usp=drive_link
+[Merino-py GSheets]: https://docs.google.com/spreadsheets/d/1dZjfFVoYYPHmStCbyQkWXfBy9yvL10-g6OLQ3nU_25o/edit?usp=drive_link
