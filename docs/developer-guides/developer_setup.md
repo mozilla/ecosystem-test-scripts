@@ -18,7 +18,7 @@ instructions. Store the key value in a safe place.
 
 **DO NOT SHARE YOUR CIRCLECI API TOKEN**
 
-# 3. Copy the BigQuery and Google Sheet Service Account JSON Keys
+## 3. Copy the BigQuery and Google Sheet Service Account JSON Keys
 
 The `metric_reporter` and `google_sheet_uploader` scripts are set up using the 
 [ecosystem-test-eng GCP project][ETE GCP Project] with the metric-reporter and metric-gsheet
