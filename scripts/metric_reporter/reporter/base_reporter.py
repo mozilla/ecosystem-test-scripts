@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from dateutil import parser
+from google.cloud.bigquery import Client
 from pydantic import BaseModel
 
 from scripts.metric_reporter.constants import DATE_FORMAT
@@ -79,7 +80,7 @@ class BaseReporter:
             self.logger.error(error_msg, exc_info=error)
             raise ReporterError(error_msg) from error
 
-    def update_table(self, client, project_id: str, dataset_name: str) -> None:
+    def update_table(self, client: Client, project_id: str, dataset_name: str) -> None:
         """Update the BigQuery table.
 
         Args:
