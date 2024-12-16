@@ -16,6 +16,8 @@ jobs:
           repository: mozilla-mobile/testops-dashboard
       - name: Setup python
         uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Authenticate to Google
         uses: google-github-actions/auth@v2
         with:
