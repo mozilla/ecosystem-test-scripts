@@ -52,14 +52,10 @@ def main(
         bigquery_service_account_file: str = (
             config.metric_reporter_config.bigquery_service_account_file
         )
-        output_csv = (
-            output_csv if output_csv is not None else config.metric_reporter_config.output_csv
-        )
-        update_bigquery = (
-            update_bigquery
-            if update_bigquery is not None
-            else config.metric_reporter_config.update_bigquery
-        )
+        if output_csv is None:
+            output_csv = config.metric_reporter_config.output_csv
+        if update_bigquery is None:
+            update_bigquery = config.metric_reporter_config.update_bigquery
 
         # Create Parsers
         circleci_parser = CircleCIJsonParser()
