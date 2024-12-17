@@ -62,6 +62,7 @@ make help
 ```
 
 ## 7. Start Developing!
+
 [CircleCI Create API Token]: https://circleci.com/docs/managing-api-tokens/#creating-a-personal-api-token
 [Community Participation Guidelines]: https://github.com/mozilla/ecosystem-test-scripts/blob/main/CODE_OF_CONDUCT.md
 [Contributing Guidelines]: https://github.com/mozilla/ecosystem-test-scripts/blob/main/CONTRIBUTING.md

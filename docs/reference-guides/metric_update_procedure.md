@@ -97,7 +97,6 @@ _**Notes**:_
 Compress the contents of the `test_result_dir`, typically called 'raw_data,' and replace the file
 located in the [ETE team folder][ETE Drive].
 
-
 [Autopush-rs GSheets]: https://docs.google.com/spreadsheets/d/1abjtg2e-PHm8JDP5A629KFVA-eBc8I5VtFPcz_UCDQs/edit?usp=drive_link
 [Developer Setup Guide]: ../developer-guides/developer_setup.md
 [ETE Drive]: https://drive.google.com/drive/folders/1N4YW97gEH6gmdlfDNtuGxUsdo2EKkCAi
