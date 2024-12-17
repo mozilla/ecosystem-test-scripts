@@ -62,31 +62,6 @@ reports_dir = reports
 service_account_file = google_sheets_key.json
 mappings = [
         {
-            "sheet_id": "1abjtg2e-PHm8JDP5A629KFVA-eBc8I5VtFPcz_UCDQs",
-            "tabs": [
-                {
-                    "file_name": "autopushrs_integration_tests_averages.csv",
-                    "tab_name": "Integration Averages"
-                },
-                {
-                    "file_name": "autopushrs_integration_tests_results.csv",
-                    "tab_name": "Integration Results"
-                },
-                {
-                    "file_name": "autopushrs_rust_unit_tests_averages.csv",
-                    "tab_name": "Unit Averages"
-                },
-                {
-                    "file_name": "autopushrs_rust_unit_tests_coverage.csv",
-                    "tab_name": "Unit Coverage"
-                },
-                {
-                    "file_name": "autopushrs_rust_unit_tests_results.csv",
-                    "tab_name": "Unit Results"
-                }
-            ]
-        },
-        {
             "sheet_id": "1qKwxsSI2RNo-qKZflETtBbyZ9b0ZUB_id2SL17_MmYo",
             "tabs": [
                {
@@ -170,35 +145,6 @@ mappings = [
                     "tab_name": "Nightly Unit Results"
                 }
             ]
-        },
-        {
-            "sheet_id": "1dZjfFVoYYPHmStCbyQkWXfBy9yvL10-g6OLQ3nU_25o",
-            "tabs": [
-                {
-                    "file_name": "merinopy_integration_tests_averages.csv",
-                    "tab_name": "Integration Averages"
-                },
-                {
-                    "file_name": "merinopy_integration_tests_coverage.csv",
-                    "tab_name": "Integration Coverage"
-                },
-                {
-                    "file_name": "merinopy_integration_tests_results.csv",
-                    "tab_name": "Integration Results"
-                },
-                {
-                    "file_name": "merinopy_unit_tests_averages.csv",
-                    "tab_name": "Unit Averages"
-                },
-                {
-                    "file_name": "merinopy_unit_tests_coverage.csv",
-                    "tab_name": "Unit Coverage"
-                },
-                {
-                    "file_name": "merinopy_unit_tests_results.csv",
-                    "tab_name": "Unit Results"
-                }
-            ]
         }
     ]
 ;
@@ -208,7 +154,7 @@ reports_dir = reports
 gcp_project_id = ecosystem-test-eng
 bigquery_dataset_name = test_metrics
 bigquery_service_account_file = metric_reporter_key.json
-output_csv = True
+output_csv = False
 update_bigquery = True
 
 [report_merger]
