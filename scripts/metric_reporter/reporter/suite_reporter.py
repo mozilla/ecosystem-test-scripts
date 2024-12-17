@@ -274,7 +274,6 @@ class SuiteReporter(BaseReporter):
             for row in result:
                 last_update: str | None = row["last_update"]
                 return datetime.strptime(last_update, DATETIME_FORMAT) if last_update else None
-            return None
         except (GoogleAPIError, TypeError, ValueError) as error:
             error_mapping: dict[type, str] = {
                 GoogleAPIError: f"Error executing query: {query}",
@@ -284,6 +283,7 @@ class SuiteReporter(BaseReporter):
             error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
             raise ReporterError(error_msg) from error
+        return None
 
     def _insert_rows(
         self, client: Client, table_id: str, results: Sequence[SuiteReporterResult]

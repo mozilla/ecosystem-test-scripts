@@ -219,7 +219,6 @@ class AveragesReporter(BaseReporter):
             for row in result:
                 last_update: date | None = row["last_update"]
                 return last_update
-            return None
         except (GoogleAPIError, TypeError, ValueError) as error:
             error_mapping: dict[type, str] = {
                 GoogleAPIError: f"Error executing query: {query}",
@@ -229,6 +228,7 @@ class AveragesReporter(BaseReporter):
             error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
             raise ReporterError(error_msg) from error
+        return None
 
     def _insert_rows(
         self, client: Client, table_id: str, results: list[AveragesReporterResult]
