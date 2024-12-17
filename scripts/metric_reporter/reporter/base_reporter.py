@@ -10,10 +10,10 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from dateutil import parser
+from google.cloud.bigquery import Client
 from pydantic import BaseModel
 
-DATE_FORMAT = "%Y-%m-%d"
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+from scripts.metric_reporter.constants import DATE_FORMAT
 
 
 class ReporterResultBase(BaseModel):
@@ -79,3 +79,16 @@ class BaseReporter:
             error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
             self.logger.error(error_msg, exc_info=error)
             raise ReporterError(error_msg) from error
+
+    def update_table(self, client: Client, project_id: str, dataset_name: str) -> None:
+        """Update the BigQuery table.
+
+        Args:
+            client (Client): The client to interact with BigQuery.
+            project_id (str): The BigQuery project ID.
+            dataset_name (str): The BigQuery dataset name.
+
+        Raises:
+            NotImplementedError: If the method is not implemented by a subclass.
+        """
+        raise NotImplementedError("Subclasses must implement the `update_table` method.")

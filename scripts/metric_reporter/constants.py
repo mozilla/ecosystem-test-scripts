@@ -2,4 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-"""__init__.py"""
+"""Module for metric reporter constants."""
+
+DATE_FORMAT = "%Y-%m-%d"
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+ISO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"

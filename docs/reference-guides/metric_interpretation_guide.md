@@ -9,8 +9,8 @@ themselves.
 
 ## Test Suite Size & Success Rates
 
-_Supported Test Frameworks:_ [jest][1], [mocha][2], [nextest][3], [playwright][4], [pytest][5], [tap][6]\
-_Supported CI:_ [CircleCI][7]
+_Supported Test Frameworks:_ [jest][jest], [mocha][mocha], [nextest][nextest], [playwright][playwright], [pytest][pytest], [tap][tap]\
+_Supported CI:_ [CircleCI][CircleCI]
 
 **Test Suite Size**
 
@@ -49,8 +49,9 @@ thresholds based on their specific needs:
 
 ## Time Measurements
 
-_Supported Test Frameworks:_ [jest][1], [mocha][2], [nextest][3], [playwright][4], [pytest][5]\
-_Supported CI:_ [CircleCI][7]
+_Supported Test Frameworks:_ [jest][jest], [mocha][mocha], [nextest][nextest],
+                             [playwright][playwright], [pytest][pytest]\
+_Supported CI:_ [CircleCI][CircleCI]
 
 Time measurements track how long it takes for tests to run. Ideally, these times should be
 proportional to the size of the test suite and remain stable over time. Significant increases or
@@ -79,7 +80,7 @@ follows:
 
 ## Coverage Metrics
 
-_Supported Coverage Frameworks:_ [pytest-cov][8], [llvm-cov][9]
+_Supported Coverage Frameworks:_ [pytest-cov][pytest-covI], [llvm-cov][llvm-cov]
 
 Coverage metrics measure the percentage of the codebase covered by tests. They help identify
 untested areas of the code, allowing teams to determine whether critical paths are adequately
@@ -99,8 +100,9 @@ needs:
 
 ## Skip Rates
 
-_Supported Test Frameworks:_ [jest][1], [mocha][2], [nextest][3], [playwright][4], [pytest][5]\
-_Supported CI:_ [CircleCI][7]
+_Supported Test Frameworks:_ [jest][jest], [mocha][mocha], [nextest][nextest], 
+                             [playwright][playwright], [pytest][pytest]\
+_Supported CI:_ [CircleCI][CircleCI]
 
 Skip rates indicate how often tests are temporarily excluded from execution. While skipping tests
 can be a necessary short-term solution to prevent flaky tests from disrupting workflows, high or
@@ -122,7 +124,7 @@ this metric.
 
 ## Retry Rates
 
-_Supported Test Frameworks:_ [playwright][4]
+_Supported Test Frameworks:_ [playwright][playwright]
 
 Retry rates track how often tests are re-executed following a failure. While retries can help
 address transient issues, such as network errors, elevated retry rates may indicate flakiness in the
@@ -130,12 +132,12 @@ test suite or performance regressions in the product. High retry rates can incre
 and negatively impact developer workflows. Monitoring retry rates helps teams identify and fix
 unstable tests, ensuring predictable test execution.
 
-[1]: https://jestjs.io/
-[2]: https://mochajs.org/
-[3]: https://nexte.st/
-[4]: https://playwright.dev/
-[5]: https://docs.pytest.org/
-[6]: https://node-tap.org/
-[7]: https://circleci.com/
-[8]: https://pypi.org/project/pytest-cov/
-[9]: https://llvm.org/docs/CommandGuide/llvm-cov.html
+[CircleCI]: https://circleci.com/
+[jest]: https://jestjs.io/
+[llvm-cov]: https://llvm.org/docs/CommandGuide/llvm-cov.html
+[mocha]: https://mochajs.org/
+[nextest]: https://nexte.st/
+[playwright]: https://playwright.dev/
+[pytest]: https://docs.pytest.org/
+[pytest-covI]: https://pypi.org/project/pytest-cov/
+[tap]: https://node-tap.org/
