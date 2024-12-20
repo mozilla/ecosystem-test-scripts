@@ -8,7 +8,7 @@ There are 5 Automation Statuses that a test case can have: Suitable, Completed, 
 
 **Suitable**
 
-This test case is suitable and can be prioritized for automation. These cases have been evaluated by Test Engineering, SoftVision or project engineers are automatable.
+This test case is suitable and can be prioritized for automation. These cases have been evaluated by Test Engineering, SoftVision or project engineers as automatable.
 
 **Completed**
 
