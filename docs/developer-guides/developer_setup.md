@@ -18,13 +18,13 @@ instructions. Store the key value in a safe place.
 
 **DO NOT SHARE YOUR CIRCLECI API TOKEN**
 
-## 3. Copy the BigQuery and Google Sheet Service Account JSON Keys
+## 3. Copy the BigQuery Service Account JSON Keys
 
-The `metric_reporter` and `google_sheet_uploader` scripts are set up using the 
-[ecosystem-test-eng GCP project][ETE GCP Project] with the metric-reporter and metric-gsheet
-[service accounts][ETE GCP Service Accounts] respectively. In order to execute these scripts, keys
-for these service account, in the form of JSON files, need to be copied from the 1Password Ecosystem
-Test Engineering Team Vault into the root directory of the `ecosystem-test-scripts` project.
+The `metric_reporter` script is set up using the [ecosystem-test-eng GCP project][ETE GCP Project]
+with the metric-reporter [service account][ETE GCP Service Accounts]. In order to execute the script
+a key for the service account, in the form of a JSON file, needs to be copied from the 1Password
+Ecosystem Test Engineering Team Vault into the root directory of the `ecosystem-test-scripts`
+project.
 
 ## 4. Set up the config.ini
 

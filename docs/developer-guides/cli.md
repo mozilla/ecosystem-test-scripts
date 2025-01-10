@@ -7,7 +7,6 @@
 - [`format`](#format) -- Apply formatting.
 - [`install`](#install) -- Install dependencies.
 - [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
-- [`run_google_sheet_uploader`](#run_google_sheet_uploader) -- Run the Test Metric Reporter.
 - [`run_metric_reporter`](#run_metric_reporter) -- Run the Test Metric Reporter.
 - [`run_report_merger`](#run_report_merger) -- Run the Report Merger.
 - [`test`](#test) -- Run tests.
@@ -167,18 +166,6 @@ If you have the previous day's data stored locally, the cached data will be used
 #### SEE ALSO
 
 - [`run_metric_reporter`](#run_metric_reporter) -- Run the Test Metric Reporter.
-
----
-
-### `run_google_sheet_uploader`
-
-Run the Google Sheet Uploader.
-
-#### USAGE
-
-```sh
-make run_google_sheet_uploader
-```
 
 ---
 
