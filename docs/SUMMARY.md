@@ -9,6 +9,7 @@
 # Reference Guides
 
 - [Metric Interpretation Guide](./reference-guides/metric_interpretation_guide.md)
+- [TestRail Metric Interpretation Guide](./reference-guides/testrail_metric_interpretation_guide.md)
 - [Metric Update Procedure](./reference-guides/metric_update_procedure.md)
 - [Project Onboarding Procedure](./reference-guides/project_onboarding_procedure.md)
 
