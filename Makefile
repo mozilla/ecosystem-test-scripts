@@ -22,7 +22,6 @@ help:
 	@echo "  run_circleci_scraper      Run the CircleCI scraper"
 	@echo "  run_google_sheet_uploader Run the Google Sheet Uploader"
 	@echo "  run_metric_reporter       Run the Metric Reporter"
-	@echo "  run_report_merger         Run the Report Merger"
 
 .PHONY: install
 install: $(INSTALL_STAMP)
@@ -86,7 +85,3 @@ run_google_sheet_uploader: $(INSTALL_STAMP)
 .PHONY: run_metric_reporter
 run_metric_reporter: $(INSTALL_STAMP)
 	PYTHONPATH=. $(POETRY) run python $(SCRIPTS_DIR)/metric_reporter/main.py --config=config.ini
-
-.PHONY: run_report_merger
-run_report_merger: $(INSTALL_STAMP)
-	PYTHONPATH=. $(POETRY) run python $(SCRIPTS_DIR)/report_merger/main.py --config=config.ini
