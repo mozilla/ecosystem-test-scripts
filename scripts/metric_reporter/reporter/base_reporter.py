@@ -4,9 +4,7 @@
 
 """Module defining the base for all reporting in the Metric Reporter."""
 
-import csv
 import logging
-from pathlib import Path
 from typing import Any, Sequence
 
 from dateutil import parser
@@ -47,38 +45,6 @@ class BaseReporter:
             return datetime.strftime(DATE_FORMAT)
         except (ValueError, TypeError) as error:
             raise ReporterError(f"Invalid timestamp format: {timestamp}") from error
-
-    def output_csv(self, report_path: Path) -> None:
-        """Output the results to a CSV file.
-
-        Args:
-            report_path (Path): Path to the file where the CSV report will be saved.
-
-        Raises:
-            ReporterError: If the report file cannot be created or written to.
-        """
-        try:
-            report_path.parent.mkdir(parents=True, exist_ok=True)
-            if not self.results:
-                self.logger.warning(f"No data to write to {report_path}.")
-                return
-
-            fieldnames: list[str] = list(self.results[0].dict_with_fieldnames().keys())
-            with open(report_path, "w", newline="") as csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                writer.writeheader()
-                for result in self.results:
-                    writer.writerow(result.dict_with_fieldnames())
-
-            self.logger.info(f"CSV report written to {report_path}")
-        except (OSError, IOError) as error:
-            error_mapping: dict[type, str] = {
-                OSError: "Error creating directories for the report file",
-                IOError: "The report file cannot be created or written to",
-            }
-            error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
-            self.logger.error(error_msg, exc_info=error)
-            raise ReporterError(error_msg) from error
 
     def update_table(self, client: Client, project_id: str, dataset_name: str) -> None:
         """Update the BigQuery table.
