@@ -34,14 +34,12 @@ logger = logging.getLogger(__name__)
 
 def main(
     config_file: str = "config.ini",
-    output_csv: bool | None = None,
     update_bigquery: bool | None = None,
 ) -> None:
     """Run the Metric Reporter.
 
     Args:
         config_file (str): Path to the configuration file.
-        output_csv (bool | None): Whether to output CSV files. Overrides config file if provided.
         update_bigquery (bool | None): Whether to update BigQuery tables. Overrides config file if provided.
     """
     try:
@@ -52,8 +50,6 @@ def main(
         bigquery_service_account_file: str = (
             config.metric_reporter_config.bigquery_service_account_file
         )
-        if output_csv is None:
-            output_csv = config.metric_reporter_config.output_csv
         if update_bigquery is None:
             update_bigquery = config.metric_reporter_config.update_bigquery
 
@@ -93,18 +89,12 @@ def main(
                 args.repository, args.workflow, args.test_suite, coverage_artifact_list
             )
 
-            if not output_csv and not update_bigquery:
+            if not update_bigquery:
                 logger.warning(
-                    "The metric reporter will not perform any action. Use the --output-csv or"
-                    " --update-bigquery flags."
+                    "The metric reporter will not perform any action. "
+                    "Use the --update-bigquery flag."
                 )
                 return
-
-            # Output CSV files if opted-in
-            if output_csv:
-                averages_reporter.output_csv(args.averages_csv_report_path)
-                coverage_reporter.output_csv(args.coverage_csv_report_path)
-                suite_reporter.output_csv(args.results_csv_report_path)
 
             # Update BigQuery dataset tables if opted-in
             if update_bigquery:
@@ -130,13 +120,11 @@ def main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the Metric Reporter")
     parser.add_argument("--config", help="Path to the config.ini file", default="config.ini")
-    parser.add_argument("--output-csv", help="Output CSV files", type=bool, default=None)
     parser.add_argument(
         "--update-bigquery", help="Update BigQuery tables", type=bool, default=None
     )
     parser_args = parser.parse_args()
     main(
         parser_args.config,
-        output_csv=parser_args.output_csv,
         update_bigquery=parser_args.update_bigquery,
     )

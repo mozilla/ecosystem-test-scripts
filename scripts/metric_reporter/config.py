@@ -9,9 +9,9 @@ import re
 from configparser import NoSectionError, NoOptionError
 from pathlib import Path
 
-from pydantic import BaseModel, ValidationError, Field
+from pydantic import BaseModel, ValidationError
 
-from scripts.common.config import BaseConfig, InvalidConfigError, DIRECTORY_PATTERN
+from scripts.common.config import BaseConfig, InvalidConfigError
 
 
 class MetricReporterArgs(BaseModel):
@@ -23,19 +23,14 @@ class MetricReporterArgs(BaseModel):
     metadata_path: Path
     junit_artifact_path: Path
     coverage_artifact_path: Path
-    averages_csv_report_path: Path
-    results_csv_report_path: Path
-    coverage_csv_report_path: Path
 
 
 class MetricReporterConfig(BaseModel):
     """Model for Metric Reporter configuration."""
 
-    reports_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
     gcp_project_id: str
     bigquery_dataset_name: str
     bigquery_service_account_file: str
-    output_csv: bool = False
     update_bigquery: bool = False
 
 
@@ -61,7 +56,6 @@ class Config(BaseConfig):
 
     def _parse_metric_reporter_config(self) -> MetricReporterConfig:
         try:
-            reports_dir: str = self.config_parser.get("metric_reporter", "reports_dir")
             gcp_project_id: str = self.config_parser.get("metric_reporter", "gcp_project_id")
             bigquery_dataset_name: str = self.config_parser.get(
                 "metric_reporter", "bigquery_dataset_name"
@@ -69,18 +63,13 @@ class Config(BaseConfig):
             bigquery_service_account_file: str = self.config_parser.get(
                 "metric_reporter", "bigquery_service_account_file"
             )
-            output_csv: bool = self.config_parser.getboolean(
-                "metric_reporter", "output_csv", fallback=False
-            )
             update_bigquery: bool = self.config_parser.getboolean(
                 "metric_reporter", "update_bigquery", fallback=False
             )
             return MetricReporterConfig(
-                reports_dir=reports_dir,
                 gcp_project_id=gcp_project_id,
                 bigquery_dataset_name=bigquery_dataset_name,
                 bigquery_service_account_file=bigquery_service_account_file,
-                output_csv=output_csv,
                 update_bigquery=update_bigquery,
             )
         except (NoSectionError, NoOptionError, ValidationError) as error:
@@ -132,18 +121,6 @@ class Config(BaseConfig):
                             metadata_path=metadata_path,
                             junit_artifact_path=junit_artifact_path,
                             coverage_artifact_path=coverage_artifact_path,
-                            averages_csv_report_path=(
-                                Path(self.metric_reporter_config.reports_dir)
-                                / f"{repository}_{test_suite}_averages.csv"
-                            ),
-                            results_csv_report_path=(
-                                Path(self.metric_reporter_config.reports_dir)
-                                / f"{repository}_{test_suite}_results.csv"
-                            ),
-                            coverage_csv_report_path=(
-                                Path(self.metric_reporter_config.reports_dir)
-                                / f"{repository}_{test_suite}_coverage.csv"
-                            ),
                         )
                         test_metric_args_list.append(test_metric_args)
 

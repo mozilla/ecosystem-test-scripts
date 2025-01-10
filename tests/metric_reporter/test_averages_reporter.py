@@ -8,7 +8,6 @@ import logging
 from datetime import date
 from pathlib import Path
 from typing import Sequence
-from unittest.mock import MagicMock
 
 from pytest import LogCaptureFixture
 from pytest_mock import MockerFixture
@@ -397,72 +396,6 @@ def test_averages_reporter_init(config: ConfigValues, test_data_directory: Path)
         and reporter.results[89] == EXPECTED_RESULTS[8]
         and reporter.results[90] == EXPECTED_RESULTS[9]
     )
-
-
-def test_averages_reporter_output_csv(
-    mocker: MockerFixture, config: ConfigValues, test_data_directory: Path
-) -> None:
-    """Test AveragesReporter output_results_csv method with test results.
-
-    Args:
-        mocker (MockerFixture): pytest_mock fixture for mocking.
-        config (ConfigValues): pytest fixture for common config values.
-        test_data_directory (Path): Test data directory for the Metric Reporter.
-    """
-    report_path: Path = test_data_directory / "fake_path.csv"
-
-    mock_open: MagicMock = mocker.mock_open()
-    mocker.patch("builtins.open", mock_open)
-    mocker.patch("os.makedirs")
-
-    expected_csv_path: Path = test_data_directory / "averages_csv" / "averages.csv"
-    with expected_csv_path.open("r", newline="") as file:
-        expected_csv = file.read()
-
-    reporter = AveragesReporter(
-        config.repository, config.workflow, config.test_suite, SUITE_RESULTS
-    )
-
-    reporter.output_csv(report_path)
-
-    mock_open.assert_called_once_with(report_path, "w", newline="")
-    handle = mock_open()
-    actual_csv = "".join(call[0][0] for call in handle.write.call_args_list)
-    assert actual_csv == expected_csv
-
-
-def test_averages_reporter_output_csv_with_empty_test_results(
-    caplog: LogCaptureFixture,
-    mocker: MockerFixture,
-    config: ConfigValues,
-    test_data_directory: Path,
-) -> None:
-    """Test AveragesReporter output_results_csv method with no test results.
-
-    Args:
-        caplog (LogCaptureFixture): pytest fixture for capturing log output.
-        mocker (MockerFixture): pytest_mock fixture for mocking.
-        config (ConfigValues): pytest fixture for common config values.
-        test_data_directory (Path): Test data directory for the Metric Reporter.
-    """
-    suite_results: Sequence[SuiteReporterResult] = []
-    report_path = test_data_directory / "fake_path.csv"
-
-    mock_open: MagicMock = mocker.mock_open()
-    mocker.patch("builtins.open", mock_open)
-    mocker.patch("os.makedirs")
-
-    expected_log = f"No data to write to {report_path}."
-
-    reporter = AveragesReporter(
-        config.repository, config.workflow, config.test_suite, suite_results
-    )
-
-    with caplog.at_level(logging.INFO):
-        reporter.output_csv(report_path)
-
-        mock_open.assert_not_called()
-        assert expected_log in caplog.text
 
 
 def test_averages_reporter_update_table_with_new_results(
