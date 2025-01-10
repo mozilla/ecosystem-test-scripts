@@ -178,5 +178,4 @@ merged_reports/
 book/
 
 # GCP service account key files
-google_sheets_key.json
 metric_reporter_key.json
