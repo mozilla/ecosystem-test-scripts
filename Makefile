@@ -20,7 +20,6 @@ help:
 	@echo "  test_coverage_html        Run tests and generate HTML coverage report"
 	@echo "  clean                     Clean up installation and cache files"
 	@echo "  run_circleci_scraper      Run the CircleCI scraper"
-	@echo "  run_google_sheet_uploader Run the Google Sheet Uploader"
 	@echo "  run_metric_reporter       Run the Metric Reporter"
 
 .PHONY: install
@@ -31,7 +30,7 @@ $(INSTALL_STAMP): $(PYPROJECT_TOML) $(POETRY_LOCK)
 		echo "Poetry could not be found. See https://python-poetry.org/docs/"; \
 		exit 2; \
 	fi
-	$(POETRY) install --no-root --with circleci_scraper,metric_reporter,google_sheet_uploader,dev
+	$(POETRY) install --no-root --with circleci_scraper,metric_reporter,dev
 	# Create an empty install stamp file to indicate that dependencies have been installed
 	touch $(INSTALL_STAMP)
 
@@ -77,10 +76,6 @@ clean:
 .PHONY: run_circleci_scraper
 run_circleci_scraper: $(INSTALL_STAMP)
 	PYTHONPATH=. $(POETRY) run python $(SCRIPTS_DIR)/circleci_scraper/main.py --config=config.ini
-
-.PHONY: run_google_sheet_uploader
-run_google_sheet_uploader: $(INSTALL_STAMP)
-	PYTHONPATH=. $(POETRY) run python $(SCRIPTS_DIR)/google_sheet_uploader/main.py --config=config.ini
 
 .PHONY: run_metric_reporter
 run_metric_reporter: $(INSTALL_STAMP)

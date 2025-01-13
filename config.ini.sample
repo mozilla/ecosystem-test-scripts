@@ -57,11 +57,6 @@ pipelines = [
 ;(optional) Get data starting from x days past from now (default: all available data)
 days_of_data = 2
 
-[google_sheet_uploader]
-reports_dir = reports
-service_account_file = google_sheets_key.json
-mappings = [];
-
 [metric_reporter]
 gcp_project_id = ecosystem-test-eng
 bigquery_dataset_name = test_metrics
