@@ -9,7 +9,6 @@
 - [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
 - [`run_google_sheet_uploader`](#run_google_sheet_uploader) -- Run the Test Metric Reporter.
 - [`run_metric_reporter`](#run_metric_reporter) -- Run the Test Metric Reporter.
-- [`run_report_merger`](#run_report_merger) -- Run the Report Merger.
 - [`test`](#test) -- Run tests.
 - [`test_coverage`](#test_coverage) -- Run tests with coverage reporting.
 - [`test_coverage_html`](#test_coverage_html) -- Run tests and generate HTML coverage report.
@@ -195,15 +194,3 @@ make run_metric_reporter
 #### SEE ALSO
 
 - [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
-
----
-
-### `run_report_merger`
-
-Run the Report Merger.
-
-#### USAGE
-
-```sh
-make run_report_merger
-```
