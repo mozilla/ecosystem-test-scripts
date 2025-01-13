@@ -5,9 +5,7 @@
 """Tests for the CoverageReporter module."""
 
 import logging
-from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock
 
 import pytest
 from pytest import LogCaptureFixture
@@ -42,76 +40,6 @@ def test_coverage_reporter_init(
     )
 
     assert reporter.results == expected_results
-
-
-@pytest.mark.parametrize(
-    "fixture", ["coverage_llvm_cov_data", "coverage_pytest_data"], ids=["llvm-cov", "pytest"]
-)
-def test_coverage_reporter_output_csv(
-    mocker: MockerFixture,
-    config: ConfigValues,
-    test_data_directory: Path,
-    fixture: str,
-    request: pytest.FixtureRequest,
-) -> None:
-    """Test CoverageReporter output_results_csv method with llvm-cov and pytest report data.
-
-    Args:
-        mocker (MockerFixture): pytest_mock fixture for mocking.
-        config (ConfigValues): pytest fixture for common config values.
-        test_data_directory (Path): Test data directory for the Metric Reporter.
-        fixture (str): The name of the fixture with coverage sample data.
-        request (FixtureRequest): A pytest request object for accessing fixtures.
-    """
-    coverage_data: SampleCoverageData = request.getfixturevalue(fixture)
-    expected_csv: str = coverage_data.csv
-    reporter = CoverageReporter(
-        config.repository, config.workflow, config.test_suite, coverage_data.report_list
-    )
-    report_path = test_data_directory / "fake_path.csv"
-
-    mock_open: MagicMock = mocker.mock_open()
-    mocker.patch("builtins.open", mock_open)
-    mocker.patch("os.makedirs")
-
-    reporter.output_csv(report_path)
-
-    mock_open.assert_called_once_with(report_path, "w", newline="")
-    handle = mock_open()
-    actual_csv = "".join(call[0][0] for call in handle.write.call_args_list)
-    assert actual_csv == expected_csv
-
-
-def test_coverage_reporter_output_csv_with_empty_test_results(
-    caplog: LogCaptureFixture,
-    mocker: MockerFixture,
-    config: ConfigValues,
-    test_data_directory: Path,
-) -> None:
-    """Test CoverageReporter output_results_csv method with no test results.
-
-    Args:
-        caplog (LogCaptureFixture): pytest fixture for capturing log output.
-        mocker (MockerFixture): pytest_mock fixture for mocking.
-        config (ConfigValues): pytest fixture for common config values.
-        test_data_directory (Path): Test data directory for the Metric Reporter.
-    """
-    coverage_summary_list: list[LlvmCovReport | PytestReport] | None = None
-    reporter = CoverageReporter(
-        config.repository, config.workflow, config.test_suite, coverage_summary_list
-    )
-    report_path = test_data_directory / "fake_path.csv"
-    expected_log = f"No data to write to {report_path}"
-
-    with caplog.at_level(logging.INFO):
-        mock_open: MagicMock = mocker.mock_open()
-        mocker.patch("builtins.open", mock_open)
-        mocker.patch("os.makedirs")
-
-        reporter.output_csv(report_path)
-
-        mock_open.assert_not_called()
-        assert expected_log in caplog.text
 
 
 @pytest.mark.parametrize(

@@ -442,14 +442,6 @@ ARTIFACT_RESULTS: list[SuiteReporterResult] = [
         success=1,
     ),
 ]
-ARTIFACT_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate,Failure Rate,Skipped Rate,Fixme Rate,Unknown Rate\r\n"
-    "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,1.1,,1.1,0,1,0,0,0,1,1,0.0,100.0,0.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,1.2,,1.2,0,0,1,1,0,0,1,0.0,0.0,100.0,100.0,0.0\r\n"
-    "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,1.3,,1.3,1,0,0,0,0,1,1,100.0,0.0,0.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-04,2024-01-04T00:00:00Z,4,success,1.4,,1.4,0,0,1,0,0,0,1,0.0,0.0,100.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-05,2024-01-05T00:00:00Z,5,success,1.5,,1.5,1,0,0,0,0,0,1,100.0,0.0,0.0,0.0,0.0\r\n"
-)
 ARTIFACT_JSON: list[dict[str, Any]] = [
     {
         "Date": "2024-01-01",
@@ -641,15 +633,6 @@ METADATA_RESULTS: list[SuiteReporterResult] = [
         unknown=1,
     ),
 ]
-METADATA_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate,Failure Rate,Skipped Rate,Fixme Rate,Unknown Rate\r\n"
-    "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,,3600.0,1.1,0,1,0,0,0,0,1,0.0,100.0,0.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,,3600.0,1.2,0,0,1,0,0,0,1,0.0,0.0,100.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,,3600.0,1.3,1,0,0,0,0,0,1,100.0,0.0,0.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-04,2024-01-04T00:00:00Z,4,success,,3600.0,1.4,0,0,1,0,0,0,1,0.0,0.0,100.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-05,2024-01-05T00:00:00Z,5,success,,3600.0,1.5,1,0,0,0,0,0,1,100.0,0.0,0.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-06,2024-01-06T00:00:00Z,6,unknown,,3600.0,1.6,0,0,0,0,1,0,1,0.0,0.0,0.0,0.0,100.0\r\n"
-)
 METADATA_JSON: list[dict[str, Any]] = [
     {
         "Date": "2024-01-01",
@@ -873,15 +856,6 @@ ARTIFACT_AND_METADATA_RESULTS: list[SuiteReporterResult] = [
         unknown=1,
     ),
 ]
-ARTIFACT_AND_METADATA_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Status,Execution Time,Job Time,Run Time,Success,Failure,Skipped,Fixme,Unknown,Retry Count,Total,Success Rate,Failure Rate,Skipped Rate,Fixme Rate,Unknown Rate\r\n"
-    "repo,main,suite,2024-01-01,2024-01-01T00:00:00Z,1,failed,1.1,3600.0,1.1,0,1,0,0,0,1,1,0.0,100.0,0.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-02,2024-01-02T00:00:00Z,2,success,1.2,3600.0,1.2,0,0,1,1,0,0,1,0.0,0.0,100.0,100.0,0.0\r\n"
-    "repo,main,suite,2024-01-03,2024-01-03T00:00:00Z,3,success,1.3,3600.0,1.3,1,0,0,0,0,1,1,100.0,0.0,0.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-04,2024-01-04T00:00:00Z,4,success,1.4,3600.0,1.4,0,0,1,0,0,0,1,0.0,0.0,100.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-05,2024-01-05T00:00:00Z,5,success,1.5,3600.0,1.5,1,0,0,0,0,0,1,100.0,0.0,0.0,0.0,0.0\r\n"
-    "repo,main,suite,2024-01-06,2024-01-06T00:00:00Z,6,unknown,,3600.0,1.6,0,0,0,0,1,0,1,0.0,0.0,0.0,0.0,100.0\r\n"
-)
 ARTIFACT_AND_METADATA_JSON: list[dict[str, Any]] = [
     {
         "Repository": "repo",
@@ -1076,10 +1050,6 @@ LLVM_COV_REPORT_RESULTS: list[CoverageReporterResult] = [
         branch_percent=0.0,
     )
 ]
-LLVM_COV_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Line Count,Line Covered,Line Not Covered,Line Excluded,Line Percent,Function Count,Function Covered,Function Not Covered,Function Percent,Branch Count,Branch Covered,Branch Not Covered,Branch Percent\r\n"
-    "repo,main,suite,2024-08-30,2024-08-30T19:56:50Z,1,9441,5761,3680,,61.0210782756064,1007,589,418,58.490566037735846,0,0,0,0.0\r\n"
-)
 LLVM_COV_JSON: list[dict[str, Any]] = [
     {
         "Branch Count": 0,
@@ -1149,10 +1119,6 @@ PYTEST_REPORT_RESULTS: list[CoverageReporterResult] = [
         branch_percent=78.15482502651113,
     )
 ]
-PYTEST_CSV: str = (
-    "Repository,Workflow,Test Suite,Date,Timestamp,Job Number,Line Count,Line Covered,Line Not Covered,Line Excluded,Line Percent,Function Count,Function Covered,Function Not Covered,Function Percent,Branch Count,Branch Covered,Branch Not Covered,Branch Percent\r\n"
-    "repo,main,suite,2024-08-29,2024-08-29T17:43:41Z,1,3782,3138,644,217,82.01058201058201,,,,,943,737,206,78.15482502651113\r\n"
-)
 PYTEST_JSON: list[dict[str, Any]] = [
     {
         "Branch Count": 943,
@@ -1194,7 +1160,6 @@ class SampleCoverageData(BaseModel):
     sample_directory: Path
     report_list: list[LlvmCovReport | PytestReport]
     report_results: list[CoverageReporterResult]
-    csv: str
     json_rows: list[dict[str, Any]]
 
 
@@ -1204,7 +1169,6 @@ class SampleResultsData(BaseModel):
     metadata_list: list[CircleCIJobTestMetadata] | None
     artifact_list: list[JUnitXmlJobTestSuites] | None
     report_results: list[SuiteReporterResult]
-    csv: str
     json_rows: list[dict[str, Any]]
 
 
@@ -1233,7 +1197,6 @@ def coverage_llvm_cov_data(test_data_directory: Path) -> SampleCoverageData:
         sample_directory=test_data_directory / LLVM_COV_SAMPLE_DIRECTORY,
         report_list=LLVM_COV_REPORT_LIST,
         report_results=LLVM_COV_REPORT_RESULTS,
-        csv=LLVM_COV_CSV,
         json_rows=LLVM_COV_JSON,
     )
 
@@ -1245,7 +1208,6 @@ def coverage_pytest_data(test_data_directory: Path) -> SampleCoverageData:
         sample_directory=test_data_directory / PYTEST_SAMPLE_DIRECTORY,
         report_list=PYTEST_REPORT_LIST,
         report_results=PYTEST_REPORT_RESULTS,
-        csv=PYTEST_CSV,
         json_rows=PYTEST_JSON,
     )
 
@@ -1257,7 +1219,6 @@ def results_artifact_data(test_data_directory: Path) -> SampleResultsData:
         metadata_list=None,
         artifact_list=JUNIT_XML_JOB_TEST_SUITES_LIST,
         report_results=ARTIFACT_RESULTS,
-        csv=ARTIFACT_CSV,
         json_rows=ARTIFACT_JSON,
     )
 
@@ -1269,7 +1230,6 @@ def results_metadata_data(test_data_directory: Path) -> SampleResultsData:
         metadata_list=CIRCLECI_JOB_TEST_METADATA_LIST,
         artifact_list=None,
         report_results=METADATA_RESULTS,
-        csv=METADATA_CSV,
         json_rows=METADATA_JSON,
     )
 
@@ -1281,6 +1241,5 @@ def results_artifact_and_metadata_data(test_data_directory: Path) -> SampleResul
         metadata_list=CIRCLECI_JOB_TEST_METADATA_LIST,
         artifact_list=JUNIT_XML_JOB_TEST_SUITES_LIST,
         report_results=ARTIFACT_AND_METADATA_RESULTS,
-        csv=ARTIFACT_AND_METADATA_CSV,
         json_rows=ARTIFACT_AND_METADATA_JSON,
     )

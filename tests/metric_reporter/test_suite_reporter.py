@@ -5,8 +5,6 @@
 """Tests for the SuiteReporter module."""
 
 import logging
-from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 from pytest import LogCaptureFixture
@@ -44,83 +42,6 @@ def test_suite_reporter_init(
     )
 
     assert reporter.results == results_data.report_results
-
-
-@pytest.mark.parametrize(
-    "fixture",
-    ["results_artifact_data", "results_metadata_data", "results_artifact_and_metadata_data"],
-    ids=["artifact_test_results", "metadata_test_results", "artifact_metadata_test_results"],
-)
-def test_suite_reporter_output_csv(
-    mocker: MockerFixture,
-    config: ConfigValues,
-    test_data_directory: Path,
-    fixture: str,
-    request: pytest.FixtureRequest,
-) -> None:
-    """Test SuiteReporter output_csv method with test results.
-
-    Args:
-        mocker (MockerFixture): pytest_mock fixture for mocking.
-        config (ConfigValues): pytest fixture for common config values.
-        test_data_directory (Path): Test data directory for the Metric Reporter.
-        fixture (str): The name of the fixture with coverage sample data.
-        request (FixtureRequest): A pytest request object for accessing fixtures.
-    """
-    results_data: SampleResultsData = request.getfixturevalue(fixture)
-    report_path = test_data_directory / "fake_path.csv"
-
-    mock_open: MagicMock = mocker.mock_open()
-    mocker.patch("builtins.open", mock_open)
-    mocker.patch("os.makedirs")
-
-    reporter = SuiteReporter(
-        config.repository,
-        config.workflow,
-        config.test_suite,
-        results_data.metadata_list,
-        results_data.artifact_list,
-    )
-
-    reporter.output_csv(report_path)
-
-    mock_open.assert_called_once_with(report_path, "w", newline="")
-    handle = mock_open()
-    actual_csv = "".join(call[0][0] for call in handle.write.call_args_list)
-    assert actual_csv == results_data.csv
-
-
-def test_suite_reporter_output_csv_with_empty_test_results(
-    caplog: LogCaptureFixture,
-    mocker: MockerFixture,
-    config: ConfigValues,
-    test_data_directory: Path,
-) -> None:
-    """Test SuiteReporter output_csv method with no test results.
-
-    Args:
-        caplog (LogCaptureFixture): pytest fixture for capturing log output.
-        mocker (MockerFixture): pytest_mock fixture for mocking.
-        config (ConfigValues): pytest fixture for common config values.
-        test_data_directory (Path): Test data directory for the Metric Reporter.
-    """
-    metadata_list: list[CircleCIJobTestMetadata] | None = None
-    artifact_list: list[JUnitXmlJobTestSuites] | None = None
-    reporter = SuiteReporter(
-        config.repository, config.workflow, config.test_suite, metadata_list, artifact_list
-    )
-    report_path = test_data_directory / "fake_path.csv"
-    expected_log = f"No data to write to {report_path}"
-
-    with caplog.at_level(logging.INFO):
-        mock_open: MagicMock = mocker.mock_open()
-        mocker.patch("builtins.open", mock_open)
-        mocker.patch("os.makedirs")
-
-        reporter.output_csv(report_path)
-
-        mock_open.assert_not_called()
-        assert expected_log in caplog.text
 
 
 @pytest.mark.parametrize(
