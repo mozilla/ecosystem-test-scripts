@@ -20,7 +20,6 @@ class MetricReporterArgs(BaseModel):
     repository: str
     workflow: str
     test_suite: str
-    metadata_path: Path
     junit_artifact_path: Path
     coverage_artifact_path: Path
 
@@ -106,19 +105,13 @@ class Config(BaseConfig):
                     coverage_artifact_path = (
                         current_path / self.common_config.coverage_artifact_dir
                     )
-                    metadata_path = current_path / self.common_config.test_metadata_dir
-                    if (
-                        junit_artifact_path.exists()
-                        or coverage_artifact_path.exists()
-                        or metadata_path.exists()
-                    ):
+                    if junit_artifact_path.exists() or coverage_artifact_path.exists():
                         repository = self._normalize_name(Path(directory_path).parents[0].name)
                         test_suite = self._normalize_name(directory_name, "_")
                         test_metric_args = MetricReporterArgs(
                             repository=repository,
                             workflow=directory_path.name,
                             test_suite=test_suite,
-                            metadata_path=metadata_path,
                             junit_artifact_path=junit_artifact_path,
                             coverage_artifact_path=coverage_artifact_path,
                         )

@@ -79,7 +79,7 @@ class PytestReport(BaseModel):
     """Represents a pytest coverage report."""
 
     job_number: int
-    job_timestamp: str | None
+    job_timestamp: str
     meta: PytestMeta
     totals: PytestTotals
 

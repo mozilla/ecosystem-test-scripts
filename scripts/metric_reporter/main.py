@@ -12,10 +12,6 @@ from google.oauth2 import service_account
 
 from scripts.metric_reporter.config import Config, InvalidConfigError
 from scripts.metric_reporter.parser.base_parser import ParserError
-from scripts.metric_reporter.parser.circleci_json_parser import (
-    CircleCIJsonParser,
-    CircleCIJobTestMetadata,
-)
 from scripts.metric_reporter.parser.coverage_json_parser import (
     CoverageJsonParser,
     LlvmCovReport,
@@ -54,7 +50,6 @@ def main(
             update_bigquery = config.metric_reporter_config.update_bigquery
 
         # Create Parsers
-        circleci_parser = CircleCIJsonParser()
         coverage_json_parser = CoverageJsonParser()
         junit_xml_parser = JUnitXmlParser()
 
@@ -68,9 +63,6 @@ def main(
             logger.info(f"Reporting for {args.repository} {args.workflow} {args.test_suite}")
 
             # Parse files
-            metadata_list: list[CircleCIJobTestMetadata] | None = None
-            if args.metadata_path.is_dir():
-                metadata_list = circleci_parser.parse(args.metadata_path)
             junit_artifact_list: list[JUnitXmlJobTestSuites] | None = None
             if args.junit_artifact_path.is_dir():
                 junit_artifact_list = junit_xml_parser.parse(args.junit_artifact_path)
@@ -80,7 +72,7 @@ def main(
 
             # Create reporters
             suite_reporter = SuiteReporter(
-                args.repository, args.workflow, args.test_suite, metadata_list, junit_artifact_list
+                args.repository, args.workflow, args.test_suite, junit_artifact_list
             )
             averages_reporter = AveragesReporter(
                 args.repository, args.workflow, args.test_suite, suite_reporter.results

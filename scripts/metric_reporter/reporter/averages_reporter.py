@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-"""Module for reporting test suite average results from CircleCI metadata."""
+"""Module for reporting test suite average results from JUnit XML reports."""
 
 import operator
 from datetime import date, datetime, timedelta
@@ -37,21 +37,18 @@ class AveragesReporterResult(ReporterResultBase):
     suite_count_30: int
     success_rate_30: float | None = None
     run_time_30: float | None = None
-    job_time_30: float | None = None
     execution_time_30: float | None = None
     start_date_60: str
     stop_date_60: str
     suite_count_60: int
     success_rate_60: float | None = None
     run_time_60: float | None = None
-    job_time_60: float | None = None
     execution_time_60: float | None = None
     start_date_90: str
     stop_date_90: str
     suite_count_90: int
     success_rate_90: float | None = None
     run_time_90: float | None = None
-    job_time_90: float | None = None
     execution_time_90: float | None = None
 
     def dict_with_fieldnames(self) -> dict[str, Any]:
@@ -70,26 +67,23 @@ class AveragesReporterResult(ReporterResultBase):
             "Success Rate 30": self.success_rate_30,
             "Run Time 30": self.run_time_30,
             "Execution Time 30": self.execution_time_30,
-            "Job Time 30": self.job_time_30,
             "Start Date 60": self.start_date_60,
             "End Date 60": self.stop_date_60,
             "Suite Count 60": self.suite_count_60,
             "Success Rate 60": self.success_rate_60,
             "Run Time 60": self.run_time_60,
             "Execution Time 60": self.execution_time_60,
-            "Job Time 60": self.job_time_60,
             "Start Date 90": self.start_date_90,
             "End Date 90": self.stop_date_90,
             "Suite Count 90": self.suite_count_90,
             "Success Rate 90": self.success_rate_90,
             "Run Time 90": self.run_time_90,
             "Execution Time 90": self.execution_time_90,
-            "Job Time 90": self.job_time_90,
         }
 
 
 class AveragesReporter(BaseReporter):
-    """Handles the reporting of test suite results from CircleCI metadata and JUnit XML Reports."""
+    """Handles the reporting of test suite results from JUnit XML Reports."""
 
     def __init__(
         self,
@@ -332,10 +326,6 @@ class AveragesReporter(BaseReporter):
             run_times: list[float] = [r.run_time for r in subset if r.run_time > 0]
             if run_times:
                 averages[f"run_time_{str(delta)}"] = reduce(operator.add, run_times) / suite_count
-
-            job_times: list[float] = [r.job_time for r in subset if r.job_time]
-            if job_times:
-                averages[f"job_time_{str(delta)}"] = reduce(operator.add, job_times) / suite_count
 
             execution_times: list[float] = [r.execution_time for r in subset if r.execution_time]
             if execution_times:

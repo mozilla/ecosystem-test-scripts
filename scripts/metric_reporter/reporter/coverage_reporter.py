@@ -10,11 +10,10 @@ from typing import Any, Sequence
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud.bigquery import ArrayQueryParameter, Client, QueryJobConfig, ScalarQueryParameter
 
-from scripts.metric_reporter.constants import DATETIME_FORMAT, ISO_DATETIME_FORMAT
+from scripts.metric_reporter.constants import DATETIME_FORMAT
 from scripts.metric_reporter.parser.coverage_json_parser import (
     LlvmCovReport,
     LlvmCovTotals,
-    PytestMeta,
     PytestReport,
     PytestTotals,
 )
@@ -289,23 +288,14 @@ class CoverageReporter(BaseReporter):
 
     def _parse_pytest_report(self, pytest_report: PytestReport) -> CoverageReporterResult:
         totals: PytestTotals = pytest_report.totals
-        meta: PytestMeta = pytest_report.meta
-
-        # Standardize Timestamp format
-        timestamp: str | None = (
-            pytest_report.job_timestamp
-            if pytest_report.job_timestamp
-            else datetime.strptime(meta.timestamp, ISO_DATETIME_FORMAT).strftime(DATETIME_FORMAT)
-            if meta.timestamp
-            else None
-        )
-
         return CoverageReporterResult(
             repository=self.repository,
             workflow=self.workflow,
             test_suite=self.test_suite,
-            timestamp=timestamp,
-            date=self._extract_date(timestamp) if timestamp else None,
+            timestamp=pytest_report.job_timestamp,
+            date=self._extract_date(pytest_report.job_timestamp)
+            if pytest_report.job_timestamp
+            else None,
             job=pytest_report.job_number,
             line_count=totals.num_statements,
             line_covered=totals.covered_lines,

@@ -10,64 +10,36 @@ import pytest
 from pytest import LogCaptureFixture
 from pytest_mock import MockerFixture
 
-from scripts.metric_reporter.parser.circleci_json_parser import CircleCIJobTestMetadata
 from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
 from tests.metric_reporter.conftest import ConfigValues, SampleResultsData
 
 
-@pytest.mark.parametrize(
-    "fixture",
-    ["results_artifact_data", "results_metadata_data", "results_artifact_and_metadata_data"],
-    ids=["artifact_test_results", "metadata_test_results", "artifact_metadata_test_results"],
-)
 def test_suite_reporter_init(
-    config: ConfigValues, fixture: str, request: pytest.FixtureRequest
+    config: ConfigValues, results_artifact_data: SampleResultsData
 ) -> None:
     """Test SuiteReporter initialization.
 
     Args:
         config (ConfigValues): pytest fixture for common config values.
-        fixture (str): The name of the fixture with coverage sample data.
-        request (FixtureRequest): A pytest request object for accessing fixtures.
+        results_artifact_data (SampleResultsData): results artifact data.
     """
-    results_data: SampleResultsData = request.getfixturevalue(fixture)
-
     reporter = SuiteReporter(
-        config.repository,
-        config.workflow,
-        config.test_suite,
-        results_data.metadata_list,
-        results_data.artifact_list,
+        config.repository, config.workflow, config.test_suite, results_artifact_data.artifact_list
     )
 
-    assert reporter.results == results_data.report_results
+    assert reporter.results == results_artifact_data.report_results
 
 
 @pytest.mark.parametrize(
-    "fixture, last_update_return_value",
-    [
-        ("results_artifact_data", []),
-        ("results_artifact_data", [{"last_update": "2023-01-01T00:00:00Z"}]),
-        ("results_metadata_data", []),
-        ("results_metadata_data", [{"last_update": "2023-01-01T00:00:00Z"}]),
-        ("results_artifact_and_metadata_data", []),
-        ("results_artifact_and_metadata_data", [{"last_update": "2023-01-01T00:00:00Z"}]),
-    ],
-    ids=[
-        "artifact_test_results_new_table",
-        "artifact_test_results_existing_table",
-        "metadata_test_results_new_table",
-        "metadata_test_results_existing_table",
-        "artifact_metadata_test_results_new_table",
-        "artifact_metadata_test_results_existing_table",
-    ],
+    "last_update_return_value",
+    [[], [{"last_update": "2023-01-01T00:00:00Z"}]],
+    ids=["new_table", "existing_table"],
 )
 def test_suite_reporter_update_table_with_new_results(
     mocker: MockerFixture,
     config: ConfigValues,
-    fixture: str,
-    request: pytest.FixtureRequest,
+    results_artifact_data: SampleResultsData,
     last_update_return_value: list[dict[str, str]],
 ) -> None:
     """Test SuiteReporter update_table method with new test results.
@@ -75,12 +47,9 @@ def test_suite_reporter_update_table_with_new_results(
     Args:
         mocker (MockerFixture): pytest_mock fixture for mocking.
         config (ConfigValues): pytest fixture for common config values.
-        fixture (str): The name of the fixture with coverage sample data.
-        request (FixtureRequest): A pytest request object for accessing fixtures.
+        results_artifact_data (SampleResultsData): results artifact data.
         last_update_return_value (list[dict[str, str]]): Value returned by get_last_update mock
     """
-    results_data: SampleResultsData = request.getfixturevalue(fixture)
-
     get_last_update_query_mock = mocker.MagicMock()
     get_last_update_query_mock.result.return_value = last_update_return_value
     check_rows_exist_query_mock = mocker.MagicMock()
@@ -89,32 +58,26 @@ def test_suite_reporter_update_table_with_new_results(
     client_mock.query.side_effect = [get_last_update_query_mock, check_rows_exist_query_mock]
     client_mock.insert_rows_json.return_value = []
 
-    expected_table_id = f"{config.project_id}.{config.dataset_name}.{config.repository}_results"
+    expected_table_id = (
+        f"{config.project_id}.{config.dataset_name}.{config.repository}_suite_results"
+    )
 
     reporter = SuiteReporter(
-        config.repository,
-        config.workflow,
-        config.test_suite,
-        results_data.metadata_list,
-        results_data.artifact_list,
+        config.repository, config.workflow, config.test_suite, results_artifact_data.artifact_list
     )
 
     reporter.update_table(client_mock, config.project_id, config.dataset_name)
 
-    client_mock.insert_rows_json.assert_called_once_with(expected_table_id, results_data.json_rows)
+    client_mock.insert_rows_json.assert_called_once_with(
+        expected_table_id, results_artifact_data.json_rows
+    )
 
 
-@pytest.mark.parametrize(
-    "fixture",
-    ["results_artifact_data", "results_metadata_data", "results_artifact_and_metadata_data"],
-    ids=["artifact_test_results", "metadata_test_results", "artifact_metadata_test_results"],
-)
 def test_suite_reporter_update_table_with_new_results_and_row_duplication(
     caplog: LogCaptureFixture,
     mocker: MockerFixture,
     config: ConfigValues,
-    fixture: str,
-    request: pytest.FixtureRequest,
+    results_artifact_data: SampleResultsData,
 ) -> None:
     """Test SuiteReporter update_table method with new test results, but a duplicate is found before
        insertion.
@@ -123,11 +86,8 @@ def test_suite_reporter_update_table_with_new_results_and_row_duplication(
         caplog (LogCaptureFixture): pytest fixture for capturing log output.
         mocker (MockerFixture): pytest_mock fixture for mocking.
         config (ConfigValues): pytest fixture for common config values.
-        fixture (str): The name of the fixture with coverage sample data.
-        request (FixtureRequest): A pytest request object for accessing fixtures.
+        results_artifact_data (SampleResultsData): artifact data.
     """
-    results_data: SampleResultsData = request.getfixturevalue(fixture)
-
     get_last_update_query_mock = mocker.MagicMock()
     get_last_update_query_mock.result.return_value = [{"last_update": "2024-01-01T00:00:00Z"}]
     check_rows_exist_query_mock = mocker.MagicMock()
@@ -138,15 +98,11 @@ def test_suite_reporter_update_table_with_new_results_and_row_duplication(
     expected_log = (
         f"Detected one or more results from "
         f"{config.repository}/{config.workflow}/{config.test_suite} already exist in table "
-        f"{config.project_id}.{config.dataset_name}.{config.repository}_results. Aborting insert."
+        f"{config.project_id}.{config.dataset_name}.{config.repository}_suite_results. Aborting insert."
     )
 
     reporter = SuiteReporter(
-        config.repository,
-        config.workflow,
-        config.test_suite,
-        results_data.metadata_list,
-        results_data.artifact_list,
+        config.repository, config.workflow, config.test_suite, results_artifact_data.artifact_list
     )
 
     with caplog.at_level(logging.WARNING):
@@ -155,17 +111,11 @@ def test_suite_reporter_update_table_with_new_results_and_row_duplication(
         assert expected_log in caplog.text
 
 
-@pytest.mark.parametrize(
-    "fixture",
-    ["results_artifact_data", "results_metadata_data", "results_artifact_and_metadata_data"],
-    ids=["artifact_test_results", "metadata_test_results", "artifact_metadata_test_results"],
-)
 def test_suite_reporter_update_table_without_new_test_results(
     caplog: LogCaptureFixture,
     mocker: MockerFixture,
     config: ConfigValues,
-    fixture: str,
-    request: pytest.FixtureRequest,
+    results_artifact_data: SampleResultsData,
 ) -> None:
     """Test SuiteReporter update_table method with old test results.
 
@@ -173,11 +123,8 @@ def test_suite_reporter_update_table_without_new_test_results(
         caplog (LogCaptureFixture): pytest fixture for capturing log output.
         mocker (MockerFixture): pytest_mock fixture for mocking.
         config (ConfigValues): pytest fixture for common config values.
-        fixture (str): The name of the fixture with coverage sample data.
-        request (FixtureRequest): A pytest request object for accessing fixtures.
+        results_artifact_data (SampleResultsData): artifact data.
     """
-    results_data: SampleResultsData = request.getfixturevalue(fixture)
-
     get_last_update_query_mock = mocker.MagicMock()
     get_last_update_query_mock.result.return_value = [{"last_update": "2024-01-06T00:00:00Z"}]
     mock_client = mocker.MagicMock()
@@ -185,15 +132,11 @@ def test_suite_reporter_update_table_without_new_test_results(
 
     expected_log = (
         f"There are no new results for {config.repository}/{config.workflow}/{config.test_suite} "
-        f"to add to {config.project_id}.{config.dataset_name}.{config.repository}_results."
+        f"to add to {config.project_id}.{config.dataset_name}.{config.repository}_suite_results."
     )
 
     reporter = SuiteReporter(
-        config.repository,
-        config.workflow,
-        config.test_suite,
-        results_data.metadata_list,
-        results_data.artifact_list,
+        config.repository, config.workflow, config.test_suite, results_artifact_data.artifact_list
     )
 
     with caplog.at_level(logging.INFO):
@@ -212,19 +155,16 @@ def test_suite_reporter_update_table_with_empty_test_results(
         mocker (MockerFixture): pytest_mock fixture for mocking.
         config (ConfigValues): pytest fixture for common config values.
     """
-    metadata_list: list[CircleCIJobTestMetadata] | None = None
     artifact_list: list[JUnitXmlJobTestSuites] | None = None
 
     client_mock = mocker.MagicMock()
 
     expected_log = (
         f"There are no results for {config.repository}/{config.workflow}/{config.test_suite} to "
-        f"add to {config.project_id}.{config.dataset_name}.{config.repository}_results."
+        f"add to {config.project_id}.{config.dataset_name}.{config.repository}_suite_results."
     )
 
-    reporter = SuiteReporter(
-        config.repository, config.workflow, config.test_suite, metadata_list, artifact_list
-    )
+    reporter = SuiteReporter(config.repository, config.workflow, config.test_suite, artifact_list)
 
     with caplog.at_level(logging.INFO):
         reporter.update_table(client_mock, config.project_id, config.dataset_name)
