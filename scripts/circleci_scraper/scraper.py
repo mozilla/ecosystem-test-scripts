@@ -4,12 +4,10 @@
 
 """CircleCIScraper and related objects"""
 
-import json
 import logging
 import re
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Any
 
 import requests
 from requests.exceptions import RequestException
@@ -20,7 +18,6 @@ from client import (
     WorkflowGroup,
     JobGroup,
     Job,
-    TestMetadataGroup,
     ArtifactGroup,
     Artifact,
     Workflow,
@@ -41,7 +38,7 @@ class CircleCIScraperError(BaseError):
 
 
 class CircleCIScraper:
-    """Export CircleCI test metadata and artifacts."""
+    """Export CircleCI test artifacts."""
 
     logger = logging.getLogger(__name__)
 
@@ -55,16 +52,15 @@ class CircleCIScraper:
         """
         self._client = client
         self._test_result_dir = common_config.test_result_dir
-        self._test_metadata_dir = common_config.test_metadata_dir
         self._junit_artifact_dir = common_config.junit_artifact_dir
         self._coverage_artifact_dir = common_config.coverage_artifact_dir
 
-    def export_test_metadata_and_artifacts(
+    def export_test_artifacts(
         self,
         pipeline_configs: list[CircleCIScraperPipelineConfig],
         date_limit: datetime | None = None,
     ) -> None:
-        """Export test metadata and artifacts for a list of pipelines.
+        """Export test artifacts for a list of pipelines.
 
         Args:
             pipeline_configs (list[CircleCIScraperPipelineConfig]): A list of pipeline
@@ -77,12 +73,12 @@ class CircleCIScraper:
         """
         for pipeline_config in pipeline_configs:
             self.logger.info(f"Scrape {pipeline_config.organization}/{pipeline_config.repository}")
-            self.export_test_metadata_and_artifacts_by_pipeline(pipeline_config, date_limit)
+            self.export_artifacts_by_pipeline(pipeline_config, date_limit)
 
-    def export_test_metadata_and_artifacts_by_pipeline(
+    def export_artifacts_by_pipeline(
         self, pipeline_config: CircleCIScraperPipelineConfig, date_limit: datetime | None = None
     ) -> None:
-        """Export test metadata and artifacts for a single pipeline.
+        """Export test artifacts for a single pipeline.
 
         Args:
             pipeline_config (CircleCIScraperPipelineConfig): A pipeline configuration.
@@ -111,7 +107,7 @@ class CircleCIScraper:
                 ).replace(tzinfo=timezone.utc)
                 if date_limit and created_at_datetime < date_limit:
                     return
-                self.export_test_metadata_and_artifacts_by_pipeline_id(
+                self.export_test_artifacts_by_pipeline_id(
                     pipeline.id,
                     pipeline_config.organization,
                     pipeline_config.repository,
@@ -121,14 +117,14 @@ class CircleCIScraper:
             if not next_page_token:
                 break
 
-    def export_test_metadata_and_artifacts_by_pipeline_id(
+    def export_test_artifacts_by_pipeline_id(
         self,
         pipeline_id: str,
         organization: str,
         repository: str,
         workflow_configs: dict[str, list[str]],
     ) -> None:
-        """Export test metadata and artifacts for a specific pipeline ID.
+        """Export test artifacts for a specific pipeline ID.
 
         Args:
             pipeline_id (str): The pipeline ID.
@@ -146,21 +142,21 @@ class CircleCIScraper:
             for workflow in workflows.items:
                 if workflow.name in workflow_configs:
                     job_names = workflow_configs[workflow.name]
-                    self.export_test_metadata_and_artifacts_workflow_id(
+                    self.export_test_artifacts_workflow_id(
                         organization, repository, workflow, job_names
                     )
             next_page_token = workflows.next_page_token
             if not next_page_token:
                 break
 
-    def export_test_metadata_and_artifacts_workflow_id(
+    def export_test_artifacts_workflow_id(
         self,
         organization: str,
         repository: str,
         workflow: Workflow,
         job_names: list[str],
     ) -> None:
-        """Export test metadata and artifacts for a specific workflow ID.
+        """Export test artifacts for a specific workflow ID.
 
         Args:
             organization (str): The organization name.
@@ -192,77 +188,10 @@ class CircleCIScraper:
                             " job is in progress or cancelled."
                         )
                         continue
-                    self.export_test_metadata_by_job(organization, repository, workflow.name, job)
                     self.export_test_artifacts_by_job(organization, repository, workflow.name, job)
             next_page_token = jobs.next_page_token
             if not next_page_token:
                 break
-
-    def export_test_metadata_by_job(
-        self,
-        organization: str,
-        repository: str,
-        workflow_name: str,
-        job: Job,
-    ) -> None:
-        """Export test metadata for a specific job.
-
-        Args:
-            organization (str): The organization name.
-            repository (str): The repository name.
-            workflow_name (str): The workflow name.
-            job (Job): The job details.
-
-        Raises:
-            CircleCIClientError: If there is an error in the CircleCI API request.
-            CircleCIScraperError: If there is an error in downloading the artifacts.
-        """
-        file_content: dict[str, Any] = {"job": job.model_dump(), "test_metadata": []}
-        next_page_token: str | None = None
-        while True:
-            test_metadata: TestMetadataGroup = self._client.get_test_metadata(
-                organization, repository, str(job.job_number), next_page_token
-            )
-            if not test_metadata:
-                break
-            file_content["test_metadata"] += [item.model_dump() for item in test_metadata.items]
-            next_page_token = test_metadata.next_page_token
-            if not next_page_token:
-                break
-        if not file_content["test_metadata"]:
-            self.logger.info(f"There is no test metadata for job {str(job.job_number)}")
-            return
-        self.export_test_metadata(repository, workflow_name, job, file_content)
-
-    def export_test_metadata(
-        self, repository: str, workflow_name: str, job: Job, file_content: dict[str, Any]
-    ):
-        """Export test metadata.
-
-        Args:
-            repository (str): The repository name.
-            workflow_name (str): The workflow name.
-            job (Job): The job details.
-            file_content (Dict[str, Any]): The content to be output.
-
-        Raises:
-            CircleCIClientError: If there is an error in the CircleCI API request.
-            CircleCIScraperError: If there is an error in downloading the artifacts.
-        """
-        test_metadata_directory = (
-            Path(self._test_result_dir)
-            / repository
-            / workflow_name
-            / job.name
-            / self._test_metadata_dir
-        )
-        test_metadata_directory.mkdir(parents=True, exist_ok=True)
-        file_path = test_metadata_directory / f"{job.job_number}_{job.started_at}.json"
-        if file_path.exists():
-            self.logger.info(f"{file_path} already exists, skipping download.")
-        else:
-            file_path.write_text(json.dumps(file_content, default=str))
-            self.logger.info(f"Output {file_path}")
 
     def export_test_artifacts_by_job(
         self,

@@ -1,6 +1,5 @@
 [common]
 test_result_dir = raw_data
-test_metadata_dir = circle_ci
 junit_artifact_dir = junit
 coverage_artifact_dir = coverage
 
