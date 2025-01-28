@@ -20,14 +20,19 @@ from scripts.metric_reporter.parser.coverage_json_parser import (
     LlvmCovTotals,
 )
 from scripts.metric_reporter.parser.junit_xml_parser import (
-    JUnitXmlFailure,
+    JestJUnitXmlTestSuites,
+    JestJUnitXmlTestSuite,
+    JestJUnitXmlTestCase,
     JUnitXmlJobTestSuites,
-    JUnitXmlProperty,
-    JUnitXmlSkipped,
-    JUnitXmlSystemOut,
-    JUnitXmlTestCase,
-    JUnitXmlTestSuite,
-    JUnitXmlTestSuites,
+    PlaywrightJUnitXmlFailure,
+    PlaywrightJUnitXmlProperty,
+    PlaywrightJUnitXmlTestSuites,
+    PlaywrightJUnitXmlTestSuite,
+    PlaywrightJUnitXmlTestCase,
+    PytestJUnitXmlTestCase,
+    PytestJUnitXmlTestSuite,
+    PytestJUnitXmlTestSuites,
+    PlaywrightJUnitXmlProperties,
 )
 from scripts.metric_reporter.reporter.coverage_reporter import CoverageReporterResult
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporterResult
@@ -37,7 +42,7 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
         job=1,
         job_timestamp="2024-01-01T00:00:00Z",
         test_suites=[
-            JUnitXmlTestSuites(
+            PlaywrightJUnitXmlTestSuites(
                 id="",
                 name="",
                 tests=1,
@@ -45,9 +50,8 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
                 skipped=0,
                 errors=0,
                 time=1.1,
-                timestamp=None,
                 test_suites=[
-                    JUnitXmlTestSuite(
+                    PlaywrightJUnitXmlTestSuite(
                         name="test_class",
                         timestamp="2024-01-01T00:00:00Z",
                         hostname="local",
@@ -57,22 +61,18 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
                         time=1.1,
                         errors=0,
                         test_cases=[
-                            JUnitXmlTestCase(
+                            PlaywrightJUnitXmlTestCase(
                                 name="test_failure",
                                 classname="test_class",
                                 time=1.1,
-                                properties=None,
-                                skipped=None,
-                                failure=JUnitXmlFailure(
+                                failure=PlaywrightJUnitXmlFailure(
                                     message="test_class:1:1 test_failure",
                                     type="FAILURE",
                                     text="\n                Error Msg\n            ",
                                 ),
-                                system_out=JUnitXmlSystemOut(
-                                    text=(
-                                        "[[ATTACHMENT|../test_class/test_failure/trace.zip]]"
-                                        "[[ATTACHMENT|../test_class/test_failure-retry1/trace.zip]]"
-                                    )
+                                system_out=(
+                                    "[[ATTACHMENT|../test_class/test_failure/trace.zip]]"
+                                    "[[ATTACHMENT|../test_class/test_failure-retry1/trace.zip]]"
                                 ),
                             )
                         ],
@@ -85,7 +85,7 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
         job=2,
         job_timestamp="2024-01-02T00:00:00Z",
         test_suites=[
-            JUnitXmlTestSuites(
+            PlaywrightJUnitXmlTestSuites(
                 id="",
                 name="",
                 tests=1,
@@ -93,9 +93,8 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
                 skipped=1,
                 errors=0,
                 time=1.2,
-                timestamp=None,
                 test_suites=[
-                    JUnitXmlTestSuite(
+                    PlaywrightJUnitXmlTestSuite(
                         name="test_class",
                         timestamp="2024-01-02T00:00:00Z",
                         hostname="local",
@@ -105,14 +104,17 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
                         time=1.2,
                         errors=0,
                         test_cases=[
-                            JUnitXmlTestCase(
+                            PlaywrightJUnitXmlTestCase(
                                 name="test_fixme",
                                 classname="test_class",
                                 time=1.2,
-                                properties=[JUnitXmlProperty(name="fixme", value="see JIRA-0000")],
-                                skipped=JUnitXmlSkipped(reason=None),
-                                failure=None,
-                                system_out=None,
+                                properties=PlaywrightJUnitXmlProperties(
+                                    property=[
+                                        PlaywrightJUnitXmlProperty(
+                                            name="fixme", value="see JIRA-0000"
+                                        )
+                                    ]
+                                ),
                             )
                         ],
                     )
@@ -124,7 +126,7 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
         job=3,
         job_timestamp="2024-01-03T00:00:00Z",
         test_suites=[
-            JUnitXmlTestSuites(
+            PlaywrightJUnitXmlTestSuites(
                 id="",
                 name="",
                 tests=1,
@@ -132,9 +134,8 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
                 skipped=0,
                 errors=0,
                 time=1.3,
-                timestamp=None,
                 test_suites=[
-                    JUnitXmlTestSuite(
+                    PlaywrightJUnitXmlTestSuite(
                         name="test_class",
                         timestamp="2024-01-03T00:00:00Z",
                         hostname="local",
@@ -144,16 +145,11 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
                         time=1.3,
                         errors=0,
                         test_cases=[
-                            JUnitXmlTestCase(
+                            PlaywrightJUnitXmlTestCase(
                                 name="test_retry",
                                 classname="test_class",
                                 time=1.3,
-                                properties=None,
-                                skipped=None,
-                                failure=None,
-                                system_out=JUnitXmlSystemOut(
-                                    text="[[ATTACHMENT|../test_class/test_retry/trace.zip]]"
-                                ),
+                                system_out="[[ATTACHMENT|../test_class/test_retry/trace.zip]]",
                             )
                         ],
                     )
@@ -165,34 +161,26 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
         job=4,
         job_timestamp="2024-01-04T00:00:00Z",
         test_suites=[
-            JUnitXmlTestSuites(
-                id=None,
+            JestJUnitXmlTestSuites(
                 name="",
                 tests=1,
                 failures=0,
-                skipped=None,
                 errors=0,
                 time=1.4,
-                timestamp=None,
                 test_suites=[
-                    JUnitXmlTestSuite(
+                    JestJUnitXmlTestSuite(
                         name="test_class",
                         timestamp="2024-01-04T00:00:00Z",
-                        hostname=None,
                         tests=1,
                         failures=0,
                         skipped=1,
                         time=1.4,
                         errors=0,
                         test_cases=[
-                            JUnitXmlTestCase(
+                            JestJUnitXmlTestCase(
                                 name="test_class",
                                 classname="test_skipped",
                                 time=1.4,
-                                properties=None,
-                                skipped=JUnitXmlSkipped(reason=None),
-                                failure=None,
-                                system_out=None,
                             )
                         ],
                     )
@@ -204,17 +192,9 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
         job=5,
         job_timestamp="2024-01-05T00:00:00Z",
         test_suites=[
-            JUnitXmlTestSuites(
-                id=None,
-                name=None,
-                tests=None,
-                failures=None,
-                skipped=None,
-                errors=None,
-                time=None,
-                timestamp=None,
+            PytestJUnitXmlTestSuites(
                 test_suites=[
-                    JUnitXmlTestSuite(
+                    PytestJUnitXmlTestSuite(
                         name="test_class",
                         timestamp="2024-01-05T00:00:00Z",
                         hostname="ip-10-0-175-52",
@@ -224,14 +204,10 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
                         time=1.5,
                         errors=0,
                         test_cases=[
-                            JUnitXmlTestCase(
+                            PytestJUnitXmlTestCase(
                                 name="test_class",
                                 classname="test_success",
                                 time=1.5,
-                                properties=None,
-                                skipped=None,
-                                failure=None,
-                                system_out=None,
                             )
                         ],
                     )
