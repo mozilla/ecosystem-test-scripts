@@ -92,24 +92,6 @@ class JobGroup(BaseModel):
     items: list[Job]
 
 
-class TestMetadata(BaseModel):
-    """CircleCI TestMetadata."""
-
-    classname: str
-    name: str
-    result: str
-    message: str
-    run_time: float
-    source: str
-
-
-class TestMetadataGroup(BaseModel):
-    """CircleCI TestMetadata collection."""
-
-    next_page_token: str | None = None
-    items: list[TestMetadata]
-
-
 class Artifact(BaseModel):
     """CircleCI Artifact."""
 
@@ -228,33 +210,6 @@ class CircleCIClient:
             f"{(f'?page-token={next_page_token}' if next_page_token else '')}"
         )
         return self._make_request(endpoint, JobGroup)
-
-    def get_test_metadata(
-        self,
-        organization: str,
-        repository: str,
-        job_number: str,
-        next_page_token: str | None = None,
-    ) -> TestMetadataGroup:
-        """Retrieve test metadata for the specified job.
-
-        Args:
-            organization (str): The organization name.
-            repository (str): The repository name.
-            job_number (str): The job number.
-            next_page_token (str | None): The token for the next page of results. Defaults to None.
-
-        Returns:
-            TestMetadataGroup: The response from the API.
-
-        Raises:
-            CircleCIClientError: If the request to the API fails.
-        """
-        endpoint = (
-            f"project/{self._vcs_slug}/{organization}/{repository}/{job_number}/tests"
-            f"{(f'?page-token={next_page_token}' if next_page_token else '')}"
-        )
-        return self._make_request(endpoint, TestMetadataGroup)
 
     def get_job_artifacts(
         self,
