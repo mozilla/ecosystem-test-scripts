@@ -86,6 +86,7 @@ class JUnitXmlJobTestSuites(BaseModel):
     """Represents the test suite results for a CircleCI job."""
 
     job: int
+    job_timestamp: str
     test_suites: list[JUnitXmlTestSuites]
 
 
@@ -141,6 +142,7 @@ class JUnitXmlParser:
         for job_path in job_paths:
             if match := JOB_DIRECTORY_PATTERN.match(job_path.name):
                 job_number = int(match.group("job_number"))
+                job_timestamp = match.group("job_timestamp")
             else:
                 raise ParserError(f"Unexpected job_path format: {job_path.name}")
             test_suites_list: list[JUnitXmlTestSuites] = []
@@ -173,6 +175,8 @@ class JUnitXmlParser:
                     self.logger.error(error_msg, exc_info=error)
                     raise ParserError(error_msg) from error
             artifact_list.append(
-                JUnitXmlJobTestSuites(job=job_number, test_suites=test_suites_list)
+                JUnitXmlJobTestSuites(
+                    job=job_number, job_timestamp=job_timestamp, test_suites=test_suites_list
+                )
             )
         return artifact_list

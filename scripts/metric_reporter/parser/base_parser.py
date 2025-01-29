@@ -9,7 +9,7 @@ import re
 from scripts.common.error import BaseError
 
 JOB_DIRECTORY_PATTERN = re.compile(
-    r"(?P<job_number>\d+)(?:_(?P<job_timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z))?"
+    r"(?P<job_number>\d+)_(?P<job_timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)"
 )
 
 

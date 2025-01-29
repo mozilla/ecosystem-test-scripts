@@ -9,8 +9,8 @@ themselves.
 
 ## Test Suite Size & Success Rates
 
-_Supported Test Frameworks:_ [jest][jest], [mocha][mocha], [nextest][nextest], [playwright][playwright], [pytest][pytest], [tap][tap]\
-_Supported CI:_ [CircleCI][CircleCI]
+_Supported Test Frameworks:_ [jest][jest], [mocha][mocha], [nextest][nextest], 
+                             [playwright][playwright], [pytest][pytest], [tap][tap]
 
 **Test Suite Size**
 
@@ -50,8 +50,7 @@ thresholds based on their specific needs:
 ## Time Measurements
 
 _Supported Test Frameworks:_ [jest][jest], [mocha][mocha], [nextest][nextest],
-                             [playwright][playwright], [pytest][pytest]\
-_Supported CI:_ [CircleCI][CircleCI]
+                             [playwright][playwright], [pytest][pytest]
 
 Time measurements track how long it takes for tests to run. Ideally, these times should be
 proportional to the size of the test suite and remain stable over time. Significant increases or
@@ -66,17 +65,13 @@ The cumulative time of all test runs in a suite.
 **Execution Time**
 
 The total time taken for the test suite to execute. If tests are not run in parallel, the execution
-time should match the run time.
-
-**Job Time**
-
-The time taken for the test job to complete in CI. Job time thresholds are typically interpreted as
+time should match the run time. Execution time thresholds are typically interpreted as
 follows:
 
 | Threshold | Interpretation                                             |
 |-----------|------------------------------------------------------------|
-| \> 10m    | Slow - The test suite may require optimization             |
-| <= 10m    | Fast - The test suite runs within an acceptable time frame |
+| \> 5m     | Slow - The test suite may require optimization             |
+| <= 5m     | Fast - The test suite runs within an acceptable time frame |
 
 ## Coverage Metrics
 
@@ -101,8 +96,7 @@ needs:
 ## Skip Rates
 
 _Supported Test Frameworks:_ [jest][jest], [mocha][mocha], [nextest][nextest], 
-                             [playwright][playwright], [pytest][pytest]\
-_Supported CI:_ [CircleCI][CircleCI]
+                             [playwright][playwright], [pytest][pytest]
 
 Skip rates indicate how often tests are temporarily excluded from execution. While skipping tests
 can be a necessary short-term solution to prevent flaky tests from disrupting workflows, high or
@@ -132,7 +126,6 @@ test suite or performance regressions in the product. High retry rates can incre
 and negatively impact developer workflows. Monitoring retry rates helps teams identify and fix
 unstable tests, ensuring predictable test execution.
 
-[CircleCI]: https://circleci.com/
 [jest]: https://jestjs.io/
 [llvm-cov]: https://llvm.org/docs/CommandGuide/llvm-cov.html
 [mocha]: https://mochajs.org/

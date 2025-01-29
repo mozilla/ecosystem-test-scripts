@@ -23,6 +23,7 @@ from scripts.metric_reporter.parser.junit_xml_parser import (
 EXPECTED_JEST = [
     JUnitXmlJobTestSuites(
         job=1,
+        job_timestamp="2024-07-13T00:21:53Z",
         test_suites=[
             JUnitXmlTestSuites(
                 id=None,
@@ -140,6 +141,7 @@ EXPECTED_JEST = [
 EXPECTED_MOCHA = [
     JUnitXmlJobTestSuites(
         job=1,
+        job_timestamp="2024-07-19T00:18:31Z",
         test_suites=[
             JUnitXmlTestSuites(
                 id=None,
@@ -230,6 +232,7 @@ EXPECTED_MOCHA = [
 EXPECTED_NEXTEST = [
     JUnitXmlJobTestSuites(
         job=1,
+        job_timestamp="2024-08-21T23:36:28Z",
         test_suites=[
             JUnitXmlTestSuites(
                 id=None,
@@ -271,6 +274,7 @@ EXPECTED_NEXTEST = [
 EXPECTED_PLAYWRIGHT = [
     JUnitXmlJobTestSuites(
         job=1,
+        job_timestamp="2024-07-17T00:23:12Z",
         test_suites=[
             JUnitXmlTestSuites(
                 id="",
@@ -482,6 +486,7 @@ EXPECTED_PLAYWRIGHT = [
 EXPECTED_PYTEST = [
     JUnitXmlJobTestSuites(
         job=1,
+        job_timestamp="2024-07-03T15:05:24Z",
         test_suites=[
             JUnitXmlTestSuites(
                 id=None,
@@ -595,6 +600,7 @@ EXPECTED_PYTEST = [
 EXPECTED_TAP = [
     JUnitXmlJobTestSuites(
         job=1,
+        job_timestamp="2024-01-01T00:00:00Z",
         test_suites=[
             JUnitXmlTestSuites(
                 id=None,
