@@ -5,85 +5,263 @@
 """Module for parsing test suite results from JUnit XML content."""
 
 import logging
-import re
 from pathlib import Path
 from typing import Any
 
-import defusedxml.ElementTree as ElementTree
+import xmltodict
 from pydantic import BaseModel, ValidationError
 
 from scripts.metric_reporter.parser.base_parser import ParserError, JOB_DIRECTORY_PATTERN
 
 
-class JUnitXmlProperty(BaseModel):
+class JestJUnitXmlTestCase(BaseModel):
+    """Represents a test case in a test suite."""
+
+    name: str
+    classname: str
+    time: float
+    skipped: str | None = None
+    failure: str | None = None
+
+
+class JestJUnitXmlTestSuite(BaseModel):
+    """Represents a test suite containing multiple test cases."""
+
+    name: str
+    timestamp: str
+    tests: int
+    failures: int
+    skipped: int
+    time: float
+    errors: int
+    test_cases: list[JestJUnitXmlTestCase]
+
+
+class JestJUnitXmlTestSuites(BaseModel):
+    """Represents a collection of test suites."""
+
+    name: str
+    tests: int
+    failures: int
+    errors: int
+    time: float
+    test_suites: list[JestJUnitXmlTestSuite]
+
+
+class MochaJUnitXmlFailure(BaseModel):
+    """Represents a failure of a test case."""
+
+    message: str
+    type: str
+    text: str | None = None
+
+
+class MochaJUnitXmlTestCase(BaseModel):
+    """Represents a test case in a test suite."""
+
+    name: str
+    classname: str
+    time: float
+    skipped: str | None = None
+    failure: MochaJUnitXmlFailure | None = None
+
+
+class MochaJUnitXmlTestSuite(BaseModel):
+    """Represents a test suite containing multiple test cases."""
+
+    name: str
+    timestamp: str
+    tests: int
+    failures: int
+    file: str | None = None
+    time: float
+    test_cases: list[MochaJUnitXmlTestCase] | None = []
+
+
+class MochaJUnitXmlTestSuites(BaseModel):
+    """Represents a collection of test suites."""
+
+    name: str
+    tests: int
+    failures: int
+    skipped: int | None = None
+    time: float
+    test_suites: list[MochaJUnitXmlTestSuite] | None = []
+
+
+class NextestJUnitXmlTestCase(BaseModel):
+    """Represents a test case in a test suite."""
+
+    name: str
+    classname: str
+    timestamp: str
+    time: float | None = None
+
+
+class NextestJUnitXmlTestSuite(BaseModel):
+    """Represents a test suite containing multiple test cases."""
+
+    name: str
+    tests: int
+    failures: int
+    skipped: int
+    errors: int
+    test_cases: list[NextestJUnitXmlTestCase]
+
+
+class NextestJUnitXmlTestSuites(BaseModel):
+    """Represents a collection of test suites."""
+
+    name: str
+    tests: int
+    failures: int
+    errors: int
+    time: float
+    timestamp: str
+    uuid: str
+    test_suites: list[NextestJUnitXmlTestSuite]
+
+
+class PlaywrightJUnitXmlProperty(BaseModel):
     """Represents a property of a test case."""
 
     name: str
     value: str
+    text: str | None = None
 
 
-class JUnitXmlSkipped(BaseModel):
-    """Represents a skipped test case."""
+class PlaywrightJUnitXmlProperties(BaseModel):
+    """Represents a property of a test case."""
 
-    reason: str | None = None
+    property: list[PlaywrightJUnitXmlProperty]
 
 
-class JUnitXmlFailure(BaseModel):
+class PlaywrightJUnitXmlFailure(BaseModel):
     """Represents a failure of a test case."""
 
-    message: str | None = None
-    type: str | None = None
+    message: str
+    type: str
     text: str | None = None
 
 
-class JUnitXmlSystemOut(BaseModel):
-    """Represents system out information."""
-
-    text: str | None = None
-
-
-class JUnitXmlTestCase(BaseModel):
+class PlaywrightJUnitXmlTestCase(BaseModel):
     """Represents a test case in a test suite."""
 
     name: str
     classname: str | None = None
     time: float | None = None
-    properties: list[JUnitXmlProperty] | None = None
-    skipped: JUnitXmlSkipped | None = None
-    failure: JUnitXmlFailure | None = None
-    system_out: JUnitXmlSystemOut | None = None
+    properties: PlaywrightJUnitXmlProperties | None = None
+    skipped: str | None = None
+    failure: PlaywrightJUnitXmlFailure | None = None
+    system_out: str | None = None
 
 
-class JUnitXmlTestSuite(BaseModel):
+class PlaywrightJUnitXmlTestSuite(BaseModel):
     """Represents a test suite containing multiple test cases."""
 
     name: str
-    timestamp: str | None = None
-    hostname: str | None = None
+    timestamp: str
+    hostname: str
     tests: int
     failures: int
-    skipped: int | None = None
-    time: float | None = None
-    errors: int | None = None
-    test_cases: list[JUnitXmlTestCase]
+    skipped: int
+    time: float
+    errors: int
+    test_cases: list[PlaywrightJUnitXmlTestCase]
 
 
-class JUnitXmlTestSuites(BaseModel):
+class PlaywrightJUnitXmlTestSuites(BaseModel):
     """Represents a collection of test suites."""
 
-    id: str | None = None
-    name: str | None = None
-    tests: int | None = None
-    failures: int | None = None
-    skipped: int | None = None
+    id: str
+    name: str
+    tests: int
+    failures: int
+    skipped: int
+    errors: int
+    time: float
+    test_suites: list[PlaywrightJUnitXmlTestSuite]
+
+
+class PytestJUnitXmlSkipped(BaseModel):
+    """Represents a skipped test case."""
+
+    message: str
+    type: str
+    text: str | None = None
+
+
+class PytestJUnitXmlFailure(BaseModel):
+    """Represents a failure of a test case."""
+
+    message: str
+    text: str | None = None
+
+
+class PytestJUnitXmlTestCase(BaseModel):
+    """Represents a test case in a test suite."""
+
+    name: str
+    classname: str
+    time: float
+    skipped: PytestJUnitXmlSkipped | None = None
+    failure: PytestJUnitXmlFailure | None = None
+
+
+class PytestJUnitXmlTestSuite(BaseModel):
+    """Represents a test suite containing multiple test cases."""
+
+    name: str
+    timestamp: str
+    hostname: str
+    tests: int
+    failures: int
+    skipped: int
+    time: float
+    errors: int
+    test_cases: list[PytestJUnitXmlTestCase]
+
+
+class PytestJUnitXmlTestSuites(BaseModel):
+    """Represents a collection of test suites."""
+
+    test_suites: list[PytestJUnitXmlTestSuite]
+
+
+class TapJUnitXmlTestCase(BaseModel):
+    """Represents a test case in a test suite."""
+
+    name: str
+
+
+class TapJUnitXmlTestSuite(BaseModel):
+    """Represents a test suite containing multiple test cases."""
+
+    name: str
+    tests: int
+    failures: int
     errors: int | None = None
-    time: float | None = None
-    timestamp: str | None = None
-    test_suites: list[JUnitXmlTestSuite] = []
+    test_cases: list[TapJUnitXmlTestCase]
+
+
+class TapJUnitXmlTestSuites(BaseModel):
+    """Represents a collection of test suites."""
+
+    test_suites: list[TapJUnitXmlTestSuite]
+
+
+JUnitXmlTestSuites = (
+    JestJUnitXmlTestSuites
+    | MochaJUnitXmlTestSuites
+    | NextestJUnitXmlTestSuites
+    | PlaywrightJUnitXmlTestSuites
+    | PytestJUnitXmlTestSuites
+    | TapJUnitXmlTestSuites
+)
 
 
 class JUnitXmlJobTestSuites(BaseModel):
-    """Represents the test suite results for a CircleCI job."""
+    """Represents test results from one or more JUnit XML files for a test run."""
 
     job: int
     job_timestamp: str
@@ -95,35 +273,32 @@ class JUnitXmlParser:
 
     logger = logging.getLogger(__name__)
 
-    @staticmethod
-    def _normalize_xml_content(content: str) -> str:
-        return re.sub(r"\x00", "", content)
+    def _get_test_suites(self, job_path: Path) -> list[JUnitXmlTestSuites]:
+        def postprocessor(path, key, value):
+            key_mapping = {
+                "testsuite": "test_suites",
+                "testcase": "test_cases",
+                "system-out": "system_out",  # Playwright
+                "disabled": "skipped",  # Nextest skipped == disabled
+                "#text": "text",
+            }
+            key = key_mapping.get(key, key)
+            return key, value
 
-    def _parse_test_case(self, test_case, xml_file_path: Path) -> dict[str, Any]:
-        test_case_dict: dict[str, Any] = test_case.attrib
-        for child in test_case:
-            tag: str = child.tag
-            if tag == "properties":
-                test_case_dict["properties"] = [prop.attrib for prop in child]
-            elif tag == "skipped":
-                test_case_dict["skipped"] = child.attrib
-            elif tag == "system-out":
-                test_case_dict["system_out"] = {"text": child.text}
-            elif tag == "failure":
-                test_case_dict["failure"] = child.attrib
-                test_case_dict["failure"]["text"] = child.text
-            else:
-                error_msg = f"Could not parse XML file, {xml_file_path}, unexpected tag: {tag}"
-                self.logger.error(error_msg)
-                raise ParserError(error_msg)
-        return test_case_dict
-
-    def _parse_test_suite(self, test_suite, xml_file_path: Path) -> dict[str, Any]:
-        test_suite_dict: dict[str, Any] = test_suite.attrib
-        test_suite_dict["test_cases"] = [
-            self._parse_test_case(test_case, xml_file_path) for test_case in test_suite
-        ]
-        return test_suite_dict
+        test_suites = []
+        artifact_file_paths: list[Path] = sorted(job_path.glob("*.xml"))
+        for artifact_file_path in artifact_file_paths:
+            self.logger.info(f"Parsing {artifact_file_path}")
+            with artifact_file_path.open() as xml_file:
+                content: str = xml_file.read()
+                test_suites_dict: dict[str, Any] = xmltodict.parse(
+                    content,
+                    attr_prefix="",
+                    postprocessor=postprocessor,
+                    force_list=["test_suites", "test_cases", "property"],
+                )
+                test_suites.append(test_suites_dict["testsuites"])
+        return test_suites
 
     def parse(self, artifact_path: Path) -> list[JUnitXmlJobTestSuites]:
         """Parse JUnit XML content from the specified directory.
@@ -132,7 +307,7 @@ class JUnitXmlParser:
             artifact_path (Path): The path to the directory containing the JUnit XML test files.
 
         Returns:
-            list[JUnitXmlJobTestSuites]: A list of parsed `JUnitXMLJobTestSuites` objects.
+            list[JUnitXmlJobTestSuites]: A list of parsed JUnit XML files.
 
         Raises:
             ParserError: If there is an error reading or parsing the XML files.
@@ -144,39 +319,23 @@ class JUnitXmlParser:
                 job_number = int(match.group("job_number"))
                 job_timestamp = match.group("job_timestamp")
             else:
-                raise ParserError(f"Unexpected job_path format: {job_path.name}")
-            test_suites_list: list[JUnitXmlTestSuites] = []
-            artifact_file_paths: list[Path] = sorted(job_path.glob("*.xml"))
-            for artifact_file_path in artifact_file_paths:
-                self.logger.info(f"Parsing {artifact_file_path}")
-                try:
-                    with artifact_file_path.open() as xml_file:
-                        content: str = xml_file.read()
-                        normalized_content: str = self._normalize_xml_content(content)
+                raise ParserError(f"Unexpected file name format: {job_path.name}")
 
-                        root = ElementTree.fromstring(normalized_content)
-                        test_suites_dict: dict[str, Any] = root.attrib
-                        test_suites_dict["test_suites"] = [
-                            self._parse_test_suite(test_suite, artifact_file_path)
-                            for test_suite in root
-                        ]
-                        test_suites = JUnitXmlTestSuites(**test_suites_dict)
-
-                        test_suites_list.append(test_suites)
-                except (OSError, ElementTree.ParseError, ValidationError) as error:
-                    error_mapping: dict[type, str] = {
-                        OSError: f"Error reading the file {artifact_file_path}",
-                        ElementTree.ParseError: f"Invalid XML format for file {artifact_file_path}",
-                        ValidationError: f"Unexpected value or schema in file {artifact_file_path}",
-                    }
-                    error_msg: str = next(
-                        m for t, m in error_mapping.items() if isinstance(error, t)
+            try:
+                test_suites: list[JUnitXmlTestSuites] = self._get_test_suites(job_path)
+                artifact_list.append(
+                    JUnitXmlJobTestSuites(
+                        job=job_number,
+                        job_timestamp=job_timestamp,
+                        test_suites=test_suites,
                     )
-                    self.logger.error(error_msg, exc_info=error)
-                    raise ParserError(error_msg) from error
-            artifact_list.append(
-                JUnitXmlJobTestSuites(
-                    job=job_number, job_timestamp=job_timestamp, test_suites=test_suites_list
                 )
-            )
+            except (OSError, ValidationError) as error:
+                error_mapping: dict[type, str] = {
+                    OSError: f"Error reading the file {job_path}",
+                    ValidationError: f"Unexpected value or schema in file {job_path}",
+                }
+                error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+                self.logger.error(error_msg, exc_info=error)
+                raise ParserError(error_msg) from error
         return artifact_list

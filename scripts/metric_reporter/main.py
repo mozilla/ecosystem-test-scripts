@@ -48,6 +48,12 @@ def main(
         )
         if update_bigquery is None:
             update_bigquery = config.metric_reporter_config.update_bigquery
+        if not update_bigquery:
+            logger.warning(
+                "The metric reporter will not perform any action. "
+                "Use the --update-bigquery flag."
+            )
+            return
 
         # Create Parsers
         coverage_json_parser = CoverageJsonParser()
@@ -81,22 +87,10 @@ def main(
                 args.repository, args.workflow, args.test_suite, coverage_artifact_list
             )
 
-            if not update_bigquery:
-                logger.warning(
-                    "The metric reporter will not perform any action. "
-                    "Use the --update-bigquery flag."
-                )
-                return
-
             # Update BigQuery dataset tables if opted-in
-            if update_bigquery:
-                averages_reporter.update_table(
-                    bigquery_client, gcp_project_id, bigquery_dataset_name
-                )
-                coverage_reporter.update_table(
-                    bigquery_client, gcp_project_id, bigquery_dataset_name
-                )
-                suite_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
+            averages_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
+            coverage_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
+            suite_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
 
         logger.info("Reporting complete")
     except InvalidConfigError as error:

@@ -10,9 +10,18 @@ from typing import Any, Sequence
 
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud.bigquery import ArrayQueryParameter, Client, QueryJobConfig, ScalarQueryParameter
+from pydantic import BaseModel
 
 from scripts.metric_reporter.constants import DATETIME_FORMAT
-from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites
+from scripts.metric_reporter.parser.junit_xml_parser import (
+    JestJUnitXmlTestSuites,
+    JUnitXmlJobTestSuites,
+    MochaJUnitXmlTestSuites,
+    NextestJUnitXmlTestSuites,
+    PlaywrightJUnitXmlTestSuites,
+    PytestJUnitXmlTestSuites,
+    TapJUnitXmlTestSuites,
+)
 from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
     ReporterError,
@@ -52,11 +61,12 @@ class SuiteReporterResult(ReporterResultBase):
 
     # The summation of all test run times in seconds. Parallelization is not taken into
     # consideration.
+    # Not supported by TAP
     run_time: float = 0
 
-    # Equal to the longest run_time in seconds when tests are run in parallel.
-    # We know tests are run in parallel if we have multiple reports for a
-    # repository/workflow/test_suite
+    # Equal to the longest run_time in seconds when tests are run in parallel. We know tests are run
+    # in parallel if we have multiple reports for a repository/workflow/test_suite.
+    # Not supported by TAP
     execution_time: float | None = None
 
     success: int = 0
@@ -67,7 +77,7 @@ class SuiteReporterResult(ReporterResultBase):
     fixme: int = 0
 
     # The number of tests that were the result of a re-execution. It is possible that the same test
-    # is re-executed more than once.
+    # is re-executed more than once. Playwright only.
     retry: int = 0
 
     @property
@@ -135,6 +145,22 @@ class SuiteReporterResult(ReporterResultBase):
             "Skipped Rate": self.skipped_rate,
             "Fixme Rate": self.fixme_rate,
         }
+
+
+class SuiteMetrics(BaseModel):
+    """Represents the results of a test suite."""
+
+    time: float | None = None
+    tests: int = 0
+    failure: int = 0
+    skipped: int = 0
+    fixme: int = 0
+    retry: int = 0
+
+    @property
+    def success(self) -> int:
+        """Calculate the number of tests that succeeded."""
+        return self.tests - self.failure - self.skipped
 
 
 class SuiteReporter(BaseReporter):
@@ -292,6 +318,56 @@ class SuiteReporter(BaseReporter):
             self.logger.error(error_msg, exc_info=error)
             raise ReporterError(error_msg) from error
 
+    @staticmethod
+    def _extract_suite_metrics(suites) -> SuiteMetrics:
+        metrics = SuiteMetrics()
+        match suites:
+            case JestJUnitXmlTestSuites() | NextestJUnitXmlTestSuites():
+                metrics.time = suites.time
+                metrics.tests = suites.tests
+                metrics.failure = suites.failures
+                metrics.skipped = sum(suite.skipped for suite in suites.test_suites)
+            case MochaJUnitXmlTestSuites():
+                metrics.time = suites.time
+                # Mocha test reporting has been known to inaccurately total the number of
+                # tests at the top level, so we count the number of test cases
+                metrics.tests = (
+                    sum(len(suite.test_cases) for suite in suites.test_suites if suite.test_cases)
+                    if suites.test_suites
+                    else 0
+                )
+                metrics.failure = suites.failures
+                metrics.skipped = suites.skipped or 0
+            case PlaywrightJUnitXmlTestSuites():
+                metrics.time = suites.time
+                metrics.tests = suites.tests
+                metrics.failure = suites.failures
+                metrics.skipped = suites.skipped
+                metrics.fixme = sum(
+                    1
+                    for suite in suites.test_suites
+                    for case in suite.test_cases
+                    if case.properties and any(p.name == "fixme" for p in case.properties.property)
+                )
+                # An assumption is made that the presence of a nested system-out tag in
+                # a test case that contains a link to a trace.zip attachment file as
+                # content is the result of a retry.
+                metrics.retry = sum(
+                    1
+                    for suite in suites.test_suites
+                    for case in suite.test_cases
+                    if case.system_out and "trace.zip" in case.system_out
+                )
+            case PytestJUnitXmlTestSuites():
+                metrics.time = sum(suite.time for suite in suites.test_suites)
+                metrics.tests = sum(suite.tests for suite in suites.test_suites)
+                metrics.failure = sum(suite.failures for suite in suites.test_suites)
+                metrics.skipped = sum(suite.skipped for suite in suites.test_suites)
+            case TapJUnitXmlTestSuites():
+                metrics.tests = sum(suite.tests for suite in suites.test_suites)
+                metrics.failure = sum(suite.failures for suite in suites.test_suites)
+        return metrics
+
     def _parse_results(
         self, artifacts_list: list[JUnitXmlJobTestSuites] | None
     ) -> list[SuiteReporterResult]:
@@ -309,51 +385,23 @@ class SuiteReporter(BaseReporter):
                 job=artifact.job,
             )
 
-            run_times: list[float] = []
-            execution_times: list[float] = []
+            times: list[float] = []
             for suites in artifact.test_suites:
-                run_time: float = 0
-                # A top level test_suites time is not always available. The top level time may
-                # not be equal to the sum of the test case times due to the use of threads/workers.
-                execution_time: float | None = (
-                    suites.time if suites.time and suites.time > 0 else None
-                )
-                for suite in suites.test_suites:
-                    # Mocha test reporting has been known to inaccurately total the number of tests
-                    # in the 'tests' attribute, so we count the number of test cases
-                    tests = len(suite.test_cases)
-                    skipped = suite.skipped if suite.skipped else 0
-                    test_suite_result.failure += suite.failures
-                    test_suite_result.skipped += skipped
-                    test_suite_result.success += tests - suite.failures - skipped
+                suite_metrics: SuiteMetrics = self._extract_suite_metrics(suites)
+                if suite_metrics.time:
+                    times.append(suite_metrics.time)
+                test_suite_result.failure += suite_metrics.failure
+                test_suite_result.skipped += suite_metrics.skipped
+                test_suite_result.success += suite_metrics.success
+                test_suite_result.fixme += suite_metrics.fixme
+                test_suite_result.retry += suite_metrics.retry
 
-                    for case in suite.test_cases:
-                        # Summing the time for each test case if test_suite.time is not available
-                        if case.time:
-                            run_time += case.time
+            # Times are not always available, for example with TAP.
+            # Times at the suites, suite and case level may not sum-up to the same values. This can
+            # be due to many factors including the use of threads.
+            test_suite_result.run_time = sum(times)
+            test_suite_result.execution_time = max(times) if times else 0
 
-                        # Increment "fixme" count, Playwright only
-                        if case.properties and any(p.name == "fixme" for p in case.properties):
-                            test_suite_result.fixme += 1
-
-                        # Check for retry condition, Playwright only
-                        # An assumption is made that the presence of a nested system-out tag in a
-                        # test case that contains a link to a trace.zip attachment file as content
-                        # is the result of a retry.
-                        if (
-                            case.system_out
-                            and case.system_out.text
-                            and "trace.zip" in case.system_out.text
-                        ):
-                            test_suite_result.retry += 1
-
-                run_times.append(run_time)
-                # If a time at the test suites level is not provided, then use the summation of
-                # times at the test case level, or run_time.
-                execution_times.append(execution_time if execution_time is not None else run_time)
-
-            test_suite_result.run_time = round(sum(run_times), 3)
-            test_suite_result.execution_time = round(max(execution_times), 3)
             results.append(test_suite_result)
 
         # Sort by timestamp and then by job
