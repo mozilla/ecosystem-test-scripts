@@ -12,7 +12,7 @@ from typing import Any, Sequence
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud.bigquery import Client, QueryJobConfig, ScalarQueryParameter
 
-from scripts.metric_reporter.constants import DATE_FORMAT
+from scripts.common.constants import DATE_FORMAT
 from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
     ReporterError,

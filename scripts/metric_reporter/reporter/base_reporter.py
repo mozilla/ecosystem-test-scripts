@@ -11,7 +11,7 @@ from dateutil import parser
 from google.cloud.bigquery import Client
 from pydantic import BaseModel
 
-from scripts.metric_reporter.constants import DATE_FORMAT
+from scripts.common.constants import DATE_FORMAT
 
 
 class ReporterResultBase(BaseModel):
