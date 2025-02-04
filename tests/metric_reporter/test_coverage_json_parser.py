@@ -7,9 +7,8 @@
 import pytest
 
 from scripts.metric_reporter.parser.coverage_json_parser import (
+    CoverageJsonGroup,
     CoverageJsonParser,
-    LlvmCovReport,
-    PytestReport,
 )
 from tests.metric_reporter.conftest import SampleCoverageData
 
@@ -25,11 +24,9 @@ def test_parse(fixture: str, request: pytest.FixtureRequest) -> None:
         request (FixtureRequest): A pytest request object for accessing fixtures.
     """
     coverage_data: SampleCoverageData = request.getfixturevalue(fixture)
-    expected_results: list[LlvmCovReport | PytestReport] = coverage_data.report_list
+    expected_results: list[CoverageJsonGroup] = [coverage_data.coverage_json_group]
     parser = CoverageJsonParser()
 
-    actual_results: list[LlvmCovReport | PytestReport] = parser.parse(
-        coverage_data.sample_directory
-    )
+    actual_results: list[CoverageJsonGroup] = parser.parse(coverage_data.sample_files)
 
     assert actual_results == expected_results

@@ -9,9 +9,9 @@ from pathlib import Path
 from typing import Any
 
 import xmltodict
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, TypeAdapter
 
-from scripts.metric_reporter.parser.base_parser import ParserError, JOB_DIRECTORY_PATTERN
+from scripts.metric_reporter.parser.base_parser import ArtifactFile, BaseParser, ParserError
 
 
 class JestJUnitXmlTestCase(BaseModel):
@@ -265,15 +265,67 @@ class JUnitXmlJobTestSuites(BaseModel):
 
     job: int
     job_timestamp: str
-    test_suites: list[JUnitXmlTestSuites]
+    test_suites: list[JUnitXmlTestSuites] = []
 
 
-class JUnitXmlParser:
+class JUnitXmlGroup(BaseModel):
+    """Represents test results for a repository/workflow/test_suite."""
+
+    repository: str
+    workflow: str
+    test_suite: str
+    junit_xmls: list[JUnitXmlJobTestSuites]
+
+
+class JUnitXmlParser(BaseParser):
     """Parses JUnit XML files."""
 
     logger = logging.getLogger(__name__)
 
-    def _get_test_suites(self, job_path: Path) -> list[JUnitXmlTestSuites]:
+    @staticmethod
+    def _get_junit_xml(
+        file: ArtifactFile, junit_xml_groups: list[JUnitXmlGroup]
+    ) -> JUnitXmlJobTestSuites:
+        if junit_xml_group := next(
+            (
+                group
+                for group in junit_xml_groups
+                if group.repository == file.repository
+                and group.workflow == file.workflow
+                and group.test_suite == file.test_suite
+            ),
+            None,
+        ):
+            if not (
+                junit_xml := next(
+                    (
+                        junit_xmls
+                        for junit_xmls in junit_xml_group.junit_xmls
+                        if junit_xmls.job == file.job_number
+                        and junit_xmls.job_timestamp == file.job_timestamp
+                    ),
+                    None,
+                )
+            ):
+                junit_xml = JUnitXmlJobTestSuites(
+                    job=file.job_number, job_timestamp=file.job_timestamp
+                )
+                junit_xml_group.junit_xmls.append(junit_xml)
+        else:
+            junit_xml = JUnitXmlJobTestSuites(
+                job=file.job_number, job_timestamp=file.job_timestamp
+            )
+            junit_xml_group = JUnitXmlGroup(
+                repository=file.repository,
+                workflow=file.workflow,
+                test_suite=file.test_suite,
+                junit_xmls=[junit_xml],
+            )
+            junit_xml_groups.append(junit_xml_group)
+        return junit_xml
+
+    @staticmethod
+    def _parse_test_suites(artifact_file_path: Path) -> JUnitXmlTestSuites:
         def postprocessor(path, key, value):
             key_mapping = {
                 "testsuite": "test_suites",
@@ -285,57 +337,47 @@ class JUnitXmlParser:
             key = key_mapping.get(key, key)
             return key, value
 
-        test_suites = []
-        artifact_file_paths: list[Path] = sorted(job_path.glob("*.xml"))
-        for artifact_file_path in artifact_file_paths:
-            self.logger.info(f"Parsing {artifact_file_path}")
-            with artifact_file_path.open() as xml_file:
-                content: str = xml_file.read()
-                test_suites_dict: dict[str, Any] = xmltodict.parse(
-                    content,
-                    attr_prefix="",
-                    postprocessor=postprocessor,
-                    force_list=["test_suites", "test_cases", "property"],
-                )
-                test_suites.append(test_suites_dict["testsuites"])
-        return test_suites
+        with artifact_file_path.open() as xml_file:
+            content: str = xml_file.read()
+            test_suites_dict: dict[str, Any] = xmltodict.parse(
+                content,
+                attr_prefix="",
+                postprocessor=postprocessor,
+                force_list=["test_suites", "test_cases", "property"],
+            )
+            adapter: TypeAdapter[JUnitXmlTestSuites] = TypeAdapter(JUnitXmlTestSuites)
+            test_suites: JUnitXmlTestSuites = adapter.validate_python(
+                test_suites_dict["testsuites"]
+            )
+            return test_suites
 
-    def parse(self, artifact_path: Path) -> list[JUnitXmlJobTestSuites]:
+    def parse(self, artifact_file_paths: list[Path]) -> list[JUnitXmlGroup]:
         """Parse JUnit XML content from the specified directory.
 
         Args:
-            artifact_path (Path): The path to the directory containing the JUnit XML test files.
+            artifact_file_paths (Path): Paths of the JUnit XML test files.
 
         Returns:
-            list[JUnitXmlJobTestSuites]: A list of parsed JUnit XML files.
+            list[JUnitXmlGroup]: A list of parsed JUnit XML files grouped by repository, workflow
+                                 and test suite.
 
         Raises:
             ParserError: If there is an error reading or parsing the XML files.
         """
-        artifact_list: list[JUnitXmlJobTestSuites] = []
-        job_paths: list[Path] = sorted(artifact_path.iterdir())
-        for job_path in job_paths:
-            if match := JOB_DIRECTORY_PATTERN.match(job_path.name):
-                job_number = int(match.group("job_number"))
-                job_timestamp = match.group("job_timestamp")
-            else:
-                raise ParserError(f"Unexpected file name format: {job_path.name}")
-
+        junit_xml_groups: list[JUnitXmlGroup] = []
+        for artifact_file_path in artifact_file_paths:
+            self.logger.info(f"Parsing {artifact_file_path}")
+            file: ArtifactFile = self._parse_artifact_file_name(artifact_file_path)
+            junit_xml: JUnitXmlJobTestSuites = self._get_junit_xml(file, junit_xml_groups)
             try:
-                test_suites: list[JUnitXmlTestSuites] = self._get_test_suites(job_path)
-                artifact_list.append(
-                    JUnitXmlJobTestSuites(
-                        job=job_number,
-                        job_timestamp=job_timestamp,
-                        test_suites=test_suites,
-                    )
-                )
+                test_suites: JUnitXmlTestSuites = self._parse_test_suites(file.path)
+                junit_xml.test_suites.append(test_suites)
             except (OSError, ValidationError) as error:
                 error_mapping: dict[type, str] = {
-                    OSError: f"Error reading the file {job_path}",
-                    ValidationError: f"Unexpected value or schema in file {job_path}",
+                    OSError: f"Error reading the file {artifact_file_path}",
+                    ValidationError: f"Unexpected value or schema in file {artifact_file_path}",
                 }
                 error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
                 self.logger.error(error_msg, exc_info=error)
                 raise ParserError(error_msg) from error
-        return artifact_list
+        return junit_xml_groups

@@ -5,7 +5,6 @@
 """Configuration handling for the Metric Reporter."""
 
 import logging
-import re
 from configparser import NoSectionError, NoOptionError
 from pathlib import Path
 
@@ -17,11 +16,8 @@ from scripts.common.config import BaseConfig, InvalidConfigError
 class MetricReporterArgs(BaseModel):
     """Model for Metric Reporter arguments."""
 
-    repository: str
-    workflow: str
-    test_suite: str
-    junit_artifact_path: Path
-    coverage_artifact_path: Path
+    coverage_artifact_paths: list[Path] = []
+    junit_artifact_paths: list[Path] = []
 
 
 class MetricReporterConfig(BaseModel):
@@ -81,43 +77,32 @@ class Config(BaseConfig):
             self.logger.error(error_msg, exc_info=error)
             raise InvalidConfigError(error_msg) from error
 
-    @staticmethod
-    def _normalize_name(name: str, delimiter: str = "") -> str:
-        normalized = re.sub(r"[^a-zA-Z0-9_]+", delimiter, name).lower()
-        return normalized.strip("_")
-
     def _build_metric_reporter_args(self) -> list[MetricReporterArgs]:
         # Here we assume that the structure of the test_result_dir directory is as follows:
         # test_result_dir/
         #     ├── repository/
-        #         ├── workflow/
-        #             ├── test_suite/
-        #                 ├── metadata_dir/
-        #                 ├── junit_artifact_dir/
-        #                 ├── coverage_artifact_dir/
+        #          ├── coverage_artifact_dir/
+        #               ├── coverage-1.json
+        #               ├── coverage-2.json
+        #          ├── junit_artifact_dir/
+        #               ├── junit-1.xml
+        #               ├── junit-2.xml
+        test_result_dir = self.common_config.test_result_dir
+        coverage_artifact_dir = self.common_config.coverage_artifact_dir
+        junit_artifact_dir = self.common_config.junit_artifact_dir
         try:
-            test_metric_args_list: list[MetricReporterArgs] = []
-            test_result_path = Path(self.common_config.test_result_dir)
-            for directory_path, directory_names, files in test_result_path.walk():
-                for directory_name in directory_names:
-                    current_path = Path(directory_path) / directory_name
-                    junit_artifact_path = current_path / self.common_config.junit_artifact_dir
-                    coverage_artifact_path = (
-                        current_path / self.common_config.coverage_artifact_dir
-                    )
-                    if junit_artifact_path.exists() or coverage_artifact_path.exists():
-                        repository = self._normalize_name(Path(directory_path).parents[0].name)
-                        test_suite = self._normalize_name(directory_name, "_")
-                        test_metric_args = MetricReporterArgs(
-                            repository=repository,
-                            workflow=directory_path.name,
-                            test_suite=test_suite,
-                            junit_artifact_path=junit_artifact_path,
-                            coverage_artifact_path=coverage_artifact_path,
-                        )
-                        test_metric_args_list.append(test_metric_args)
-
-            return test_metric_args_list
+            test_result_path = Path(test_result_dir)
+            return [
+                MetricReporterArgs(
+                    coverage_artifact_paths=list(
+                        repository_directory.joinpath(coverage_artifact_dir).glob("*.json")
+                    ),
+                    junit_artifact_paths=list(
+                        repository_directory.joinpath(junit_artifact_dir).glob("*.xml")
+                    ),
+                )
+                for repository_directory in test_result_path.iterdir()
+            ]
         except (OSError, ValidationError) as error:
             error_mapping: dict[type, str] = {
                 OSError: "Filesystem error while building Metric Reporter arguments",

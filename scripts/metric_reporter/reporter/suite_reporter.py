@@ -12,7 +12,7 @@ from google.api_core.exceptions import GoogleAPIError
 from google.cloud.bigquery import ArrayQueryParameter, Client, QueryJobConfig, ScalarQueryParameter
 from pydantic import BaseModel
 
-from scripts.metric_reporter.constants import DATETIME_FORMAT
+from scripts.common.constants import DATETIME_FORMAT
 from scripts.metric_reporter.parser.junit_xml_parser import (
     JestJUnitXmlTestSuites,
     JUnitXmlJobTestSuites,
@@ -196,7 +196,9 @@ class SuiteReporter(BaseReporter):
             project_id (str): The BigQuery project ID.
             dataset_name (str): The BigQuery dataset name.
         """
-        table_id = f"{project_id}.{dataset_name}.{self.repository}_suite_results"
+        table_id = (
+            f"{project_id}.{dataset_name}.{self._normalize_name(self.repository)}_suite_results"
+        )
 
         if not self.results:
             self.logger.warning(

@@ -7,7 +7,11 @@
 import pytest
 from requests.exceptions import HTTPError, ConnectionError, Timeout
 from scripts.circleci_scraper.client import CircleCIClient, CircleCIClientError
-from scripts.circleci_scraper.config import CircleCIScraperConfig, CircleCIScraperPipelineConfig
+from scripts.circleci_scraper.config import (
+    CircleCIScraperConfig,
+    CircleCIScraperJobConfig,
+    CircleCIScraperPipelineConfig,
+)
 
 
 @pytest.mark.parametrize(
@@ -30,7 +34,11 @@ def test_get_pipelines_request_error(mocker, exception):
         base_url="https://fake.api",
         pipelines=[
             CircleCIScraperPipelineConfig(
-                organization="mozilla", repository="repo", workflows={"workflow": ["suite"]}
+                organization="mozilla",
+                repository="repo",
+                workflows={
+                    "workflow": [CircleCIScraperJobConfig(job_name="job", test_suite="suite")]
+                },
             )
         ],
         days_of_data=30,

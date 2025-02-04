@@ -19,12 +19,19 @@ TOKEN_PATTERN = r"^\S+$"  # nosec B105
 URL_PATTERN = r"^https?://[a-zA-Z0-9.-]+(/[a-zA-Z0-9._~-]*)*$"
 
 
+class CircleCIScraperJobConfig(BaseModel):
+    """CircleCIScraper Config Job."""
+
+    job_name: str
+    test_suite: str
+
+
 class CircleCIScraperPipelineConfig(BaseModel):
     """CircleCIScraper Config Pipelines."""
 
     organization: Literal["mozilla", "mozilla-services"]
     repository: str = Field(..., pattern=REPOSITORY_PATTERN)
-    workflows: dict[str, list[str]]
+    workflows: dict[str, list[CircleCIScraperJobConfig]]
     branches: list[str] | None = []
 
 

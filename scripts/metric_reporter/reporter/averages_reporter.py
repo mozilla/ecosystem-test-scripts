@@ -12,7 +12,7 @@ from typing import Any, Sequence
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud.bigquery import Client, QueryJobConfig, ScalarQueryParameter
 
-from scripts.metric_reporter.constants import DATE_FORMAT
+from scripts.common.constants import DATE_FORMAT
 from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
     ReporterError,
@@ -114,7 +114,7 @@ class AveragesReporter(BaseReporter):
             project_id (str): The BigQuery project ID.
             dataset_name (str): The BigQuery dataset name.
         """
-        table_id = f"{project_id}.{dataset_name}.{self.repository}_averages"
+        table_id = f"{project_id}.{dataset_name}.{self._normalize_name(self.repository)}_averages"
 
         if not self.results:
             self.logger.warning(

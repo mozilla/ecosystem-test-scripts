@@ -10,14 +10,13 @@ import logging
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
-from scripts.metric_reporter.config import Config, InvalidConfigError
+from scripts.metric_reporter.config import Config, InvalidConfigError, MetricReporterArgs
 from scripts.metric_reporter.parser.base_parser import ParserError
 from scripts.metric_reporter.parser.coverage_json_parser import (
+    CoverageJsonGroup,
     CoverageJsonParser,
-    LlvmCovReport,
-    PytestReport,
 )
-from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites, JUnitXmlParser
+from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlParser, JUnitXmlGroup
 from scripts.metric_reporter.reporter.averages_reporter import AveragesReporter
 from scripts.metric_reporter.reporter.base_reporter import ReporterError
 from scripts.metric_reporter.reporter.coverage_reporter import CoverageReporter
@@ -41,6 +40,7 @@ def main(
     try:
         logger.info(f"Starting Metric Reporter with configuration file: {config_file}")
         config = Config(config_file)
+        metric_reporter_args: list[MetricReporterArgs] = config.metric_reporter_args
         gcp_project_id: str = config.metric_reporter_config.gcp_project_id
         bigquery_dataset_name: str = config.metric_reporter_config.bigquery_dataset_name
         bigquery_service_account_file: str = (
@@ -55,44 +55,19 @@ def main(
             )
             return
 
-        # Create Parsers
-        coverage_json_parser = CoverageJsonParser()
-        junit_xml_parser = JUnitXmlParser()
-
         # Create BigQuery client
         credentials = service_account.Credentials.from_service_account_file(
             bigquery_service_account_file
         )  # type: ignore
         bigquery_client = bigquery.Client(credentials=credentials, project=gcp_project_id)
 
-        for args in config.metric_reporter_args:
-            logger.info(f"Reporting for {args.repository} {args.workflow} {args.test_suite}")
-
-            # Parse files
-            junit_artifact_list: list[JUnitXmlJobTestSuites] | None = None
-            if args.junit_artifact_path.is_dir():
-                junit_artifact_list = junit_xml_parser.parse(args.junit_artifact_path)
-            coverage_artifact_list: list[LlvmCovReport | PytestReport] | None = None
-            if args.coverage_artifact_path.is_dir():
-                coverage_artifact_list = coverage_json_parser.parse(args.coverage_artifact_path)
-
-            # Create reporters
-            suite_reporter = SuiteReporter(
-                args.repository, args.workflow, args.test_suite, junit_artifact_list
-            )
-            averages_reporter = AveragesReporter(
-                args.repository, args.workflow, args.test_suite, suite_reporter.results
-            )
-            coverage_reporter = CoverageReporter(
-                args.repository, args.workflow, args.test_suite, coverage_artifact_list
-            )
-
-            # Update BigQuery dataset tables if opted-in
-            averages_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
-            coverage_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
-            suite_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
-
-        logger.info("Reporting complete")
+        # Report
+        report_coverage(
+            metric_reporter_args, bigquery_client, gcp_project_id, bigquery_dataset_name
+        )
+        report_suite_results_and_averages(
+            metric_reporter_args, bigquery_client, gcp_project_id, bigquery_dataset_name
+        )
     except InvalidConfigError as error:
         logger.error(f"Configuration error: {error}")
     except ParserError as error:
@@ -101,6 +76,68 @@ def main(
         logger.error(f"Test Suite Reporter error: {error}")
     except Exception as error:
         logger.error(f"Unexpected error: {error}", exc_info=error)
+
+
+def report_coverage(
+    metric_reporter_args: list[MetricReporterArgs],
+    bigquery_client,
+    gcp_project_id: str,
+    bigquery_dataset_name: str,
+) -> None:
+    """Report results from Coverage JSON files to a BigQuery dataset table.
+
+    Args:
+        metric_reporter_args (list[MetricReporterArgs]): Configuration arguments.
+        bigquery_client: BigQuery client
+        gcp_project_id (str): The GCP project ID.
+        bigquery_dataset_name (str): The name of the BigQuery dataset.
+    """
+    coverage_json_parser = CoverageJsonParser()
+    coverage_artifact_groups: list[CoverageJsonGroup] = [
+        group
+        for args in metric_reporter_args
+        for group in coverage_json_parser.parse(args.coverage_artifact_paths)
+    ]
+    for group in coverage_artifact_groups:
+        logger.info(f"Report coverage for {group.repository} {group.workflow} {group.test_suite}")
+        coverage_reporter = CoverageReporter(
+            group.repository, group.workflow, group.test_suite, group.coverage_jsons
+        )
+        coverage_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
+
+
+def report_suite_results_and_averages(
+    metric_reporter_args: list[MetricReporterArgs],
+    bigquery_client,
+    gcp_project_id: str,
+    bigquery_dataset_name: str,
+) -> None:
+    """Report results from JUnit XML files to BigQuery dataset tables.
+
+    Args:
+        metric_reporter_args (list[MetricReporterArgs]): Configuration arguments.
+        bigquery_client: BigQuery client
+        gcp_project_id (str): The GCP project ID.
+        bigquery_dataset_name (str): The name of the BigQuery dataset.
+    """
+    junit_xml_parser = JUnitXmlParser()
+    junit_artifact_groups: list[JUnitXmlGroup] = [
+        group
+        for args in metric_reporter_args
+        for group in junit_xml_parser.parse(args.junit_artifact_paths)
+    ]
+    for group in junit_artifact_groups:
+        logger.info(
+            f"Reporting results for {group.repository} {group.workflow} {group.test_suite}"
+        )
+        suite_reporter = SuiteReporter(
+            group.repository, group.workflow, group.test_suite, group.junit_xmls
+        )
+        averages_reporter = AveragesReporter(
+            group.repository, group.workflow, group.test_suite, suite_reporter.results
+        )
+        suite_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
+        averages_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
 
 
 if __name__ == "__main__":

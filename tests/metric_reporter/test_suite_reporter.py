@@ -10,23 +10,26 @@ import pytest
 from pytest import LogCaptureFixture
 from pytest_mock import MockerFixture
 
-from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlJobTestSuites
+from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlGroup
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
-from tests.metric_reporter.conftest import ConfigValues, SampleResultsData
+from tests.metric_reporter.conftest import (
+    ConfigValues,
+    REPOSITORY,
+    SampleResultsData,
+    TEST_SUITE,
+    WORKFLOW,
+)
 
 
-def test_suite_reporter_init(
-    config: ConfigValues, results_artifact_data: SampleResultsData
-) -> None:
+def test_suite_reporter_init(results_artifact_data: SampleResultsData) -> None:
     """Test SuiteReporter initialization.
 
     Args:
-        config (ConfigValues): pytest fixture for common config values.
         results_artifact_data (SampleResultsData): results artifact data.
     """
-    reporter = SuiteReporter(
-        config.repository, config.workflow, config.test_suite, results_artifact_data.artifact_list
-    )
+    group: JUnitXmlGroup = results_artifact_data.artifact_group
+
+    reporter = SuiteReporter(group.repository, group.workflow, group.test_suite, group.junit_xmls)
 
     assert reporter.results == results_artifact_data.report_results
 
@@ -57,14 +60,13 @@ def test_suite_reporter_update_table_with_new_results(
     client_mock = mocker.MagicMock()
     client_mock.query.side_effect = [get_last_update_query_mock, check_rows_exist_query_mock]
     client_mock.insert_rows_json.return_value = []
+    group: JUnitXmlGroup = results_artifact_data.artifact_group
 
     expected_table_id = (
-        f"{config.project_id}.{config.dataset_name}.{config.repository}_suite_results"
+        f"{config.project_id}.{config.dataset_name}.{group.repository}_suite_results"
     )
 
-    reporter = SuiteReporter(
-        config.repository, config.workflow, config.test_suite, results_artifact_data.artifact_list
-    )
+    reporter = SuiteReporter(group.repository, group.workflow, group.test_suite, group.junit_xmls)
 
     reporter.update_table(client_mock, config.project_id, config.dataset_name)
 
@@ -94,16 +96,15 @@ def test_suite_reporter_update_table_with_new_results_and_row_duplication(
     check_rows_exist_query_mock.result.return_value = [{"1": 1}]
     client_mock = mocker.MagicMock()
     client_mock.query.side_effect = [get_last_update_query_mock, check_rows_exist_query_mock]
+    group: JUnitXmlGroup = results_artifact_data.artifact_group
 
     expected_log = (
         f"Detected one or more results from "
-        f"{config.repository}/{config.workflow}/{config.test_suite} already exist in table "
-        f"{config.project_id}.{config.dataset_name}.{config.repository}_suite_results. Aborting insert."
+        f"{group.repository}/{group.workflow}/{group.test_suite} already exist in table "
+        f"{config.project_id}.{config.dataset_name}.{group.repository}_suite_results. Aborting insert."
     )
 
-    reporter = SuiteReporter(
-        config.repository, config.workflow, config.test_suite, results_artifact_data.artifact_list
-    )
+    reporter = SuiteReporter(group.repository, group.workflow, group.test_suite, group.junit_xmls)
 
     with caplog.at_level(logging.WARNING):
         reporter.update_table(client_mock, config.project_id, config.dataset_name)
@@ -129,15 +130,14 @@ def test_suite_reporter_update_table_without_new_test_results(
     get_last_update_query_mock.result.return_value = [{"last_update": "2024-01-06T00:00:00Z"}]
     mock_client = mocker.MagicMock()
     mock_client.query.return_value = get_last_update_query_mock
+    group: JUnitXmlGroup = results_artifact_data.artifact_group
 
     expected_log = (
-        f"There are no new results for {config.repository}/{config.workflow}/{config.test_suite} "
-        f"to add to {config.project_id}.{config.dataset_name}.{config.repository}_suite_results."
+        f"There are no new results for {group.repository}/{group.workflow}/{group.test_suite} "
+        f"to add to {config.project_id}.{config.dataset_name}.{group.repository}_suite_results."
     )
 
-    reporter = SuiteReporter(
-        config.repository, config.workflow, config.test_suite, results_artifact_data.artifact_list
-    )
+    reporter = SuiteReporter(group.repository, group.workflow, group.test_suite, group.junit_xmls)
 
     with caplog.at_level(logging.INFO):
         reporter.update_table(mock_client, config.project_id, config.dataset_name)
@@ -155,16 +155,20 @@ def test_suite_reporter_update_table_with_empty_test_results(
         mocker (MockerFixture): pytest_mock fixture for mocking.
         config (ConfigValues): pytest fixture for common config values.
     """
-    artifact_list: list[JUnitXmlJobTestSuites] | None = None
-
+    group = JUnitXmlGroup(
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
+        junit_xmls=[],
+    )
     client_mock = mocker.MagicMock()
 
     expected_log = (
-        f"There are no results for {config.repository}/{config.workflow}/{config.test_suite} to "
-        f"add to {config.project_id}.{config.dataset_name}.{config.repository}_suite_results."
+        f"There are no results for {group.repository}/{group.workflow}/{group.test_suite} to "
+        f"add to {config.project_id}.{config.dataset_name}.{group.repository}_suite_results."
     )
 
-    reporter = SuiteReporter(config.repository, config.workflow, config.test_suite, artifact_list)
+    reporter = SuiteReporter(group.repository, group.workflow, group.test_suite, group.junit_xmls)
 
     with caplog.at_level(logging.INFO):
         reporter.update_table(client_mock, config.project_id, config.dataset_name)

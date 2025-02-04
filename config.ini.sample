@@ -14,20 +14,84 @@ pipelines = [
         "repository": "fxa",
         "workflows": {
           "nightly": [
-            "Unit Test (nightly)",
-            "Integration Test - Frontends (nightly)",
-            "Integration Test - Libraries (nightly)",
-            "Integration Test - Servers (nightly)",
-            "Integration Test - Servers - Auth (nightly)",
-            "Integration Test - Servers - Auth V2 (nightly)",
-            "Chromium Functional Tests - Playwright (nightly)",
-            "Firefox Functional Tests - Playwright (nightly)"
+            {
+              "job_name": "Unit Test (nightly)",
+              "test_suite": "unit"
+            },
+            {
+              "job_name": "Integration Test - Frontends (nightly)",
+              "test_suite": "integration-frontends"
+            },
+            {
+              "job_name": "Integration Test - Libraries (nightly)",
+              "test_suite": "integration-libraries"
+            },
+            {
+              "job_name": "Integration Test - Servers (nightly)",
+              "test_suite": "integration-servers"
+            },
+            {
+              "job_name": "Integration Test - Servers - Auth (nightly)",
+              "test_suite": "integration-servers-auth"
+            },
+            {
+              "job_name": "Integration Test - Servers - Auth V2 (nightly)",
+              "test_suite": "integration-servers-auth-v2"
+            },
+            {
+              "job_name": "Functional Tests - Playwright (nightly)",
+              "test_suite": "firefox-e2e"
+            },
+            {
+              "job_name": "Chromium Functional Tests - Playwright (nightly)",
+              "test_suite": "chromium-e2e"
+            },
+            {
+              "job_name": "Firefox Functional Tests - Playwright (nightly)",
+              "test_suite": "firefox-e2e"
+            }
+          ],
+          "test_and_deploy_tag": [
+            {
+              "job_name": "Unit Test",
+              "test_suite": "unit"
+            },
+            {
+              "job_name": "Integration Test - Frontends",
+              "test_suite": "integration-frontends"
+            },
+            {
+              "job_name": "Integration Test - Libraries",
+              "test_suite": "integration-libraries"
+            },
+            {
+              "job_name": "Integration Test - Servers",
+              "test_suite": "integration-servers"
+            },
+            {
+              "job_name": "Integration Test - Servers - Auth",
+              "test_suite": "integration-servers-auth"
+            },
+            {
+              "job_name": "Integration Test - Servers - Auth V2",
+              "test_suite": "integration-servers-auth-v2"
+            },
+            {
+              "job_name": "Functional Tests - Playwright",
+              "test_suite": "firefox-e2e"
+            }
           ],
           "stage_smoke_tests": [
-            "Smoke Test Stage - Playwright"
+            {
+              "job_name": "Smoke Test Stage - Playwright",
+              "test_suite": "firefox-e2e"
+            }
           ],
           "production_smoke_tests": [
-            "Smoke Test Production - Playwright"
+            {
+              "job_name": "Smoke Test Production - Playwright",
+              "test_suite": "firefox-e2e"
+            }
           ]
         }
       },
@@ -37,8 +101,14 @@ pipelines = [
         "branches": ["master"],
         "workflows": {
           "build-test-deploy": [
-            "Rust Unit Tests",
-            "Integration Tests"
+            {
+              "job_name": "Rust Unit Tests",
+              "test_suite": "unit"
+            },
+            {
+              "job_name": "Integration Tests",
+              "test_suite": "integration"
+            }
           ]
         }
       },
@@ -47,14 +117,20 @@ pipelines = [
         "repository": "merino-py",
         "workflows": {
           "main-workflow": [
-            "unit-tests",
-            "integration-tests"
+            {
+              "job_name": "unit-tests",
+              "test_suite": "unit"
+            },
+            {
+              "job_name": "integration-tests",
+              "test_suite": "integration"
+            }
           ]
         }
       }
     ]
 ;(optional) Get data starting from x days past from now (default: all available data)
-days_of_data = 2
+days_of_data = 7
 
 [metric_reporter]
 gcp_project_id = ecosystem-test-eng
