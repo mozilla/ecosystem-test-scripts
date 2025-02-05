@@ -16,7 +16,8 @@ Before updating the test metrics, ensure that:
 - You have the latest raw data in the ecosystem-test-scripts root directory.
   - The raw data should be found in the `test_result_dir` specified in the config.ini file and is
     typically named `raw_data`.
-  - The latest raw data is available in the [ETE team folder][ETE Drive]
+  - The latest raw data is available in the
+    [ecosystem-test-eng-metrics GCP Cloud Bucket][GCP Cloud Bucket]
 
 ## 1. Scrape for New Raw Test Data
 
@@ -49,11 +50,11 @@ _**Notes**:_
   tests.
 
 
-## 3. Backup the latest `test_result_dir` to the ETE team folder
+## 3. Backup the latest `test_result_dir` to the GCP Cloud Bucket
 
-Compress the contents of the `test_result_dir`, typically called 'raw_data,' and replace the file
-located in the [ETE team folder][ETE Drive].
+Upload the new contents of the `test_result_dir`, typically called 'raw_data', to the
+[ecosystem-test-eng-metrics GCP Cloud Bucket][GCP Cloud Bucket].
 
 [Developer Setup Guide]: ../developer-guides/developer_setup.md
-[ETE Drive]: https://drive.google.com/drive/folders/1N4YW97gEH6gmdlfDNtuGxUsdo2EKkCAi
 [ETE Looker Dashboards]: https://mozilla.cloud.looker.com/boards/140
+[GCP Cloud Bucket]: https://console.cloud.google.com/storage/browser/ecosystem-test-eng-metrics

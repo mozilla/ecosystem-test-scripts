@@ -22,8 +22,12 @@ from client import (
     Artifact,
     Workflow,
 )
-from scripts.circleci_scraper.config import CircleCIScraperPipelineConfig
+from scripts.circleci_scraper.config import (
+    CircleCIScraperJobConfig,
+    CircleCIScraperPipelineConfig,
+)
 from scripts.common.config import CommonConfig
+from scripts.common.constants import DATETIME_FORMAT, DATETIME_MILLISECOND_FORMAT
 from scripts.common.error import BaseError
 
 COVERAGE_FILE_REGEX = r".*cov.*\.json$"
@@ -103,7 +107,7 @@ class CircleCIScraper:
                     continue
                 # Filter for date limit
                 created_at_datetime = datetime.strptime(
-                    pipeline.created_at, "%Y-%m-%dT%H:%M:%S.%fZ"
+                    pipeline.created_at, DATETIME_MILLISECOND_FORMAT
                 ).replace(tzinfo=timezone.utc)
                 if date_limit and created_at_datetime < date_limit:
                     return
@@ -122,7 +126,7 @@ class CircleCIScraper:
         pipeline_id: str,
         organization: str,
         repository: str,
-        workflow_configs: dict[str, list[str]],
+        workflow_configs: dict[str, list[CircleCIScraperJobConfig]],
     ) -> None:
         """Export test artifacts for a specific pipeline ID.
 
@@ -130,7 +134,8 @@ class CircleCIScraper:
             pipeline_id (str): The pipeline ID.
             organization (str): The organization name.
             repository (str): The repository name.
-            workflow_configs (dict[str, list[str]]): The workflow configurations.
+            workflow_configs (dict[str, list[CircleCIScraperJobConfig]]): The workflow
+                                                                          configurations.
 
         Raises:
             CircleCIClientError: If there is an error in the CircleCI API request.
@@ -141,9 +146,9 @@ class CircleCIScraper:
             workflows: WorkflowGroup = self._client.get_workflows(pipeline_id, next_page_token)
             for workflow in workflows.items:
                 if workflow.name in workflow_configs:
-                    job_names = workflow_configs[workflow.name]
+                    job_configs: list[CircleCIScraperJobConfig] = workflow_configs[workflow.name]
                     self.export_test_artifacts_workflow_id(
-                        organization, repository, workflow, job_names
+                        organization, repository, workflow, job_configs
                     )
             next_page_token = workflows.next_page_token
             if not next_page_token:
@@ -154,7 +159,7 @@ class CircleCIScraper:
         organization: str,
         repository: str,
         workflow: Workflow,
-        job_names: list[str],
+        job_configs: list[CircleCIScraperJobConfig],
     ) -> None:
         """Export test artifacts for a specific workflow ID.
 
@@ -162,7 +167,7 @@ class CircleCIScraper:
             organization (str): The organization name.
             repository (str): The repository name.
             workflow (Workflow): The workflow.
-            job_names (list[str]): A list of job names.
+            job_configs (list[CircleCIScraperJobConfig]): A list of job configs.
 
         Raises:
             CircleCIClientError: If there is an error in the CircleCI API request.
@@ -172,7 +177,9 @@ class CircleCIScraper:
         while True:
             jobs: JobGroup = self._client.get_jobs(workflow.id, next_page_token)
             for job in jobs.items:
-                if job.name in job_names:
+                if job_config := next(
+                    (config for config in job_configs if job.name == config.job_name), None
+                ):
                     if not job.job_number:
                         # This happens when workflows are cancelled before a number is assigned
                         # to the test job
@@ -188,7 +195,9 @@ class CircleCIScraper:
                             " job is in progress or cancelled."
                         )
                         continue
-                    self.export_test_artifacts_by_job(organization, repository, workflow.name, job)
+                    self.export_test_artifacts_by_job(
+                        organization, repository, workflow.name, job_config.test_suite, job
+                    )
             next_page_token = jobs.next_page_token
             if not next_page_token:
                 break
@@ -198,6 +207,7 @@ class CircleCIScraper:
         organization: str,
         repository: str,
         workflow_name: str,
+        test_suite: str,
         job: Job,
     ) -> None:
         """Export test artifacts for a specific job.
@@ -206,6 +216,7 @@ class CircleCIScraper:
             organization (str): The organization name.
             repository (str): The repository name.
             workflow_name (str): The workflow name.
+            test_suite (str): The test suite name.
             job (Job): The job details.
 
         Raises:
@@ -232,11 +243,21 @@ class CircleCIScraper:
                 break
         if junit_artifacts:
             self.export_artifacts(
-                repository, workflow_name, self._junit_artifact_dir, job, junit_artifacts
+                repository,
+                workflow_name,
+                self._junit_artifact_dir,
+                test_suite,
+                job,
+                junit_artifacts,
             )
         if coverage_artifacts:
             self.export_artifacts(
-                repository, workflow_name, self._coverage_artifact_dir, job, coverage_artifacts
+                repository,
+                workflow_name,
+                self._coverage_artifact_dir,
+                test_suite,
+                job,
+                coverage_artifacts,
             )
 
     def export_artifacts(
@@ -244,6 +265,7 @@ class CircleCIScraper:
         repository: str,
         workflow_name: str,
         artifact_directory: str,
+        test_suite: str,
         job: Job,
         artifacts: list[Artifact],
     ):
@@ -253,6 +275,7 @@ class CircleCIScraper:
             repository (str): The repository name.
             workflow_name (str): The workflow name.
             artifact_directory (str): The destination directory name for artifacts.
+            test_suite (str): The test suite name.
             job (Job): The job details.
             artifacts (list[Artifact]): The list of artifacts.
 
@@ -260,22 +283,30 @@ class CircleCIScraper:
             CircleCIClientError: If there is an error in the CircleCI API request.
             CircleCIScraperError: If there is an error in downloading the artifacts.
         """
-        artifact_path = (
-            Path(self._test_result_dir)
-            / repository
-            / workflow_name
-            / job.name
-            / artifact_directory
-            / f"{str(job.job_number)}_{job.started_at}"
-        )
-        if artifact_path.exists():
-            self.logger.info(f"{artifact_path} already exists, skipping download(s).")
-            return
-
-        artifact_path.mkdir(parents=True)
+        destination_path = Path(self._test_result_dir) / repository / artifact_directory
+        destination_path.mkdir(parents=True, exist_ok=True)
         for index, artifact in enumerate(artifacts):
-            file_path: Path = artifact_path / f"{index}-{Path(artifact.path).name}"
-            self.download_artifact(file_path, artifact.url)
+            job_datetime = datetime.strptime(job.started_at, DATETIME_FORMAT).replace(
+                tzinfo=timezone.utc
+            )
+            epoch = int(job_datetime.timestamp())
+            artifact_path = Path(artifact.path)
+            # FxA doesn't guarantee unique names for their test files, so concatenating the parent
+            # directory is a necessary evil atm
+            destination_file_name = (
+                f"{str(job.job_number)}__"
+                f"{epoch}__"
+                f"{repository}__"
+                f"{workflow_name}__"
+                f"{test_suite}__"
+                f"{f'{artifact_path.parent.name.replace("_", "-")}-' if artifact_path.parent.name else ''}"
+                f"{artifact_path.name.replace("_", "-")}"
+            )
+            destination_file_path: Path = destination_path / destination_file_name
+            if destination_file_path.exists():
+                self.logger.info(f"{destination_file_path} already exists, skipping download.")
+            else:
+                self.download_artifact(destination_file_path, artifact.url)
 
     def download_artifact(self, file_name: Path, url: str) -> None:
         """Download an artifact from the specified URL.
