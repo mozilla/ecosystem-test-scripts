@@ -17,13 +17,13 @@ from scripts.metric_reporter.reporter.averages_reporter import (
     AveragesReporterResult,
 )
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporterResult
-from tests.metric_reporter.conftest import ConfigValues
+from tests.metric_reporter.conftest import ConfigValues, REPOSITORY, TEST_SUITE, WORKFLOW
 
 SUITE_RESULTS: Sequence[SuiteReporterResult] = [
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-01-01T00:00:00Z",
         date="2024-01-01",
         job=1,
@@ -31,9 +31,9 @@ SUITE_RESULTS: Sequence[SuiteReporterResult] = [
         execution_time=None,
     ),
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-01-30T00:00:00Z",
         date="2024-01-31",
         job=2,
@@ -41,9 +41,9 @@ SUITE_RESULTS: Sequence[SuiteReporterResult] = [
         execution_time=None,
     ),
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-03-01T00:00:00Z",
         date="2024-03-01",
         job=3,
@@ -51,9 +51,9 @@ SUITE_RESULTS: Sequence[SuiteReporterResult] = [
         execution_time=15,
     ),
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-03-31T00:00:00Z",
         date="2024-03-31",
         job=4,
@@ -61,9 +61,9 @@ SUITE_RESULTS: Sequence[SuiteReporterResult] = [
         execution_time=20,
     ),
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-04-30T00:00:00Z",
         date="2024-04-30",
         job=5,
@@ -75,9 +75,9 @@ SUITE_RESULTS: Sequence[SuiteReporterResult] = [
 # This list only contains boundary values
 EXPECTED_RESULTS = [
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-01-01",
         stop_date_30="2024-01-31",
         suite_count_30=2,
@@ -98,9 +98,9 @@ EXPECTED_RESULTS = [
         execution_time_90=None,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-01-02",
         stop_date_30="2024-02-01",
         suite_count_30=1,
@@ -121,9 +121,9 @@ EXPECTED_RESULTS = [
         execution_time_90=None,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-01-30",
         stop_date_30="2024-02-29",
         suite_count_30=1,
@@ -144,9 +144,9 @@ EXPECTED_RESULTS = [
         execution_time_90=None,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-01-31",
         stop_date_30="2024-03-01",
         suite_count_30=2,
@@ -167,9 +167,9 @@ EXPECTED_RESULTS = [
         execution_time_90=5.0,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-02-01",
         stop_date_30="2024-03-02",
         suite_count_30=1,
@@ -190,9 +190,9 @@ EXPECTED_RESULTS = [
         execution_time_90=5.0,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-02-29",
         stop_date_30="2024-03-30",
         suite_count_30=1,
@@ -213,9 +213,9 @@ EXPECTED_RESULTS = [
         execution_time_90=5.0,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-03-01",
         stop_date_30="2024-03-31",
         suite_count_30=2,
@@ -236,9 +236,9 @@ EXPECTED_RESULTS = [
         execution_time_90=8.75,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-03-02",
         stop_date_30="2024-04-01",
         suite_count_30=1,
@@ -259,9 +259,9 @@ EXPECTED_RESULTS = [
         execution_time_90=11.666666666666666,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-03-30",
         stop_date_30="2024-04-29",
         suite_count_30=1,
@@ -282,9 +282,9 @@ EXPECTED_RESULTS = [
         execution_time_90=11.666666666666666,
     ),
     AveragesReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         start_date_30="2024-03-31",
         stop_date_30="2024-04-30",
         suite_count_30=2,
@@ -333,16 +333,13 @@ EXPECTED_JSON = [
 ]
 
 
-def test_averages_reporter_init(config: ConfigValues, test_data_directory: Path) -> None:
+def test_averages_reporter_init(test_data_directory: Path) -> None:
     """Test AveragesReporter initialization.
 
     Args:
-        config (ConfigValues): pytest fixture for common config values.
         test_data_directory (Path): Test data directory for the Metric Reporter.
     """
-    reporter = AveragesReporter(
-        config.repository, config.workflow, config.test_suite, SUITE_RESULTS
-    )
+    reporter = AveragesReporter(REPOSITORY, WORKFLOW, TEST_SUITE, SUITE_RESULTS)
 
     # Testing the boundaries which occur on the 1st, 30th, 60th, 90th and 120th day marks
     assert (
@@ -367,7 +364,6 @@ def test_averages_reporter_update_table_with_new_results(
 
     Args:
         mocker (MockerFixture): pytest_mock fixture for mocking.
-        config (ConfigValues): pytest fixture for common config values.
     """
     get_last_update_query_mock = mocker.MagicMock()
     get_last_update_query_mock.result.return_value = [{"last_update": date(2024, 4, 29)}]
@@ -377,11 +373,9 @@ def test_averages_reporter_update_table_with_new_results(
     client_mock.query.side_effect = [get_last_update_query_mock, check_rows_exist_query_mock]
     client_mock.insert_rows_json.return_value = []
 
-    expected_table_id = f"{config.project_id}.{config.dataset_name}.{config.repository}_averages"
+    expected_table_id = f"{config.project_id}.{config.dataset_name}.{REPOSITORY}_averages"
 
-    reporter = AveragesReporter(
-        config.repository, config.workflow, config.test_suite, SUITE_RESULTS
-    )
+    reporter = AveragesReporter(REPOSITORY, WORKFLOW, TEST_SUITE, SUITE_RESULTS)
 
     reporter.update_table(client_mock, config.project_id, config.dataset_name)
 
@@ -408,13 +402,11 @@ def test_averages_reporter_update_table_with_new_results_and_row_duplication(
 
     expected_log = (
         f"Detected one or more results from "
-        f"{config.repository}/{config.workflow}/{config.test_suite} already exist in table "
-        f"{config.project_id}.{config.dataset_name}.{config.repository}_averages. Aborting insert."
+        f"{REPOSITORY}/{WORKFLOW}/{TEST_SUITE} already exist in table "
+        f"{config.project_id}.{config.dataset_name}.{REPOSITORY}_averages. Aborting insert."
     )
 
-    reporter = AveragesReporter(
-        config.repository, config.workflow, config.test_suite, SUITE_RESULTS
-    )
+    reporter = AveragesReporter(REPOSITORY, WORKFLOW, TEST_SUITE, SUITE_RESULTS)
 
     with caplog.at_level(logging.WARNING):
         reporter.update_table(client_mock, config.project_id, config.dataset_name)
@@ -438,13 +430,11 @@ def test_averages_reporter_update_table_without_new_results(
     mock_client.query.return_value = get_last_update_query_mock
 
     expected_log = (
-        f"There are no new averages for {config.repository}/{config.workflow}/{config.test_suite} "
-        f"to add to {config.project_id}.{config.dataset_name}.{config.repository}_averages."
+        f"There are no new averages for {REPOSITORY}/{WORKFLOW}/{TEST_SUITE} "
+        f"to add to {config.project_id}.{config.dataset_name}.{REPOSITORY}_averages."
     )
 
-    reporter = AveragesReporter(
-        config.repository, config.workflow, config.test_suite, SUITE_RESULTS
-    )
+    reporter = AveragesReporter(REPOSITORY, WORKFLOW, TEST_SUITE, SUITE_RESULTS)
 
     with caplog.at_level(logging.INFO):
         reporter.update_table(mock_client, config.project_id, config.dataset_name)
@@ -465,11 +455,11 @@ def test_averages_reporter_update_table_with_empty_test_results(
     client_mock = mocker.MagicMock()
 
     expected_log = (
-        f"There are no averages for {config.repository}/{config.workflow}/{config.test_suite} "
-        f"to add to {config.project_id}.{config.dataset_name}.{config.repository}_averages."
+        f"There are no averages for {REPOSITORY}/{WORKFLOW}/{TEST_SUITE} "
+        f"to add to {config.project_id}.{config.dataset_name}.{REPOSITORY}_averages."
     )
 
-    reporter = AveragesReporter(config.repository, config.workflow, config.test_suite, [])
+    reporter = AveragesReporter(REPOSITORY, WORKFLOW, TEST_SUITE, [])
 
     with caplog.at_level(logging.INFO):
         reporter.update_table(client_mock, config.project_id, config.dataset_name)

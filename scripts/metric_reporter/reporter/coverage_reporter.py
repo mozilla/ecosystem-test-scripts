@@ -10,8 +10,9 @@ from typing import Any, Sequence
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud.bigquery import ArrayQueryParameter, Client, QueryJobConfig, ScalarQueryParameter
 
-from scripts.metric_reporter.constants import DATETIME_FORMAT
+from scripts.common.constants import DATETIME_FORMAT
 from scripts.metric_reporter.parser.coverage_json_parser import (
+    CoverageJson,
     LlvmCovReport,
     LlvmCovTotals,
     PytestReport,
@@ -88,7 +89,7 @@ class CoverageReporter(BaseReporter):
         repository: str,
         workflow: str,
         test_suite: str,
-        coverage_artifact_list: list[LlvmCovReport | PytestReport] | None,
+        coverage_artifact_list: list[CoverageJson] | None,
     ) -> None:
         """Initialize the reporter with the coverage data.
 
@@ -115,7 +116,7 @@ class CoverageReporter(BaseReporter):
             project_id (str): The BigQuery project ID.
             dataset_name (str): The BigQuery dataset name.
         """
-        table_id = f"{project_id}.{dataset_name}.{self.repository}_coverage"
+        table_id = f"{project_id}.{dataset_name}.{self._normalize_name(self.repository)}_coverage"
 
         if not self.results:
             self.logger.warning(
@@ -238,8 +239,7 @@ class CoverageReporter(BaseReporter):
             raise ReporterError(error_msg) from error
 
     def _parse_results(
-        self,
-        coverage_artifact_list: list[LlvmCovReport | PytestReport] | None,
+        self, coverage_artifact_list: list[CoverageJson] | None
     ) -> Sequence[CoverageReporterResult]:
         if coverage_artifact_list is None:
             return []

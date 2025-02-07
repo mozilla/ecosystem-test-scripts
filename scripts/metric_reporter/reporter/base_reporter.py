@@ -5,13 +5,14 @@
 """Module defining the base for all reporting in the Metric Reporter."""
 
 import logging
+import re
 from typing import Any, Sequence
 
 from dateutil import parser
 from google.cloud.bigquery import Client
 from pydantic import BaseModel
 
-from scripts.metric_reporter.constants import DATE_FORMAT
+from scripts.common.constants import DATE_FORMAT
 
 
 class ReporterResultBase(BaseModel):
@@ -45,6 +46,11 @@ class BaseReporter:
             return datetime.strftime(DATE_FORMAT)
         except (ValueError, TypeError) as error:
             raise ReporterError(f"Invalid timestamp format: {timestamp}") from error
+
+    @staticmethod
+    def _normalize_name(name: str, delimiter: str = "") -> str:
+        normalized = re.sub(r"[^a-zA-Z0-9_]+", delimiter, name).lower()
+        return normalized.strip("_")
 
     def update_table(self, client: Client, project_id: str, dataset_name: str) -> None:
         """Update the BigQuery table.

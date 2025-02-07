@@ -11,18 +11,21 @@ import pytest
 from pydantic import BaseModel
 
 from scripts.metric_reporter.parser.coverage_json_parser import (
-    PytestReport,
-    PytestMeta,
-    PytestTotals,
+    CoverageJson,
+    CoverageJsonGroup,
     LlvmCovDataItem,
     LlvmCovReport,
     LlvmCovStats,
     LlvmCovTotals,
+    PytestReport,
+    PytestMeta,
+    PytestTotals,
 )
 from scripts.metric_reporter.parser.junit_xml_parser import (
     JestJUnitXmlTestSuites,
     JestJUnitXmlTestSuite,
     JestJUnitXmlTestCase,
+    JUnitXmlGroup,
     JUnitXmlJobTestSuites,
     PlaywrightJUnitXmlFailure,
     PlaywrightJUnitXmlProperty,
@@ -37,7 +40,11 @@ from scripts.metric_reporter.parser.junit_xml_parser import (
 from scripts.metric_reporter.reporter.coverage_reporter import CoverageReporterResult
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporterResult
 
-JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
+REPOSITORY = "repo"
+WORKFLOW = "main"
+TEST_SUITE = "suite"
+
+JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] = [
     JUnitXmlJobTestSuites(
         job=1,
         job_timestamp="2024-01-01T00:00:00Z",
@@ -219,9 +226,9 @@ JUNIT_XML_JOB_TEST_SUITES_LIST: list[JUnitXmlJobTestSuites] | None = [
 
 ARTIFACT_RESULTS: list[SuiteReporterResult] = [
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-01-01T00:00:00Z",
         date="2024-01-01",
         job=1,
@@ -231,9 +238,9 @@ ARTIFACT_RESULTS: list[SuiteReporterResult] = [
         retry=1,
     ),
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-01-02T00:00:00Z",
         date="2024-01-02",
         job=2,
@@ -243,9 +250,9 @@ ARTIFACT_RESULTS: list[SuiteReporterResult] = [
         fixme=1,
     ),
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-01-03T00:00:00Z",
         date="2024-01-03",
         job=3,
@@ -255,9 +262,9 @@ ARTIFACT_RESULTS: list[SuiteReporterResult] = [
         retry=1,
     ),
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-01-04T00:00:00Z",
         date="2024-01-04",
         job=4,
@@ -266,9 +273,9 @@ ARTIFACT_RESULTS: list[SuiteReporterResult] = [
         skipped=1,
     ),
     SuiteReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         timestamp="2024-01-05T00:00:00Z",
         date="2024-01-05",
         job=5,
@@ -386,7 +393,7 @@ ARTIFACT_JSON: list[dict[str, Any]] = [
 ]
 
 LLVM_COV_SAMPLE_DIRECTORY = "llvm_cov_json_samples"
-LLVM_COV_REPORT_LIST: list[LlvmCovReport | PytestReport] = [
+LLVM_COV_REPORT_LIST: list[CoverageJson] = [
     LlvmCovReport(
         job_number=1,
         job_timestamp="2024-08-30T19:56:50Z",
@@ -410,9 +417,9 @@ LLVM_COV_REPORT_LIST: list[LlvmCovReport | PytestReport] = [
 ]
 LLVM_COV_REPORT_RESULTS: list[CoverageReporterResult] = [
     CoverageReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         date="2024-08-30",
         timestamp="2024-08-30T19:56:50Z",
         job=1,
@@ -456,7 +463,7 @@ LLVM_COV_JSON: list[dict[str, Any]] = [
 ]
 
 PYTEST_SAMPLE_DIRECTORY = "pytest_json_samples"
-PYTEST_REPORT_LIST: list[LlvmCovReport | PytestReport] = [
+PYTEST_REPORT_LIST: list[CoverageJson] = [
     PytestReport(
         job_number=1,
         job_timestamp="2024-08-29T17:43:41Z",
@@ -483,9 +490,9 @@ PYTEST_REPORT_LIST: list[LlvmCovReport | PytestReport] = [
 ]
 PYTEST_REPORT_RESULTS: list[CoverageReporterResult] = [
     CoverageReporterResult(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
         date="2024-08-29",
         timestamp="2024-08-29T17:43:41Z",
         job=1,
@@ -528,9 +535,6 @@ PYTEST_JSON: list[dict[str, Any]] = [
 class ConfigValues(BaseModel):
     """Grouping common config sample data."""
 
-    repository: str
-    workflow: str
-    test_suite: str
     project_id: str
     dataset_name: str
 
@@ -539,15 +543,20 @@ class SampleCoverageData(BaseModel):
     """Grouping of test coverage sample data."""
 
     sample_directory: Path
-    report_list: list[LlvmCovReport | PytestReport]
+    coverage_json_group: CoverageJsonGroup
     report_results: list[CoverageReporterResult]
     json_rows: list[dict[str, Any]]
+
+    @property
+    def sample_files(self) -> list[Path]:
+        """Test files in sample directory"""
+        return [file_path for file_path in self.sample_directory.iterdir()]
 
 
 class SampleResultsData(BaseModel):
     """Grouping of test result sample data."""
 
-    artifact_list: list[JUnitXmlJobTestSuites] | None
+    artifact_group: JUnitXmlGroup
     report_results: list[SuiteReporterResult]
     json_rows: list[dict[str, Any]]
 
@@ -556,9 +565,6 @@ class SampleResultsData(BaseModel):
 def config() -> ConfigValues:
     """Provide the base path to the test data directory."""
     return ConfigValues(
-        repository="repo",
-        workflow="main",
-        test_suite="suite",
         project_id="project",
         dataset_name="dataset",
     )
@@ -575,7 +581,12 @@ def coverage_llvm_cov_data(test_data_directory: Path) -> SampleCoverageData:
     """Provide the llvm-cov coverage report sample data."""
     return SampleCoverageData(
         sample_directory=test_data_directory / LLVM_COV_SAMPLE_DIRECTORY,
-        report_list=LLVM_COV_REPORT_LIST,
+        coverage_json_group=CoverageJsonGroup(
+            repository=REPOSITORY,
+            workflow=WORKFLOW,
+            test_suite=TEST_SUITE,
+            coverage_jsons=LLVM_COV_REPORT_LIST,
+        ),
         report_results=LLVM_COV_REPORT_RESULTS,
         json_rows=LLVM_COV_JSON,
     )
@@ -586,7 +597,12 @@ def coverage_pytest_data(test_data_directory: Path) -> SampleCoverageData:
     """Provide the pytest coverage report sample data."""
     return SampleCoverageData(
         sample_directory=test_data_directory / PYTEST_SAMPLE_DIRECTORY,
-        report_list=PYTEST_REPORT_LIST,
+        coverage_json_group=CoverageJsonGroup(
+            repository=REPOSITORY,
+            workflow=WORKFLOW,
+            test_suite=TEST_SUITE,
+            coverage_jsons=PYTEST_REPORT_LIST,
+        ),
         report_results=PYTEST_REPORT_RESULTS,
         json_rows=PYTEST_JSON,
     )
@@ -596,7 +612,12 @@ def coverage_pytest_data(test_data_directory: Path) -> SampleCoverageData:
 def results_artifact_data(test_data_directory: Path) -> SampleResultsData:
     """Provide the artifact only test suite report sample data."""
     return SampleResultsData(
-        artifact_list=JUNIT_XML_JOB_TEST_SUITES_LIST,
+        artifact_group=JUnitXmlGroup(
+            repository=REPOSITORY,
+            workflow=WORKFLOW,
+            test_suite=TEST_SUITE,
+            junit_xmls=JUNIT_XML_JOB_TEST_SUITES_LIST,
+        ),
         report_results=ARTIFACT_RESULTS,
         json_rows=ARTIFACT_JSON,
     )

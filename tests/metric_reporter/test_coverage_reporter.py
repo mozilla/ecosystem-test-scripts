@@ -11,32 +11,36 @@ import pytest
 from pytest import LogCaptureFixture
 from pytest_mock import MockerFixture
 
-from scripts.metric_reporter.parser.coverage_json_parser import LlvmCovReport, PytestReport
+from scripts.metric_reporter.parser.coverage_json_parser import CoverageJsonGroup
 from scripts.metric_reporter.reporter.coverage_reporter import (
     CoverageReporter,
     CoverageReporterResult,
 )
-from tests.metric_reporter.conftest import ConfigValues, SampleCoverageData
+from tests.metric_reporter.conftest import (
+    ConfigValues,
+    REPOSITORY,
+    SampleCoverageData,
+    TEST_SUITE,
+    WORKFLOW,
+)
 
 
 @pytest.mark.parametrize(
     "fixture", ["coverage_llvm_cov_data", "coverage_pytest_data"], ids=["llvm-cov", "pytest"]
 )
-def test_coverage_reporter_init(
-    config: ConfigValues, fixture: str, request: pytest.FixtureRequest
-) -> None:
+def test_coverage_reporter_init(fixture: str, request: pytest.FixtureRequest) -> None:
     """Test CoverageReporter initialization with llvm-cov and pytest report data.
 
     Args:
-        config (ConfigValues): pytest fixture for common config values.
         fixture (str): The name of the fixture with coverage sample data.
         request (FixtureRequest): A pytest request object for accessing fixtures.
     """
     coverage_data: SampleCoverageData = request.getfixturevalue(fixture)
+    group: CoverageJsonGroup = coverage_data.coverage_json_group
     expected_results: list[CoverageReporterResult] = coverage_data.report_results
 
     reporter = CoverageReporter(
-        config.repository, config.workflow, config.test_suite, coverage_data.report_list
+        group.repository, group.workflow, group.test_suite, group.coverage_jsons
     )
 
     assert reporter.results == expected_results
@@ -74,6 +78,7 @@ def test_coverage_reporter_update_table_with_new_results(
         last_update_return_value (list[dict[str, str]]): Value returned by get_last_update mock.
     """
     coverage_data: SampleCoverageData = request.getfixturevalue(fixture)
+    group: CoverageJsonGroup = coverage_data.coverage_json_group
 
     get_last_update_query_mock = mocker.MagicMock()
     get_last_update_query_mock.result.return_value = last_update_return_value
@@ -83,11 +88,11 @@ def test_coverage_reporter_update_table_with_new_results(
     client_mock.query.side_effect = [get_last_update_query_mock, check_rows_exist_query_mock]
     client_mock.insert_rows_json.return_value = []
 
-    expected_table_id = f"{config.project_id}.{config.dataset_name}.{config.repository}_coverage"
+    expected_table_id = f"{config.project_id}.{config.dataset_name}.{group.repository}_coverage"
     expected_results: list[dict[str, Any]] = coverage_data.json_rows
 
     reporter = CoverageReporter(
-        config.repository, config.workflow, config.test_suite, coverage_data.report_list
+        group.repository, group.workflow, group.test_suite, group.coverage_jsons
     )
 
     reporter.update_table(client_mock, config.project_id, config.dataset_name)
@@ -116,6 +121,7 @@ def test_coverage_reporter_update_table_with_new_results_and_row_duplication(
         request (FixtureRequest): A pytest request object for accessing fixtures.
     """
     coverage_data: SampleCoverageData = request.getfixturevalue(fixture)
+    group: CoverageJsonGroup = coverage_data.coverage_json_group
 
     get_last_update_query_mock = mocker.MagicMock()
     get_last_update_query_mock.result.return_value = [{"last_update": "2024-01-01T00:00:00Z"}]
@@ -126,12 +132,12 @@ def test_coverage_reporter_update_table_with_new_results_and_row_duplication(
 
     expected_log = (
         f"Detected one or more results from "
-        f"{config.repository}/{config.workflow}/{config.test_suite} already exist in table "
-        f"{config.project_id}.{config.dataset_name}.{config.repository}_coverage. Aborting insert."
+        f"{group.repository}/{group.workflow}/{group.test_suite} already exist in table "
+        f"{config.project_id}.{config.dataset_name}.{group.repository}_coverage. Aborting insert."
     )
 
     reporter = CoverageReporter(
-        config.repository, config.workflow, config.test_suite, coverage_data.report_list
+        group.repository, group.workflow, group.test_suite, group.coverage_jsons
     )
 
     with caplog.at_level(logging.WARNING):
@@ -160,6 +166,7 @@ def test_coverage_reporter_update_table_without_new_results(
         request (FixtureRequest): A pytest request object for accessing fixtures.
     """
     coverage_data: SampleCoverageData = request.getfixturevalue(fixture)
+    group: CoverageJsonGroup = coverage_data.coverage_json_group
 
     get_last_update_query_mock = mocker.MagicMock()
     get_last_update_query_mock.result.return_value = [{"last_update": "2024-09-01T00:00:00Z"}]
@@ -167,12 +174,12 @@ def test_coverage_reporter_update_table_without_new_results(
     mock_client.query.return_value = get_last_update_query_mock
 
     expected_log = (
-        f"There are no new results for {config.repository}/{config.workflow}/{config.test_suite} "
-        f"to add to {config.project_id}.{config.dataset_name}.{config.repository}_coverage."
+        f"There are no new results for {group.repository}/{group.workflow}/{group.test_suite} "
+        f"to add to {config.project_id}.{config.dataset_name}.{group.repository}_coverage."
     )
 
     reporter = CoverageReporter(
-        config.repository, config.workflow, config.test_suite, coverage_data.report_list
+        group.repository, group.workflow, group.test_suite, group.coverage_jsons
     )
 
     with caplog.at_level(logging.INFO):
@@ -191,17 +198,21 @@ def test_coverage_reporter_update_table_with_empty_test_results(
         mocker (MockerFixture): pytest_mock fixture for mocking.
         config (ConfigValues): pytest fixture for common config values.
     """
-    coverage_artifact_list: list[LlvmCovReport | PytestReport] = []
+    group = CoverageJsonGroup(
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
+    )
 
     client_mock = mocker.MagicMock()
 
     expected_log = (
-        f"There are no results for {config.repository}/{config.workflow}/{config.test_suite} "
-        f"to add to {config.project_id}.{config.dataset_name}.{config.repository}_coverage."
+        f"There are no results for {group.repository}/{group.workflow}/{group.test_suite} "
+        f"to add to {config.project_id}.{config.dataset_name}.{group.repository}_coverage."
     )
 
     reporter = CoverageReporter(
-        config.repository, config.workflow, config.test_suite, coverage_artifact_list
+        group.repository, group.workflow, group.test_suite, group.coverage_jsons
     )
 
     with caplog.at_level(logging.INFO):

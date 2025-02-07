@@ -6,3 +6,4 @@
 
 DATE_FORMAT = "%Y-%m-%d"
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+DATETIME_MILLISECOND_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
