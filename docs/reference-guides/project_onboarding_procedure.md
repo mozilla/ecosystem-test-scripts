@@ -6,8 +6,8 @@ Below are step-by-step instructions on how to onboard a project to report test m
 
 To report test metrics for a project, ensure the following requirements are met:
 
-- The project uses [CircleCI][CircleCI] for test execution, and members of the ETE team have access to the
-  CircleCI pipelines.
+- The project uses [CircleCI][CircleCI] for test execution, and members of the ETE team have access
+  to the CircleCI pipelines.
 - Testing and coverage results are stored as artifacts in CircleCI jobs:
   - Test results must be in JUnit format.
   - Coverage results must be in JSON format.
@@ -26,8 +26,8 @@ To report test metrics for a project, ensure the following requirements are met:
   ```shell
   make run_circleci_scraper
   ```
-- Once scraping is complete, compress the contents of `test_result_dir`, and replace the
-  corresponding file in the [ETE team folder][ETE Drive].
+- Once scraping is complete, upload the new contents of the `test_result_dir` to the
+  [ecosystem-test-eng-metrics GCP Cloud Bucket][GCP Cloud Bucket].
 
 ## 2. Create and Populate Tables in the ETE BigQuery Dataset
 
@@ -65,10 +65,10 @@ To report test metrics for a project, ensure the following requirements are met:
 
 [BigQuery Documentation]: https://cloud.google.com/bigquery/docs/tables#create-table
 [CircleCI]: https://app.circleci.com/home
-[ETE Drive]: https://drive.google.com/drive/folders/1N4YW97gEH6gmdlfDNtuGxUsdo2EKkCAi
 [ETE BigQuery]: https://console.cloud.google.com/bigquery?cloudshell=false&project=ecosystem-test-eng
 [ETE Looker]: https://mozilla.cloud.looker.com/projects/ecosystem-test-eng
 [ETE Looker Dashboards]: https://mozilla.cloud.looker.com/boards/140
+[GCP Cloud Bucket]: https://console.cloud.google.com/storage/browser/ecosystem-test-eng-metrics
 [Github ETE Looker]: https://github.com/mozilla/looker-ecosystem-test-eng
 [Metric Interpretation Guide]: ../reference-guides/metric_interpretation_guide.md
 [Mozilla Confluence]: https://mozilla-hub.atlassian.net/wiki/spaces/SRE/pages/27920436/Looker
