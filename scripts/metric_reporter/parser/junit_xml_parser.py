@@ -5,12 +5,12 @@
 """Module for parsing test suite results from JUnit XML content."""
 
 import logging
-from pathlib import Path
 from typing import Any
 
 import xmltodict
 from pydantic import BaseModel, ValidationError, TypeAdapter
 
+from scripts.metric_reporter.gcs_client import GCSClient
 from scripts.metric_reporter.parser.base_parser import ArtifactFile, BaseParser, ParserError
 
 
@@ -282,6 +282,14 @@ class JUnitXmlParser(BaseParser):
 
     logger = logging.getLogger(__name__)
 
+    def __init__(self, gcs_client: GCSClient) -> None:
+        """Initialize the JUnitXmlParser.
+
+        Args:
+            gcs_client (GCSClient): GCS client.
+        """
+        self._gcs_client = gcs_client
+
     @staticmethod
     def _get_junit_xml(
         file: ArtifactFile, junit_xml_groups: list[JUnitXmlGroup]
@@ -324,8 +332,7 @@ class JUnitXmlParser(BaseParser):
             junit_xml_groups.append(junit_xml_group)
         return junit_xml
 
-    @staticmethod
-    def _parse_test_suites(artifact_file_path: Path) -> JUnitXmlTestSuites:
+    def _parse_test_suites(self, repository: str, artifact_file_name: str) -> JUnitXmlTestSuites:
         def postprocessor(path, key, value):
             key_mapping = {
                 "testsuite": "test_suites",
@@ -337,25 +344,22 @@ class JUnitXmlParser(BaseParser):
             key = key_mapping.get(key, key)
             return key, value
 
-        with artifact_file_path.open() as xml_file:
-            content: str = xml_file.read()
-            test_suites_dict: dict[str, Any] = xmltodict.parse(
-                content,
-                attr_prefix="",
-                postprocessor=postprocessor,
-                force_list=["test_suites", "test_cases", "property"],
-            )
-            adapter: TypeAdapter[JUnitXmlTestSuites] = TypeAdapter(JUnitXmlTestSuites)
-            test_suites: JUnitXmlTestSuites = adapter.validate_python(
-                test_suites_dict["testsuites"]
-            )
-            return test_suites
+        content: str = self._gcs_client.get_junit_artifact_content(repository, artifact_file_name)
+        test_suites_dict: dict[str, Any] = xmltodict.parse(
+            content,
+            attr_prefix="",
+            postprocessor=postprocessor,
+            force_list=["test_suites", "test_cases", "property"],
+        )
+        adapter: TypeAdapter[JUnitXmlTestSuites] = TypeAdapter(JUnitXmlTestSuites)
+        test_suites: JUnitXmlTestSuites = adapter.validate_python(test_suites_dict["testsuites"])
+        return test_suites
 
-    def parse(self, artifact_file_paths: list[Path]) -> list[JUnitXmlGroup]:
+    def parse(self, artifact_file_names: list[str]) -> list[JUnitXmlGroup]:
         """Parse JUnit XML content from the specified directory.
 
         Args:
-            artifact_file_paths (Path): Paths of the JUnit XML test files.
+            artifact_file_names (str): Paths of the JUnit XML test files.
 
         Returns:
             list[JUnitXmlGroup]: A list of parsed JUnit XML files grouped by repository, workflow
@@ -365,19 +369,17 @@ class JUnitXmlParser(BaseParser):
             ParserError: If there is an error reading or parsing the XML files.
         """
         junit_xml_groups: list[JUnitXmlGroup] = []
-        for artifact_file_path in artifact_file_paths:
-            self.logger.info(f"Parsing {artifact_file_path}")
-            file: ArtifactFile = self._parse_artifact_file_name(artifact_file_path)
+        for artifact_file_name in artifact_file_names:
+            self.logger.info(f"Parsing {artifact_file_name}")
+            file: ArtifactFile = self._parse_artifact_file_name(artifact_file_name)
             junit_xml: JUnitXmlJobTestSuites = self._get_junit_xml(file, junit_xml_groups)
             try:
-                test_suites: JUnitXmlTestSuites = self._parse_test_suites(file.path)
+                test_suites: JUnitXmlTestSuites = self._parse_test_suites(
+                    file.repository, file.name
+                )
                 junit_xml.test_suites.append(test_suites)
-            except (OSError, ValidationError) as error:
-                error_mapping: dict[type, str] = {
-                    OSError: f"Error reading the file {artifact_file_path}",
-                    ValidationError: f"Unexpected value or schema in file {artifact_file_path}",
-                }
-                error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
+            except ValidationError as error:
+                error_msg: str = f"Unexpected value or schema in file {artifact_file_name}"
                 self.logger.error(error_msg, exc_info=error)
                 raise ParserError(error_msg) from error
         return junit_xml_groups

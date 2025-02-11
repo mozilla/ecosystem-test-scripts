@@ -7,10 +7,11 @@
 import argparse
 import logging
 
-from google.cloud import bigquery
-from google.oauth2 import service_account
+from google.cloud import bigquery, storage
+from google.oauth2.service_account import Credentials
 
-from scripts.metric_reporter.config import Config, InvalidConfigError, MetricReporterArgs
+from scripts.metric_reporter.config import Config, InvalidConfigError
+from scripts.metric_reporter.gcs_client import GCSClient, GCSArtifacts, GCSClientError
 from scripts.metric_reporter.parser.base_parser import ParserError
 from scripts.metric_reporter.parser.coverage_json_parser import (
     CoverageJsonGroup,
@@ -40,12 +41,12 @@ def main(
     try:
         logger.info(f"Starting Metric Reporter with configuration file: {config_file}")
         config = Config(config_file)
-        metric_reporter_args: list[MetricReporterArgs] = config.metric_reporter_args
-        gcp_project_id: str = config.metric_reporter_config.gcp_project_id
+        gcp_project_id: str = config.common_config.gcp_project_id
+        test_result_bucket: str = config.common_config.test_result_bucket
+        coverage_artifact_dir: str = config.common_config.coverage_artifact_dir
+        junit_artifact_dir: str = config.common_config.junit_artifact_dir
         bigquery_dataset_name: str = config.metric_reporter_config.bigquery_dataset_name
-        bigquery_service_account_file: str = (
-            config.metric_reporter_config.bigquery_service_account_file
-        )
+        service_account_file: str = config.metric_reporter_config.service_account_file
         if update_bigquery is None:
             update_bigquery = config.metric_reporter_config.update_bigquery
         if not update_bigquery:
@@ -55,21 +56,26 @@ def main(
             )
             return
 
-        # Create BigQuery client
-        credentials = service_account.Credentials.from_service_account_file(
-            bigquery_service_account_file
-        )  # type: ignore
-        bigquery_client = bigquery.Client(credentials=credentials, project=gcp_project_id)
+        # Create GCS and BigQuery clients
+        credentials = Credentials.from_service_account_file(service_account_file)  # type: ignore
+        storage_client = storage.Client(project=gcp_project_id, credentials=credentials)
+        bigquery_client = bigquery.Client(project=gcp_project_id, credentials=credentials)
 
         # Report
+        gcs_client = GCSClient(
+            storage_client, test_result_bucket, coverage_artifact_dir, junit_artifact_dir
+        )
+        gcs_artifacts: list[GCSArtifacts] = gcs_client.get_artifacts()
         report_coverage(
-            metric_reporter_args, bigquery_client, gcp_project_id, bigquery_dataset_name
+            gcs_client, gcs_artifacts, bigquery_client, gcp_project_id, bigquery_dataset_name
         )
         report_suite_results_and_averages(
-            metric_reporter_args, bigquery_client, gcp_project_id, bigquery_dataset_name
+            gcs_client, gcs_artifacts, bigquery_client, gcp_project_id, bigquery_dataset_name
         )
     except InvalidConfigError as error:
         logger.error(f"Configuration error: {error}")
+    except GCSClientError as error:
+        logger.error(f"GCS client error: {error}")
     except ParserError as error:
         logger.error(f"Parsing error: {error}")
     except ReporterError as error:
@@ -79,7 +85,8 @@ def main(
 
 
 def report_coverage(
-    metric_reporter_args: list[MetricReporterArgs],
+    gcs_client: GCSClient,
+    gcs_artifacts: list[GCSArtifacts],
     bigquery_client,
     gcp_project_id: str,
     bigquery_dataset_name: str,
@@ -87,16 +94,17 @@ def report_coverage(
     """Report results from Coverage JSON files to a BigQuery dataset table.
 
     Args:
-        metric_reporter_args (list[MetricReporterArgs]): Configuration arguments.
+        gcs_client (GCSClient): Storage client
+        gcs_artifacts (list[GCSArtifacts]): Lists of artifact files grouped by repository
         bigquery_client: BigQuery client
         gcp_project_id (str): The GCP project ID.
         bigquery_dataset_name (str): The name of the BigQuery dataset.
     """
-    coverage_json_parser = CoverageJsonParser()
+    coverage_json_parser = CoverageJsonParser(gcs_client)
     coverage_artifact_groups: list[CoverageJsonGroup] = [
         group
-        for args in metric_reporter_args
-        for group in coverage_json_parser.parse(args.coverage_artifact_paths)
+        for artifacts in gcs_artifacts
+        for group in coverage_json_parser.parse(artifacts.coverage_artifact_files)
     ]
     for group in coverage_artifact_groups:
         logger.info(f"Report coverage for {group.repository} {group.workflow} {group.test_suite}")
@@ -107,7 +115,8 @@ def report_coverage(
 
 
 def report_suite_results_and_averages(
-    metric_reporter_args: list[MetricReporterArgs],
+    gcs_client: GCSClient,
+    gcs_artifacts: list[GCSArtifacts],
     bigquery_client,
     gcp_project_id: str,
     bigquery_dataset_name: str,
@@ -115,16 +124,17 @@ def report_suite_results_and_averages(
     """Report results from JUnit XML files to BigQuery dataset tables.
 
     Args:
-        metric_reporter_args (list[MetricReporterArgs]): Configuration arguments.
+        gcs_client (GCSClient): Storage client
+        gcs_artifacts (list[GCSArtifacts]): Lists of artifact files grouped by repository
         bigquery_client: BigQuery client
         gcp_project_id (str): The GCP project ID.
         bigquery_dataset_name (str): The name of the BigQuery dataset.
     """
-    junit_xml_parser = JUnitXmlParser()
+    junit_xml_parser = JUnitXmlParser(gcs_client)
     junit_artifact_groups: list[JUnitXmlGroup] = [
         group
-        for args in metric_reporter_args
-        for group in junit_xml_parser.parse(args.junit_artifact_paths)
+        for artifacts in gcs_artifacts
+        for group in junit_xml_parser.parse(artifacts.junit_artifact_files)
     ]
     for group in junit_artifact_groups:
         logger.info(

@@ -18,13 +18,13 @@ instructions. Store the key value in a safe place.
 
 **DO NOT SHARE YOUR CIRCLECI API TOKEN**
 
-## 3. Copy the BigQuery Service Account JSON Keys
+## 3. Copy the Service Account JSON Keys
 
-The `metric_reporter` script is set up using the [ecosystem-test-eng GCP project][ETE GCP Project]
-with the metric-reporter [service account][ETE GCP Service Accounts]. In order to execute the script
-a key for the service account, in the form of a JSON file, needs to be copied from the 1Password
-Ecosystem Test Engineering Team Vault into the root directory of the `ecosystem-test-scripts`
-project.
+The `circleci_scraper` and `metric_reporter` scripts are set up using the
+[ecosystem-test-eng GCP project][ETE GCP Project] with the circleci-scraper and metric-reporter
+[service accounts][ETE GCP Service Accounts]. In order to execute the scripts, keys for the service
+accounts, in the form of a JSON files, need to be copied from the 1Password Ecosystem Test
+Engineering Team Vault into the root directory of the `ecosystem-test-scripts` project.
 
 ## 4. Set up the config.ini
 
@@ -36,15 +36,7 @@ local `config.ini` file:
 4.2 Under the `[circleci_scraper]` section of the file, set the `token` value to the CircleCI API
     key created in step 2
 
-## 5. Copy the latest raw data locally
-
-By default, CircleCI has a retention policy of 30 days for artifacts; However, we have over a years
-worth of data gathered for some projects. In order to produce reports with full trend data and
-reduce scraping time, copy the latest `raw_data` from the
-[ecosystem-test-eng-metrics GCP Cloud Bucket][GCP Cloud Bucket] to the root directory of the
-`ecosystem-test-scripts` project.
-
-## 6. Set up the python virtual environment
+## 5. Set up the python virtual environment
 
 This project uses [Poetry][Poetry] for dependency management in conjunction with a pyproject.toml
 file. While you can use virtualenv to set up the dev environment, it is recommended to use
@@ -62,14 +54,13 @@ For more information on Make commands, run:
 make help
 ```
 
-## 7. Start Developing!
+## 6. Start Developing!
 
 [CircleCI Create API Token]: https://circleci.com/docs/managing-api-tokens/#creating-a-personal-api-token
 [Community Participation Guidelines]: https://github.com/mozilla/ecosystem-test-scripts/blob/main/CODE_OF_CONDUCT.md
 [Contributing Guidelines]: https://github.com/mozilla/ecosystem-test-scripts/blob/main/CONTRIBUTING.md
 [ETE GCP Project]: https://console.cloud.google.com/welcome?project=ecosystem-test-eng
 [ETE GCP Service Accounts]: https://console.cloud.google.com/iam-admin/serviceaccounts?project=ecosystem-test-eng
-[GCP Cloud Bucket]: https://console.cloud.google.com/storage/browser/ecosystem-test-eng-metrics
 [Github Cloning A Repository]: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository
 [Mozilla Github]: https://github.com/mozilla/ecosystem-test-scripts/
 [Poetry]: https://python-poetry.org/docs/#installing-with-pipx

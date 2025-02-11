@@ -7,9 +7,13 @@
 import argparse
 import logging
 
+from google.cloud import storage
+from google.oauth2.service_account import Credentials
+
 from client import CircleCIClient, CircleCIClientError
 from config import Config, InvalidConfigError
 from scraper import CircleCIScraper, CircleCIScraperError
+from scripts.circleci_scraper.gcs_client import GCSClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -24,17 +28,27 @@ def main(config_file: str = "config.ini") -> None:
     """
     try:
         config = Config(config_file)
+
         date_limit = config.circleci_scraper_config.date_limit
         logger.info(
             f"Scraping data from {date_limit.strftime('%Y-%m-%d %H:%M:%S')} to now."
             if date_limit
             else "Scraping all available data."
         )
-        client = CircleCIClient(config.circleci_scraper_config)
-        scraper = CircleCIScraper(config.common_config, client)
+
+        circleci_client = CircleCIClient(config.circleci_scraper_config)
+
+        service_account_file: str = config.circleci_scraper_config.service_account_file
+        project: str = config.common_config.gcp_project_id
+        credentials = Credentials.from_service_account_file(service_account_file)  # type: ignore
+        storage_client = storage.Client(project=project, credentials=credentials)
+        gcs_client = GCSClient(storage_client, config.common_config.test_result_bucket)
+
+        scraper = CircleCIScraper(config.common_config, circleci_client, gcs_client)
         scraper.export_test_artifacts(
             config.circleci_scraper_config.pipelines, config.circleci_scraper_config.date_limit
         )
+
         logger.info("Scraping complete")
     except InvalidConfigError as error:
         logger.error(f"Configuration error: {error}")

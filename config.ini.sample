@@ -1,11 +1,13 @@
 [common]
-test_result_dir = raw_data
+gcp_project_id = ecosystem-test-eng
+test_result_bucket = ecosystem-test-eng-metrics
 junit_artifact_dir = junit
 coverage_artifact_dir = coverage
 
 [circleci_scraper]
 ;create a personal Circle CI token: https://circleci.com/docs/managing-api-tokens/
 token =
+service_account_file = circleci_scraper_key.json
 base_url = https://circleci.com/api/v2
 vcs_slug = gh
 pipelines = [
@@ -133,7 +135,6 @@ pipelines = [
 days_of_data = 7
 
 [metric_reporter]
-gcp_project_id = ecosystem-test-eng
+service_account_file = metric_reporter_key.json
 bigquery_dataset_name = test_metrics
-bigquery_service_account_file = metric_reporter_key.json
 update_bigquery = True

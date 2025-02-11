@@ -5,29 +5,32 @@ Below are step-by-step instructions on how to onboard a project to report test m
 ## Prerequisites
 
 To report test metrics for a project, ensure the following requirements are met:
+- Test results must be in JUnit format.
+- Coverage results must be in JSON format.
+- Supported test frameworks are listed in the 
+  [Metric Interpretation Guide][Metric Interpretation Guide].
 
-- The project uses [CircleCI][CircleCI] for test execution, and members of the ETE team have access
-  to the CircleCI pipelines.
-- Testing and coverage results are stored as artifacts in CircleCI jobs:
-  - Test results must be in JUnit format.
-  - Coverage results must be in JSON format.
-  - Supported test frameworks are listed in the 
-    [Metric Interpretation Guide][Metric Interpretation Guide].
+## 1. Setup CICD to push test result and coverage data to GCS
 
-## 1. Add CircleCI Pipelines to the Config File and Scrape Historical Data
-
-- Add the new CircleCI pipelines under the `circleci_scraper` section in your local `config.ini` and
-  `config.ini.sample`. Push changes to the `config.ini.sample` to the repository to keep
-  contributors up-to-date.
-- Execute the `circleci_scraper` using the following command. Ensure the `days_of_data` option in
-  the `circleci_scraper` section of `config.ini` is omitted to scrape all available historical data.
-  Test and coverage data will be stored locally in the `test_result_dir` (typically called
-  `raw_data` at the project root).
-  ```shell
-  make run_circleci_scraper
-  ```
-- Once scraping is complete, upload the new contents of the `test_result_dir` to the
+- Create a directory for the repository in the
   [ecosystem-test-eng-metrics GCP Cloud Bucket][GCP Cloud Bucket].
+- Set up a [service account][ETE GCP Service Accounts] for the project with `Storage Object Creator`
+  and `Storage Object Viewer` permissions. Store the credentials in the ETE 1Password vault.
+- Update project CICD jobs to push Coverage JSON files and JUnit XML files to the GCS repository
+  directory, under `coverage` and `junit` subdirectories respectively.
+- Coverage JSON files must follow a strict naming convention:
+    ```text
+  {job_number}__{utc_epoch_datetime}__{workflow}__{test_suite}__coverage.xml
+  ```
+  - Example: `15592__1724283071__autopush-rs__build-test-deploy__integration__coverage.json`
+- JUnit XML files must follow a strict naming convention:
+  ```text
+  {job_number}__{utc_epoch_datetime}__{workflow}__{test_suite}__results{-index}.xml
+  ```
+  - Example: `15592__1724283071__autopush-rs__build-test-deploy__integration__results.xml`
+  - The index is optional and can be used in cases of parallel test execution
+
+    
 
 ## 2. Create and Populate Tables in the ETE BigQuery Dataset
 
@@ -68,6 +71,7 @@ To report test metrics for a project, ensure the following requirements are met:
 [ETE BigQuery]: https://console.cloud.google.com/bigquery?cloudshell=false&project=ecosystem-test-eng
 [ETE Looker]: https://mozilla.cloud.looker.com/projects/ecosystem-test-eng
 [ETE Looker Dashboards]: https://mozilla.cloud.looker.com/boards/140
+[ETE GCP Service Accounts]: https://console.cloud.google.com/iam-admin/serviceaccounts?project=ecosystem-test-eng
 [GCP Cloud Bucket]: https://console.cloud.google.com/storage/browser/ecosystem-test-eng-metrics
 [Github ETE Looker]: https://github.com/mozilla/looker-ecosystem-test-eng
 [Metric Interpretation Guide]: ../reference-guides/metric_interpretation_guide.md

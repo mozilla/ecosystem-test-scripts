@@ -30,6 +30,7 @@ def test_get_pipelines_request_error(mocker, exception):
     """
     config = CircleCIScraperConfig(
         token="token",  # nosec B106
+        service_account_file="file.json",
         vcs_slug="gh",
         base_url="https://fake.api",
         pipelines=[

@@ -548,9 +548,9 @@ class SampleCoverageData(BaseModel):
     json_rows: list[dict[str, Any]]
 
     @property
-    def sample_files(self) -> list[Path]:
+    def sample_files(self) -> list[str]:
         """Test files in sample directory"""
-        return [file_path for file_path in self.sample_directory.iterdir()]
+        return [file_path.name for file_path in self.sample_directory.iterdir()]
 
 
 class SampleResultsData(BaseModel):
