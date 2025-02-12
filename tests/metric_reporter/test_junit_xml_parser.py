@@ -478,6 +478,23 @@ EXPECTED_PYTEST = [
                         test_suites=[
                             PytestJUnitXmlTestSuite(
                                 name="pytest",
+                                timestamp="2024-07-03T15:05:24.621274",
+                                hostname="ip-10-0-191-153",
+                                tests=1,
+                                failures=0,
+                                skipped=0,
+                                time=2.368,
+                                errors=1,
+                                test_cases=[
+                                    PytestJUnitXmlTestCase(name="", classname="", time=0.0)
+                                ],
+                            )
+                        ]
+                    ),
+                    PytestJUnitXmlTestSuites(
+                        test_suites=[
+                            PytestJUnitXmlTestSuite(
+                                name="pytest",
                                 timestamp="2024-07-03T15:05:24.279183",
                                 hostname="ip-10-0-175-52",
                                 tests=1,
@@ -505,7 +522,7 @@ EXPECTED_PYTEST = [
                         test_suites=[
                             PytestJUnitXmlTestSuite(
                                 name="pytest",
-                                timestamp="2024-08-06T09:17:36.201378",
+                                timestamp="2024-07-03T15:05:24.201378",
                                 hostname="ip-10-0-175-52",
                                 tests=1,
                                 failures=0,

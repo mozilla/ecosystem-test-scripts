@@ -327,7 +327,7 @@ class SuiteReporter(BaseReporter):
             case JestJUnitXmlTestSuites() | NextestJUnitXmlTestSuites():
                 metrics.time = suites.time
                 metrics.tests = suites.tests
-                metrics.failure = suites.failures
+                metrics.failure = suites.failures + suites.errors
                 metrics.skipped = sum(suite.skipped for suite in suites.test_suites)
             case MochaJUnitXmlTestSuites():
                 metrics.time = suites.time
@@ -343,7 +343,7 @@ class SuiteReporter(BaseReporter):
             case PlaywrightJUnitXmlTestSuites():
                 metrics.time = suites.time
                 metrics.tests = suites.tests
-                metrics.failure = suites.failures
+                metrics.failure = suites.failures + suites.errors
                 metrics.skipped = suites.skipped
                 metrics.fixme = sum(
                     1
@@ -363,11 +363,16 @@ class SuiteReporter(BaseReporter):
             case PytestJUnitXmlTestSuites():
                 metrics.time = sum(suite.time for suite in suites.test_suites)
                 metrics.tests = sum(suite.tests for suite in suites.test_suites)
-                metrics.failure = sum(suite.failures for suite in suites.test_suites)
+                metrics.failure = sum(
+                    suite.failures + suite.errors for suite in suites.test_suites
+                )
                 metrics.skipped = sum(suite.skipped for suite in suites.test_suites)
             case TapJUnitXmlTestSuites():
                 metrics.tests = sum(suite.tests for suite in suites.test_suites)
-                metrics.failure = sum(suite.failures for suite in suites.test_suites)
+                # With Tap it's possible for errors to be omitted
+                metrics.failure = sum(
+                    suite.failures + (suite.errors or 0) for suite in suites.test_suites
+                )
         return metrics
 
     def _parse_results(
