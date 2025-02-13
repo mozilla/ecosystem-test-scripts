@@ -39,6 +39,7 @@ class CircleCIScraperConfig(BaseModel):
     """CircleCIScraper Config."""
 
     token: str = Field(..., pattern=TOKEN_PATTERN)
+    service_account_file: str
     base_url: str = Field(..., pattern=URL_PATTERN)
     vcs_slug: Literal["gh"]
     pipelines: list[CircleCIScraperPipelineConfig]
@@ -83,6 +84,7 @@ class Config(BaseConfig):
             )
             return CircleCIScraperConfig(
                 token=config_parser.get("circleci_scraper", "token"),
+                service_account_file=config_parser.get("circleci_scraper", "service_account_file"),
                 base_url=config_parser.get("circleci_scraper", "base_url"),
                 vcs_slug=cast(Literal["gh"], config_parser.get("circleci_scraper", "vcs_slug")),
                 pipelines=pipelines,

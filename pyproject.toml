@@ -59,18 +59,21 @@ description = "Python scripts for the Ecosystem Test Engineering team"
 authors = ["Ecosystem Test Engineering"]
 readme = "README.md"
 license = "Mozilla Public License Version 2.0"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
 setuptools = ">=74.1.2"
 
 [tool.poetry.group.circleci_scraper.dependencies]
+google-cloud-storage = "^3.0.0"
 pydantic = "^2.9.0"
 requests = "^2.32.3"
 types-requests = "^2.32.0.20240905"
 
 [tool.poetry.group.metric_reporter.dependencies]
 google-cloud-bigquery = "^3.10.0"
+google-cloud-storage = "^3.0.0"
 pydantic = "^2.9.0"
 python-dateutil = "^2.9.0.post0"
 types-python-dateutil = "^2.9.0.20240906"

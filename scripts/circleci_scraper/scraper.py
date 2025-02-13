@@ -26,6 +26,7 @@ from scripts.circleci_scraper.config import (
     CircleCIScraperJobConfig,
     CircleCIScraperPipelineConfig,
 )
+from scripts.circleci_scraper.gcs_client import GCSClient
 from scripts.common.config import CommonConfig
 from scripts.common.constants import DATETIME_FORMAT, DATETIME_MILLISECOND_FORMAT
 from scripts.common.error import BaseError
@@ -46,18 +47,20 @@ class CircleCIScraper:
 
     logger = logging.getLogger(__name__)
 
-    def __init__(self, common_config: CommonConfig, client: CircleCIClient):
+    def __init__(
+        self, common_config: CommonConfig, client: CircleCIClient, gcs_client: GCSClient
+    ) -> None:
         """Initialize the CircleCIScraper.
 
         Args:
             common_config (CommonConfig): Directory information to store test results.
             client (CircleCIClient): The CircleCI client to interact with the API.
-
+            gcs_client (GCSClient): The GCS client to interact with storage.
         """
         self._client = client
-        self._test_result_dir = common_config.test_result_dir
         self._junit_artifact_dir = common_config.junit_artifact_dir
         self._coverage_artifact_dir = common_config.coverage_artifact_dir
+        self._gcs_client: GCSClient = gcs_client
 
     def export_test_artifacts(
         self,
@@ -283,8 +286,6 @@ class CircleCIScraper:
             CircleCIClientError: If there is an error in the CircleCI API request.
             CircleCIScraperError: If there is an error in downloading the artifacts.
         """
-        destination_path = Path(self._test_result_dir) / repository / artifact_directory
-        destination_path.mkdir(parents=True, exist_ok=True)
         for index, artifact in enumerate(artifacts):
             job_datetime = datetime.strptime(job.started_at, DATETIME_FORMAT).replace(
                 tzinfo=timezone.utc
@@ -293,7 +294,9 @@ class CircleCIScraper:
             artifact_path = Path(artifact.path)
             # FxA doesn't guarantee unique names for their test files, so concatenating the parent
             # directory is a necessary evil atm
-            destination_file_name = (
+            destination_path = (
+                f"{repository}/"
+                f"{artifact_directory}/"
                 f"{str(job.job_number)}__"
                 f"{epoch}__"
                 f"{repository}__"
@@ -302,17 +305,13 @@ class CircleCIScraper:
                 f"{f'{artifact_path.parent.name.replace("_", "-")}-' if artifact_path.parent.name else ''}"
                 f"{artifact_path.name.replace("_", "-")}"
             )
-            destination_file_path: Path = destination_path / destination_file_name
-            if destination_file_path.exists():
-                self.logger.info(f"{destination_file_path} already exists, skipping download.")
-            else:
-                self.download_artifact(destination_file_path, artifact.url)
+            self.download_artifact(destination_path, artifact.url)
 
-    def download_artifact(self, file_name: Path, url: str) -> None:
+    def download_artifact(self, destination_path: str, url: str) -> None:
         """Download an artifact from the specified URL.
 
         Args:
-            file_name (str): The name of the destination file.
+            destination_path (str): The destination blob path.
             url (str): The URL of the artifact to download.
 
         Raises:
@@ -321,9 +320,7 @@ class CircleCIScraper:
         try:
             response: requests.Response = requests.get(url, timeout=10)
             response.raise_for_status()
-            with open(file_name, "wb") as file:
-                file.write(response.content)
-            self.logger.info(f"Output {file_name}")
+            self._gcs_client.upload_artifact(destination_path, response.content)
         except RequestException as error:
             self.logger.error(f"Failed to download artifact from {url}", exc_info=error)
             raise CircleCIScraperError(f"Failed to download artifact from {url}", error)

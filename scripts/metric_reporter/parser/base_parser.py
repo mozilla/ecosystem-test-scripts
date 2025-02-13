@@ -6,7 +6,6 @@
 
 import re
 from datetime import datetime, timezone
-from pathlib import Path
 
 from pydantic import BaseModel
 
@@ -27,7 +26,7 @@ class ParserError(BaseError):
 class ArtifactFile(BaseModel):
     """Represents data contained in an artifact file name."""
 
-    path: Path
+    name: str
     job_number: int
     epoch: int
     repository: str
@@ -44,10 +43,10 @@ class BaseParser:
     """Base class for parsers."""
 
     @staticmethod
-    def _parse_artifact_file_name(artifact_path: Path) -> ArtifactFile:
-        if match := ARTIFACT_FILE_PATTERN.match(artifact_path.name):
+    def _parse_artifact_file_name(name: str) -> ArtifactFile:
+        if match := ARTIFACT_FILE_PATTERN.match(name):
             return ArtifactFile(
-                path=artifact_path,
+                name=name,
                 job_number=int(match.group("job_number")),
                 epoch=int(match.group("epoch")),
                 repository=match.group("repository"),
@@ -55,4 +54,4 @@ class BaseParser:
                 test_suite=match.group("test_suite"),
             )
         else:
-            raise ParserError(f"Unexpected file name format: {artifact_path.name}")
+            raise ParserError(f"Unexpected file name format: {name}")

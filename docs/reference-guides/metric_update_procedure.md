@@ -13,11 +13,6 @@ Before updating the test metrics, ensure that:
   [Developer Setup][Developer Setup Guide]).
 - You are on the latest version of the `main` branch
 - Your `config.ini` file in the root directory is up-to-date
-- You have the latest raw data in the ecosystem-test-scripts root directory.
-  - The raw data should be found in the `test_result_dir` specified in the config.ini file and is
-    typically named `raw_data`.
-  - The latest raw data is available in the
-    [ecosystem-test-eng-metrics GCP Cloud Bucket][GCP Cloud Bucket]
 
 ## 1. Scrape for New Raw Test Data
 
@@ -49,12 +44,5 @@ _**Notes**:_
 - Coverage results are produced only for Autopush-rs unit tests and Merino-py unit and integration
   tests.
 
-
-## 3. Backup the latest `test_result_dir` to the GCP Cloud Bucket
-
-Upload the new contents of the `test_result_dir`, typically called 'raw_data', to the
-[ecosystem-test-eng-metrics GCP Cloud Bucket][GCP Cloud Bucket].
-
 [Developer Setup Guide]: ../developer-guides/developer_setup.md
 [ETE Looker Dashboards]: https://mozilla.cloud.looker.com/boards/140
-[GCP Cloud Bucket]: https://console.cloud.google.com/storage/browser/ecosystem-test-eng-metrics

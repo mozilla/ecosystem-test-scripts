@@ -18,7 +18,8 @@ DIRECTORY_PATTERN = r"^[^<>:;,?\"*|]+$"
 class CommonConfig(BaseModel):
     """Configuration model for common settings."""
 
-    test_result_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
+    gcp_project_id: str
+    test_result_bucket: str
     junit_artifact_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
     coverage_artifact_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
 
@@ -50,7 +51,8 @@ class BaseConfig:
     def _parse_main_config(self, config_parser: ConfigParser) -> CommonConfig:
         try:
             return CommonConfig(
-                test_result_dir=config_parser.get("common", "test_result_dir"),
+                gcp_project_id=config_parser.get("common", "gcp_project_id"),
+                test_result_bucket=config_parser.get("common", "test_result_bucket"),
                 junit_artifact_dir=config_parser.get("common", "junit_artifact_dir"),
                 coverage_artifact_dir=config_parser.get("common", "coverage_artifact_dir"),
             )

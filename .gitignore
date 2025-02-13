@@ -170,10 +170,10 @@ cython_debug/
 
 # Project files and outputs
 config.ini
-raw_data/
 
 # Documentation
 book/
 
 # GCP service account key files
+circleci_scraper_key.json
 metric_reporter_key.json

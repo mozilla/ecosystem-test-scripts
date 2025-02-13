@@ -7,6 +7,7 @@
 from pathlib import Path
 
 import pytest
+from pytest_mock import MockerFixture
 
 from scripts.metric_reporter.parser.junit_xml_parser import (
     JestJUnitXmlTestSuites,
@@ -619,19 +620,29 @@ EXPECTED_TAP = [
     ids=["jest", "mocha", "nextest", "playwright", "pytest", "tap"],
 )
 def test_parse(
-    test_data_directory: Path, artifact_directory: str, expected_results: list[JUnitXmlGroup]
+    mocker: MockerFixture,
+    test_data_directory: Path,
+    artifact_directory: str,
+    expected_results: list[JUnitXmlGroup],
 ) -> None:
     """Test JUnitXmlParser parse method with various test data.
 
     Args:
+        mocker (MockerFixture): pytest_mock fixture for mocking.
         test_data_directory (Path): Test data directory for the Metric Reporter.
         artifact_directory (str): Test data directory name.
         expected_results (list[SuiteReporterResult]): Expected results from the JUnitXmlParser.
     """
     artifact_path: Path = test_data_directory / artifact_directory
-    artifact_file_path: list[Path] = sorted([file_path for file_path in artifact_path.iterdir()])
-    parser = JUnitXmlParser()
+    artifact_file_names: list[str] = sorted(
+        [file_path.name for file_path in artifact_path.iterdir()]
+    )
+    gcs_client_mock = mocker.MagicMock()
+    gcs_client_mock.get_junit_artifact_content.side_effect = (
+        lambda repository, artifact_file_name: (artifact_path / artifact_file_name).read_text()
+    )
+    parser = JUnitXmlParser(gcs_client_mock)
 
-    actual_results: list[JUnitXmlGroup] = parser.parse(artifact_file_path)
+    actual_results: list[JUnitXmlGroup] = parser.parse(artifact_file_names)
 
     assert actual_results == expected_results

@@ -7,11 +7,11 @@
 import json
 import logging
 from json import JSONDecodeError
-from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
+from scripts.metric_reporter.gcs_client import GCSClient
 from scripts.metric_reporter.parser.base_parser import BaseParser, ParserError, ArtifactFile
 
 
@@ -101,6 +101,14 @@ class CoverageJsonParser(BaseParser):
 
     logger = logging.getLogger(__name__)
 
+    def __init__(self, gcs_client: GCSClient) -> None:
+        """Initialize the CoverageJsonParser.
+
+        Args:
+            gcs_client (GCSClient): GCS client.
+        """
+        self._gcs_client = gcs_client
+
     @staticmethod
     def _get_coverage_json_group(
         file: ArtifactFile, coverage_json_groups: list[CoverageJsonGroup]
@@ -123,7 +131,7 @@ class CoverageJsonParser(BaseParser):
             ):
                 raise ParserError(
                     f"More than one coverage JSON file found for a test suite. "
-                    f"Duplicate File: {file.path}."
+                    f"Duplicate File: {file.name}."
                 )
         else:
             group = CoverageJsonGroup(
@@ -145,13 +153,13 @@ class CoverageJsonParser(BaseParser):
                 **json_data,
             )
         else:
-            raise ParserError(f"Unknown JSON format for {file.path}")
+            raise ParserError(f"Unknown JSON format for {file.name}")
 
-    def parse(self, artifact_file_paths: list[Path]) -> list[CoverageJsonGroup]:
+    def parse(self, artifact_file_names: list[str]) -> list[CoverageJsonGroup]:
         """Parse coverage JSON data from the specified directory.
 
         Args:
-            artifact_file_paths (list[Path]): Paths of the coverage JSON files.
+            artifact_file_names (list[str]): File names of the coverage JSON files.
 
         Returns:
             list[CoverageJsonGroup]: Parsed coverage JSON files grouped by repository, workflow and
@@ -162,20 +170,21 @@ class CoverageJsonParser(BaseParser):
                          JSON data.
         """
         coverage_json_groups: list[CoverageJsonGroup] = []
-        for artifact_file_path in artifact_file_paths:
-            self.logger.info(f"Parsing {artifact_file_path}")
-            file: ArtifactFile = self._parse_artifact_file_name(artifact_file_path)
+        for artifact_file_name in artifact_file_names:
+            self.logger.info(f"Parsing {artifact_file_name}")
+            file: ArtifactFile = self._parse_artifact_file_name(artifact_file_name)
             group: CoverageJsonGroup = self._get_coverage_json_group(file, coverage_json_groups)
             try:
-                with file.path.open() as json_file:
-                    json_data: dict[str, Any] = json.load(json_file)
-                    coverage_json: CoverageJson = self._parse_json_data(file, json_data)
-                    group.coverage_jsons.append(coverage_json)
-            except (OSError, JSONDecodeError, ValidationError) as error:
+                content: str = self._gcs_client.get_coverage_artifact_content(
+                    file.repository, artifact_file_name
+                )
+                json_data: dict[str, Any] = json.loads(content)
+                coverage_json: CoverageJson = self._parse_json_data(file, json_data)
+                group.coverage_jsons.append(coverage_json)
+            except (JSONDecodeError, ValidationError) as error:
                 error_mapping: dict[type, str] = {
-                    OSError: f"Error reading the file {artifact_file_path}",
-                    JSONDecodeError: f"Invalid JSON format for file {artifact_file_path}",
-                    ValidationError: f"Unexpected value or schema in file {artifact_file_path}",
+                    JSONDecodeError: f"Invalid JSON format for file {artifact_file_name}",
+                    ValidationError: f"Unexpected value or schema in file {artifact_file_name}",
                 }
                 error_msg: str = next(m for t, m in error_mapping.items() if isinstance(error, t))
                 self.logger.error(error_msg, exc_info=error)
