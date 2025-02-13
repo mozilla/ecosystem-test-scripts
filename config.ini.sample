@@ -20,23 +20,23 @@ pipelines = [
             },
             {
               "job_name": "Integration Test - Frontends (nightly)",
-              "test_suite": "integration-frontends"
+              "test_suite": "frontends-integration"
             },
             {
               "job_name": "Integration Test - Libraries (nightly)",
-              "test_suite": "integration-libraries"
+              "test_suite": "libraries-integration"
             },
             {
               "job_name": "Integration Test - Servers (nightly)",
-              "test_suite": "integration-servers"
+              "test_suite": "servers-integration"
             },
             {
               "job_name": "Integration Test - Servers - Auth (nightly)",
-              "test_suite": "integration-servers-auth"
+              "test_suite": "servers-auth-integration"
             },
             {
               "job_name": "Integration Test - Servers - Auth V2 (nightly)",
-              "test_suite": "integration-servers-auth-v2"
+              "test_suite": "servers-auth-v2-integration"
             },
             {
               "job_name": "Functional Tests - Playwright (nightly)",
@@ -58,23 +58,23 @@ pipelines = [
             },
             {
               "job_name": "Integration Test - Frontends",
-              "test_suite": "integration-frontends"
+              "test_suite": "frontends-integration"
             },
             {
               "job_name": "Integration Test - Libraries",
-              "test_suite": "integration-libraries"
+              "test_suite": "libraries-integration"
             },
             {
               "job_name": "Integration Test - Servers",
-              "test_suite": "integration-servers"
+              "test_suite": "servers-integration"
             },
             {
               "job_name": "Integration Test - Servers - Auth",
-              "test_suite": "integration-servers-auth"
+              "test_suite": "servers-auth-integration"
             },
             {
               "job_name": "Integration Test - Servers - Auth V2",
-              "test_suite": "integration-servers-auth-v2"
+              "test_suite": "servers-auth-v2-integration"
             },
             {
               "job_name": "Functional Tests - Playwright",

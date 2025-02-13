@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+    <testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="2.368"
+               timestamp="2024-07-03T15:05:24.621274" hostname="ip-10-0-191-153">
+        <testcase classname="" name="" time="0.000">
+            <error message="collection failure">
+                /opt/circleci/.pyenv/versions/3.12.1/lib/python3.12/importlib/__init__.py:90: in
+                import_module
+                return _bootstrap._gcd_import(name[level:], package, level)
+                &lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+                ???
+                &lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+                ???
+                &lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+                ???
+                &lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+                ???
+                ../.cache/pypoetry/virtualenvs/merino-py-3aSsmiER-py3.12/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:186:
+                in exec_module
+                exec(co, module.__dict__)
+                tests/integration/api/conftest.py:26: in &lt;module&gt;
+                from merino.main import app
+                merino/main.py:15: in &lt;module&gt;
+                from merino.providers import suggest, manifest
+                merino/providers/suggest/__init__.py:10: in &lt;module&gt;
+                from merino.providers.suggest.manager import load_providers
+                merino/providers/suggest/manager.py:22: in &lt;module&gt;
+                from merino.providers.suggest.top_picks.backends.top_picks import TopPicksBackend
+                merino/providers/suggest/top_picks/backends/top_picks.py:13: in &lt;module&gt;
+                from merino.providers.suggest.top_picks.backends.filemanager import (
+                merino/providers/suggest/top_picks/backends/filemanager.py:10: in &lt;module&gt;
+                from merino.utils.gcs.gcp_uploader import GcsUploader
+                E ModuleNotFoundError: No module named 'merino.utils.gcs.gcp_uploader'
+            </error>
+        </testcase>
+    </testsuite>
+</testsuites>
