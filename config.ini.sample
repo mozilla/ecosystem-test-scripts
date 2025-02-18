@@ -96,23 +96,6 @@ pipelines = [
             }
           ]
         }
-      },
-      {
-        "organization": "mozilla-services",
-        "repository": "autopush-rs",
-        "branches": ["master"],
-        "workflows": {
-          "build-test-deploy": [
-            {
-              "job_name": "Rust Unit Tests",
-              "test_suite": "unit"
-            },
-            {
-              "job_name": "Integration Tests",
-              "test_suite": "integration"
-            }
-          ]
-        }
       }
     ]
 ;(optional) Get data starting from x days past from now (default: all available data)
