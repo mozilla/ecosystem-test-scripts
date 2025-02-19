@@ -113,22 +113,6 @@ pipelines = [
             }
           ]
         }
-      },
-      {
-        "organization": "mozilla-services",
-        "repository": "merino-py",
-        "workflows": {
-          "main-workflow": [
-            {
-              "job_name": "unit-tests",
-              "test_suite": "unit"
-            },
-            {
-              "job_name": "integration-tests",
-              "test_suite": "integration"
-            }
-          ]
-        }
       }
     ]
 ;(optional) Get data starting from x days past from now (default: all available data)
