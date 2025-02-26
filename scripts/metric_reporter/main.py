@@ -18,7 +18,6 @@ from scripts.metric_reporter.parser.coverage_json_parser import (
     CoverageJsonParser,
 )
 from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlParser, JUnitXmlGroup
-from scripts.metric_reporter.reporter.averages_reporter import AveragesReporter
 from scripts.metric_reporter.reporter.base_reporter import ReporterError
 from scripts.metric_reporter.reporter.coverage_reporter import CoverageReporter
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
@@ -36,7 +35,8 @@ def main(
 
     Args:
         config_file (str): Path to the configuration file.
-        update_bigquery (bool | None): Whether to update BigQuery tables. Overrides config file if provided.
+        update_bigquery (bool | None): Whether to update BigQuery tables. Overrides config file if
+                                       provided.
     """
     try:
         logger.info(f"Starting Metric Reporter with configuration file: {config_file}")
@@ -69,7 +69,7 @@ def main(
         report_coverage(
             gcs_client, gcs_artifacts, bigquery_client, gcp_project_id, bigquery_dataset_name
         )
-        report_suite_results_and_averages(
+        report_suite_results(
             gcs_client, gcs_artifacts, bigquery_client, gcp_project_id, bigquery_dataset_name
         )
     except InvalidConfigError as error:
@@ -114,7 +114,7 @@ def report_coverage(
         coverage_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
 
 
-def report_suite_results_and_averages(
+def report_suite_results(
     gcs_client: GCSClient,
     gcs_artifacts: list[GCSArtifacts],
     bigquery_client,
@@ -137,17 +137,11 @@ def report_suite_results_and_averages(
         for group in junit_xml_parser.parse(artifacts.junit_artifact_files)
     ]
     for group in junit_artifact_groups:
-        logger.info(
-            f"Reporting results for {group.repository} {group.workflow} {group.test_suite}"
-        )
+        logger.info(f"Report results for {group.repository} {group.workflow} {group.test_suite}")
         suite_reporter = SuiteReporter(
             group.repository, group.workflow, group.test_suite, group.junit_xmls
         )
-        averages_reporter = AveragesReporter(
-            group.repository, group.workflow, group.test_suite, suite_reporter.results
-        )
         suite_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
-        averages_reporter.update_table(bigquery_client, gcp_project_id, bigquery_dataset_name)
 
 
 if __name__ == "__main__":

@@ -20,12 +20,12 @@ To report test metrics for a project, ensure the following requirements are met:
   directory, under `coverage` and `junit` subdirectories respectively.
 - Coverage JSON files must follow a strict naming convention:
     ```text
-  {job_number}__{utc_epoch_datetime}__{workflow}__{test_suite}__coverage.xml
+  {job_number}__{utc_epoch_datetime}__{repository}__{workflow}__{test_suite}__coverage.xml
   ```
   - Example: `15592__1724283071__autopush-rs__build-test-deploy__integration__coverage.json`
 - JUnit XML files must follow a strict naming convention:
   ```text
-  {job_number}__{utc_epoch_datetime}__{workflow}__{test_suite}__results{-index}.xml
+  {job_number}__{utc_epoch_datetime}__{repository}__{workflow}__{test_suite}__results{-index}.xml
   ```
   - Example: `15592__1724283071__autopush-rs__build-test-deploy__integration__results.xml`
   - The index is optional and can be used in cases of parallel test execution
@@ -35,9 +35,7 @@ To report test metrics for a project, ensure the following requirements are met:
 ## 2. Create and Populate Tables in the ETE BigQuery Dataset
 
 - **Create Tables**:
-  - For test results, create two empty tables using the following naming conventions:
-    - `{project_name}_averages`
-    - `{project_name}_results`
+  - For test results, create one empty table named `{project_name}_results`.
   - For coverage results, create one empty table named `{project_name}_coverage`.
   - These tables should be created in the `test_metrics` dataset of the 
     [ETE BigQuery instance][ETE BigQuery]. Reference the 

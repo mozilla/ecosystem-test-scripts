@@ -2,8 +2,8 @@
 
 Please follow the steps below to update the [ETE Looker Dashboards][ETE Looker Dashboards]. The
 dashboards are typically updated on Monday mornings (North America ET/PT) to ensure the values are
-available for team check-in meetings. The process of updating the dashboards can take up to 10
-minutes.
+available for team check-in meetings. The process of updating the dashboards can take up to an hour,
+this is due to network latency from parsing files stored on GCS.
 
 ## Prerequisites
 
@@ -30,8 +30,8 @@ _**Notes**:_
 
 ## 2. Push updates to BigQuery
 
-To push data to BigQuery and generate CSV reports with the latest test results, test averages, and
-test coverages, execute the following command from the ecosystem-test-scripts root directory:
+To push data to BigQuery with the latest test results and test coverages, execute the following
+command from the ecosystem-test-scripts root directory:
 
 ```shell
 make run_metric_reporter
@@ -39,8 +39,6 @@ make run_metric_reporter
 
 _**Notes**:_
 
-- Average data is produced only after 90 days of data is available. Therefore, some test suites
-  may not have these values.
 - Coverage results are produced only for Autopush-rs unit tests and Merino-py unit and integration
   tests.
 
