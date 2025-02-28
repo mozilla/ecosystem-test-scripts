@@ -41,10 +41,10 @@ def main(
     try:
         logger.info(f"Starting Metric Reporter with configuration file: {config_file}")
         config = Config(config_file)
-        gcp_project_id: str = config.common_config.gcp_project_id
-        test_result_bucket: str = config.common_config.test_result_bucket
-        coverage_artifact_dir: str = config.common_config.coverage_artifact_dir
-        junit_artifact_dir: str = config.common_config.junit_artifact_dir
+        gcp_project_id: str = config.metric_reporter_config.gcp_project_id
+        test_result_bucket: str = config.metric_reporter_config.test_result_bucket
+        coverage_artifact_dir: str = config.metric_reporter_config.coverage_artifact_dir
+        junit_artifact_dir: str = config.metric_reporter_config.junit_artifact_dir
         bigquery_dataset_name: str = config.metric_reporter_config.bigquery_dataset_name
         service_account_file: str = config.metric_reporter_config.service_account_file
         if update_bigquery is None:

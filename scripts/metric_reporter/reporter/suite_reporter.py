@@ -12,7 +12,7 @@ from google.api_core.exceptions import GoogleAPIError
 from google.cloud.bigquery import ArrayQueryParameter, Client, QueryJobConfig, ScalarQueryParameter
 from pydantic import BaseModel
 
-from scripts.common.constants import DATETIME_FORMAT
+from scripts.metric_reporter.constants import DATETIME_FORMAT
 from scripts.metric_reporter.parser.junit_xml_parser import (
     JestJUnitXmlTestSuites,
     JUnitXmlJobTestSuites,

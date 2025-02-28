@@ -10,7 +10,7 @@ from typing import Any, Sequence
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud.bigquery import ArrayQueryParameter, Client, QueryJobConfig, ScalarQueryParameter
 
-from scripts.common.constants import DATETIME_FORMAT
+from scripts.metric_reporter.constants import DATETIME_FORMAT
 from scripts.metric_reporter.parser.coverage_json_parser import (
     CoverageJson,
     LlvmCovReport,

@@ -7,7 +7,7 @@
 from google.cloud.storage import Client
 from pydantic import BaseModel
 
-from scripts.common.error import BaseError
+from scripts.metric_reporter.error import BaseError
 
 
 class GCSClientError(BaseError):

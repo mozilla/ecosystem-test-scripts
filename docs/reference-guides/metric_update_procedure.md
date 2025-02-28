@@ -14,21 +14,7 @@ Before updating the test metrics, ensure that:
 - You are on the latest version of the `main` branch
 - Your `config.ini` file in the root directory is up-to-date
 
-## 1. Scrape for New Raw Test Data
-
-To retrieve the latest test and coverage results for local parsing, execute the following command
-from the ecosystem-test-scripts root directory:
-
-```shell
-make run_circleci_scraper
-```
-
-_**Notes**:_
-
-- Set the `days_of_data` option in the config.ini file to the appropriate number of days. This is
-  typically `8` days since the update cadence is weekly on Mondays.
-
-## 2. Push updates to BigQuery
+## 1. Push updates to BigQuery
 
 To push data to BigQuery with the latest test results and test coverages, execute the following
 command from the ecosystem-test-scripts root directory:

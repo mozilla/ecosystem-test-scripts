@@ -10,33 +10,21 @@ using the method of your choice (see [Github Cloning A Repository][Github Clonin
 Contributors should follow the [Contributing Guidelines][Contributing Guidelines] and
 [Community Participation Guidelines][Community Participation Guidelines] for the repository.
 
-## 2. Create a CircleCI API Token
+## 2. Copy the Metric Reporter Service Account JSON Key
 
-In order to execute the `circleci_scraper` script, a personal CircleCI API Token is needed. To
-create a token, follow the [creating a personal api token][CircleCI Create API Token] CircleCI
-instructions. Store the key value in a safe place.
+The `metric_reporter` script is set up using the [ecosystem-test-eng GCP project][ETE GCP Project]
+with the metric-reporter [service accounts][ETE GCP Service Accounts]. In order to execute the
+script, a key for the service account, in the form of a JSON file, needs to be copied from the
+1Password Ecosystem Test Engineering Team Vault into the root directory of the 
+`ecosystem-test-scripts` project.
 
-**DO NOT SHARE YOUR CIRCLECI API TOKEN**
-
-## 3. Copy the Service Account JSON Keys
-
-The `circleci_scraper` and `metric_reporter` scripts are set up using the
-[ecosystem-test-eng GCP project][ETE GCP Project] with the circleci-scraper and metric-reporter
-[service accounts][ETE GCP Service Accounts]. In order to execute the scripts, keys for the service
-accounts, in the form of a JSON files, need to be copied from the 1Password Ecosystem Test
-Engineering Team Vault into the root directory of the `ecosystem-test-scripts` project.
-
-## 4. Set up the config.ini
+## 3. Set up the config.ini
 
 All settings for the `ecosystem-test-scripts` are defined in the `config.ini` file. To set up a 
-local `config.ini` file:
+local `config.ini` file, make a copy of the `config.ini.sample` file found in the root directory of
+the ecosystem-test-scripts` project and rename it to `config.ini`
 
-4.1 Make a copy of the `config.ini.sample` file found in the root directory of the
-    `ecosystem-test-scripts` project and rename it to `config.ini`\
-4.2 Under the `[circleci_scraper]` section of the file, set the `token` value to the CircleCI API
-    key created in step 2
-
-## 5. Set up the python virtual environment
+## 4. Set up the python virtual environment
 
 This project uses [Poetry][Poetry] for dependency management in conjunction with a pyproject.toml
 file. While you can use virtualenv to set up the dev environment, it is recommended to use
@@ -54,9 +42,8 @@ For more information on Make commands, run:
 make help
 ```
 
-## 6. Start Developing!
+## 5. Start Developing!
 
-[CircleCI Create API Token]: https://circleci.com/docs/managing-api-tokens/#creating-a-personal-api-token
 [Community Participation Guidelines]: https://github.com/mozilla/ecosystem-test-scripts/blob/main/CODE_OF_CONDUCT.md
 [Contributing Guidelines]: https://github.com/mozilla/ecosystem-test-scripts/blob/main/CONTRIBUTING.md
 [ETE GCP Project]: https://console.cloud.google.com/welcome?project=ecosystem-test-eng

@@ -175,5 +175,4 @@ config.ini
 book/
 
 # GCP service account key files
-circleci_scraper_key.json
 metric_reporter_key.json

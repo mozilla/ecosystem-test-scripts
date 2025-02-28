@@ -9,8 +9,8 @@ from datetime import datetime, timezone
 
 from pydantic import BaseModel
 
-from scripts.common.constants import DATETIME_FORMAT
-from scripts.common.error import BaseError
+from scripts.metric_reporter.constants import DATETIME_FORMAT
+from scripts.metric_reporter.error import BaseError
 
 ARTIFACT_FILE_PATTERN = re.compile(
     r"(?P<job_number>\d+)__(?P<epoch>\d+)__(?P<repository>.+?)__(?P<workflow>.+?)__(?P<test_suite>.+?)__(.*)"
