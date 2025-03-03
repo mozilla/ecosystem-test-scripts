@@ -5,22 +5,34 @@
 """Configuration handling for the Metric Reporter."""
 
 import logging
-from configparser import NoSectionError, NoOptionError
+from configparser import ConfigParser, NoSectionError, NoOptionError
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
-from scripts.common.config import BaseConfig, InvalidConfigError
+from scripts.metric_reporter.error import BaseError
+
+DIRECTORY_PATTERN = r"^[^<>:;,?\"*|]+$"
 
 
 class MetricReporterConfig(BaseModel):
     """Model for Metric Reporter configuration."""
 
+    gcp_project_id: str
+    test_result_bucket: str
+    junit_artifact_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
+    coverage_artifact_dir: str = Field(..., pattern=DIRECTORY_PATTERN)
     service_account_file: str
     bigquery_dataset_name: str
     update_bigquery: bool = False
 
 
-class Config(BaseConfig):
+class InvalidConfigError(BaseError):
+    """Custom error raised for invalid configurations."""
+
+    pass
+
+
+class Config:
     """Configuration handler for the Metric Reporter."""
 
     logger = logging.getLogger(__name__)
@@ -35,25 +47,29 @@ class Config(BaseConfig):
             InvalidConfigError: If the configuration file contains missing or invalid values,
                                 or if an error occurs while building Metric Reporter arguments.
         """
-        super().__init__(config_file)
-        self.metric_reporter_config: MetricReporterConfig = self._parse_metric_reporter_config()
+        self.config_parser = ConfigParser()
+        self.config_parser.read(config_file)
+        self.metric_reporter_config: MetricReporterConfig = self._parse_metric_reporter_config(
+            self.config_parser
+        )
         self.logger.info("Successfully loaded configuration")
 
-    def _parse_metric_reporter_config(self) -> MetricReporterConfig:
+    def _parse_metric_reporter_config(self, config_parser: ConfigParser) -> MetricReporterConfig:
         try:
-            service_account_file: str = self.config_parser.get(
-                "metric_reporter", "service_account_file"
-            )
-            bigquery_dataset_name: str = self.config_parser.get(
-                "metric_reporter", "bigquery_dataset_name"
-            )
-            update_bigquery: bool = self.config_parser.getboolean(
-                "metric_reporter", "update_bigquery", fallback=False
-            )
             return MetricReporterConfig(
-                service_account_file=service_account_file,
-                bigquery_dataset_name=bigquery_dataset_name,
-                update_bigquery=update_bigquery,
+                gcp_project_id=config_parser.get("metric_reporter", "gcp_project_id"),
+                test_result_bucket=config_parser.get("metric_reporter", "test_result_bucket"),
+                junit_artifact_dir=config_parser.get("metric_reporter", "junit_artifact_dir"),
+                coverage_artifact_dir=config_parser.get(
+                    "metric_reporter", "coverage_artifact_dir"
+                ),
+                service_account_file=config_parser.get("metric_reporter", "service_account_file"),
+                bigquery_dataset_name=config_parser.get(
+                    "metric_reporter", "bigquery_dataset_name"
+                ),
+                update_bigquery=config_parser.getboolean(
+                    "metric_reporter", "update_bigquery", fallback=False
+                ),
             )
         except (NoSectionError, NoOptionError, ValidationError) as error:
             error_mapping: dict[type, str] = {

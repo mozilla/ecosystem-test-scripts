@@ -6,7 +6,6 @@
 - [`clean`](#clean) -- Clean up installation and cache files.
 - [`format`](#format) -- Apply formatting.
 - [`install`](#install) -- Install dependencies.
-- [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
 - [`run_metric_reporter`](#run_metric_reporter) -- Run the Test Metric Reporter.
 - [`test`](#test) -- Run tests.
 - [`test_coverage`](#test_coverage) -- Run tests with coverage reporting.
@@ -135,39 +134,6 @@ make test_coverage_html
 
 ---
 
-### `run_circleci_scraper`
-
-Run the CircleCI scraper.
-
-#### USAGE
-
-```sh
-make run_circleci_scraper
-```
-
-In order to use this command, you need to make sure you set your [personal CircleCI token](https://circleci.com/docs/managing-api-tokens/) in your local config.ini file, as seen below:
-
-```ini
-[circleci_scraper]
-token = <YoUr_tOkEn_hErE>
-```
-
-If the `days_of_data` option is not present in the config.ini file, the default of "all available data" will be fetched. If you want to customize how many previous days are fetched, you can set the `days_of_data` option in your local config.ini file:
-
-```ini
-[circleci_scraper]
-;(optional) Get data starting from x days past from now (default: all available data)
-days_of_data = 7
-```
-
-If you have the previous day's data stored locally, the cached data will be used and not re-fetched from CircleCI.
-
-#### SEE ALSO
-
-- [`run_metric_reporter`](#run_metric_reporter) -- Run the Test Metric Reporter.
-
----
-
 ### `run_metric_reporter`
 
 Run the Test Metric Reporter.
@@ -177,7 +143,3 @@ Run the Test Metric Reporter.
 ```sh
 make run_metric_reporter
 ```
-
-#### SEE ALSO
-
-- [`run_circleci_scraper`](#run_circleci_scraper) -- Run the CircleCI scraper.
