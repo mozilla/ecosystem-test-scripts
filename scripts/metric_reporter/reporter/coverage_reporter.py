@@ -153,11 +153,20 @@ class CoverageReporter(BaseReporter):
         query = f"""
             SELECT 1
             FROM `{table_id}`
-            WHERE `Job Number` IN UNNEST(@job_numbers)
+            WHERE 
+                Repository = @repository
+                AND Workflow = @workflow
+                AND `Test Suite` = @test_suite
+                AND `Job Number` IN UNNEST(@job_numbers)
             LIMIT 1
         """  # nosec
         jobs: list[int] = [result.job for result in results]
-        query_parameters = [ArrayQueryParameter("job_numbers", "INT64", jobs)]
+        query_parameters = [
+            ScalarQueryParameter("repository", "STRING", self.repository),
+            ScalarQueryParameter("workflow", "STRING", self.workflow),
+            ScalarQueryParameter("test_suite", "STRING", self.test_suite),
+            ArrayQueryParameter("job_numbers", "INT64", jobs),
+        ]
         job_config = QueryJobConfig(query_parameters=query_parameters)
         try:
             query_job = client.query(query, job_config=job_config)
