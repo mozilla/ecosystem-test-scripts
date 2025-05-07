@@ -29,14 +29,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: Install Poetry
-      run: pipx install poetry
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-        cache: poetry
-    - name: Install dependencies
-      run: make install
+    - name: Setup Project
+      uses: ./.github/actions/setup-project
     - name: Run tests with coverage reporting
       run: make test_coverage

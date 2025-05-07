@@ -1,0 +1,25 @@
+name: Run Metrcis Reporter on schedule
+
+on:
+  schedule:
+    # Every Monday at 13:00 UTC
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+jobs:
+    run_metrics_reporter:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out source repository
+              uses: actions/checkout@v4
+            - name: Setup Project
+              uses: ./.github/actions/setup-project
+            - name: Authenticate to Google
+              uses: google-github-actions/auth@v2
+              with:
+                credentials_json: ${{ secrets.GCLOUD_AUTH }}
+            - name: Write config.ini
+              run: echo "${{ secrets.CONFIG_INI }}" > config.ini
+            - name: Run Reporter
+              run: make run_metric_reporter
+
