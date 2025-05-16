@@ -1,0 +1,30 @@
+name: "Setup Project"
+description: "Setup project and install dependencies"
+inputs:
+  python-version:
+    description: "Python version to use"
+    required: true
+    default: "3.12"
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install Poetry
+      shell: bash
+      run: pipx install poetry
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+    - name: Install dependencies
+      shell: bash
+      run: make install
+

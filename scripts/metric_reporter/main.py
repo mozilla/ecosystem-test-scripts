@@ -7,7 +7,9 @@
 import argparse
 import logging
 
+from google.auth import default as google_auth_default
 from google.cloud import bigquery, storage
+from google.auth.exceptions import DefaultCredentialsError
 from google.oauth2.service_account import Credentials
 
 from scripts.metric_reporter.config import Config, InvalidConfigError
@@ -17,7 +19,10 @@ from scripts.metric_reporter.parser.coverage_json_parser import (
     CoverageJsonGroup,
     CoverageJsonParser,
 )
-from scripts.metric_reporter.parser.junit_xml_parser import JUnitXmlParser, JUnitXmlGroup
+from scripts.metric_reporter.parser.junit_xml_parser import (
+    JUnitXmlParser,
+    JUnitXmlGroup,
+)
 from scripts.metric_reporter.reporter.base_reporter import ReporterError
 from scripts.metric_reporter.reporter.coverage_reporter import CoverageReporter
 from scripts.metric_reporter.reporter.suite_reporter import SuiteReporter
@@ -57,20 +62,39 @@ def main(
             return
 
         # Create GCS and BigQuery clients
-        credentials = Credentials.from_service_account_file(service_account_file)  # type: ignore
+        try:
+            credentials, _ = google_auth_default()  # type: ignore
+            logger.info("Using default application credentials.")
+        except DefaultCredentialsError:
+            logger.info(
+                "Default application credentials not found. Falling back to service account file."
+            )
+            credentials = Credentials.from_service_account_file(service_account_file)  # type: ignore
+
         storage_client = storage.Client(project=gcp_project_id, credentials=credentials)
         bigquery_client = bigquery.Client(project=gcp_project_id, credentials=credentials)
 
         # Report
         gcs_client = GCSClient(
-            storage_client, test_result_bucket, coverage_artifact_dir, junit_artifact_dir
+            storage_client,
+            test_result_bucket,
+            coverage_artifact_dir,
+            junit_artifact_dir,
         )
         gcs_artifacts: list[GCSArtifacts] = gcs_client.get_artifacts()
         report_coverage(
-            gcs_client, gcs_artifacts, bigquery_client, gcp_project_id, bigquery_dataset_name
+            gcs_client,
+            gcs_artifacts,
+            bigquery_client,
+            gcp_project_id,
+            bigquery_dataset_name,
         )
         report_suite_results(
-            gcs_client, gcs_artifacts, bigquery_client, gcp_project_id, bigquery_dataset_name
+            gcs_client,
+            gcs_artifacts,
+            bigquery_client,
+            gcp_project_id,
+            bigquery_dataset_name,
         )
     except InvalidConfigError as error:
         logger.error(f"Configuration error: {error}")
@@ -82,6 +106,9 @@ def main(
         logger.error(f"Test Suite Reporter error: {error}")
     except Exception as error:
         logger.error(f"Unexpected error: {error}", exc_info=error)
+        # if we have an unexpected error, we want to raise it
+        # so that the CI/CD pipeline can fail.
+        raise error
 
 
 def report_coverage(
