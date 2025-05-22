@@ -26,7 +26,9 @@ from tests.metric_reporter.conftest import (
 
 
 @pytest.mark.parametrize(
-    "fixture", ["coverage_llvm_cov_data", "coverage_pytest_data"], ids=["llvm-cov", "pytest"]
+    "fixture",
+    ["coverage_llvm_cov_data", "coverage_pytest_data", "coverage_jest_data"],
+    ids=["llvm-cov", "pytest", "jest"],
 )
 def test_coverage_reporter_init(fixture: str, request: pytest.FixtureRequest) -> None:
     """Test CoverageReporter initialization with llvm-cov and pytest report data.
@@ -53,12 +55,16 @@ def test_coverage_reporter_init(fixture: str, request: pytest.FixtureRequest) ->
         ("coverage_llvm_cov_data", [{"last_update": "2024-01-01T00:00:00Z"}]),
         ("coverage_pytest_data", []),
         ("coverage_pytest_data", [{"last_update": "2024-01-01T00:00:00Z"}]),
+        ("coverage_jest_data", []),
+        ("coverage_jest_data", [{"last_update": "2024-01-01T00:00:00Z"}]),
     ],
     ids=[
         "llvm-cov_new_table",
         "llvm-cov_existing_table",
         "pytest_new_table",
         "pytest_existing_table",
+        "jest_new_table",
+        "jest_existing_table",
     ],
 )
 def test_coverage_reporter_update_table_with_new_results(
@@ -101,7 +107,13 @@ def test_coverage_reporter_update_table_with_new_results(
 
 
 @pytest.mark.parametrize(
-    "fixture", ["coverage_llvm_cov_data", "coverage_pytest_data"], ids=["llvm-cov", "pytest"]
+    "fixture",
+    [
+        "coverage_llvm_cov_data",
+        "coverage_pytest_data",
+        "coverage_jest_data",
+    ],
+    ids=["llvm-cov", "pytest", "jest"],
 )
 def test_coverage_reporter_update_table_with_new_results_and_row_duplication(
     caplog: LogCaptureFixture,
@@ -147,7 +159,13 @@ def test_coverage_reporter_update_table_with_new_results_and_row_duplication(
 
 
 @pytest.mark.parametrize(
-    "fixture", ["coverage_llvm_cov_data", "coverage_pytest_data"], ids=["llvm-cov", "pytest"]
+    "fixture",
+    [
+        "coverage_llvm_cov_data",
+        "coverage_pytest_data",
+        "coverage_jest_data",
+    ],
+    ids=["llvm-cov", "pytest", "jest"],
 )
 def test_coverage_reporter_update_table_without_new_results(
     caplog: LogCaptureFixture,
