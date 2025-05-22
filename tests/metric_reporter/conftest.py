@@ -20,6 +20,9 @@ from scripts.metric_reporter.parser.coverage_json_parser import (
     PytestReport,
     PytestMeta,
     PytestTotals,
+    JestCovReport,
+    JestCovTotals,
+    JestCovDetails,
 )
 from scripts.metric_reporter.parser.junit_xml_parser import (
     JestJUnitXmlTestSuites,
@@ -449,6 +452,10 @@ LLVM_COV_JSON: list[dict[str, Any]] = [
         "Function Covered": 589,
         "Function Not Covered": 418,
         "Function Percent": 58.490566037735846,
+        "Statement Count": None,
+        "Statement Percent": None,
+        "Statement Not Covered": None,
+        "Statement Covered": None,
         "Job Number": 1,
         "Line Count": 9441,
         "Line Covered": 5761,
@@ -518,12 +525,98 @@ PYTEST_JSON: list[dict[str, Any]] = [
         "Function Covered": None,
         "Function Not Covered": None,
         "Function Percent": None,
+        "Statement Count": None,
+        "Statement Percent": None,
+        "Statement Not Covered": None,
+        "Statement Covered": None,
         "Job Number": 1,
         "Line Count": 3782,
         "Line Covered": 3138,
         "Line Excluded": 217,
         "Line Not Covered": 644,
         "Line Percent": 82.01058201058201,
+        "Repository": "repo",
+        "Test Suite": "suite",
+        "Timestamp": "2024-08-29T17:43:41Z",
+        "Workflow": "main",
+    }
+]
+JEST_SAMPLE_DIRECTORY = "jest_json_samples"
+JEST_REPORT_LIST: list[CoverageJson] = [
+    JestCovReport(
+        job_number=1,
+        job_timestamp="2024-08-29T17:43:41Z",
+        totals=JestCovTotals(
+            line=JestCovDetails(
+                count=3782,
+                covered=3138,
+                not_covered=644,
+                percent=82.01,
+            ),
+            branch=JestCovDetails(
+                count=943,
+                covered=737,
+                not_covered=206,
+                percent=78.15,
+            ),
+            statement=JestCovDetails(
+                count=3,
+                percent=98.64,
+                not_covered=6,
+                covered=200,
+            ),
+            function=JestCovDetails(count=600, covered=500, not_covered=100, percent=83.33),
+        ),
+    )
+]
+JEST_REPORT_RESULTS: list[CoverageReporterResult] = [
+    CoverageReporterResult(
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
+        date="2024-08-29",
+        timestamp="2024-08-29T17:43:41Z",
+        job=1,
+        line_count=3782,
+        line_covered=3138,
+        line_not_covered=644,
+        line_excluded=None,
+        line_percent=82.01,
+        branch_count=943,
+        branch_covered=737,
+        branch_not_covered=206,
+        branch_percent=78.15,
+        statement_count=3,
+        statement_percent=98.64,
+        statement_not_covered=6,
+        statement_covered=200,
+        function_count=600,
+        function_covered=500,
+        function_not_covered=100,
+        function_percent=83.33,
+    )
+]
+JEST_JSON: list[dict[str, Any]] = [
+    {
+        "Branch Count": 943,
+        "Branch Covered": 737,
+        "Branch Not Covered": 206,
+        "Branch Percent": 78.15,
+        "Date": "2024-08-29",
+        "Function Count": 600,
+        "Function Covered": 500,
+        "Function Not Covered": 100,
+        "Function Percent": 83.33,
+        "Statement Count": 3,
+        "Statement Percent": 98.64,
+        "Statement Not Covered": 6,
+        "Statement Covered": 200,
+        "Job Number": 1,
+        "Line Count": 3782,
+        "Line Covered": 3138,
+        "Line Excluded": None,
+        "Line Not Covered": 644,
+        "Line Percent": 82.01,
         "Repository": "repo",
         "Test Suite": "suite",
         "Timestamp": "2024-08-29T17:43:41Z",
@@ -605,6 +698,22 @@ def coverage_pytest_data(test_data_directory: Path) -> SampleCoverageData:
         ),
         report_results=PYTEST_REPORT_RESULTS,
         json_rows=PYTEST_JSON,
+    )
+
+
+@pytest.fixture
+def coverage_jest_data(test_data_directory: Path) -> SampleCoverageData:
+    """Provide the jest coverage report sample data."""
+    return SampleCoverageData(
+        sample_directory=test_data_directory / JEST_SAMPLE_DIRECTORY,
+        coverage_json_group=CoverageJsonGroup(
+            repository=REPOSITORY,
+            workflow=WORKFLOW,
+            test_suite=TEST_SUITE,
+            coverage_jsons=JEST_REPORT_LIST,
+        ),
+        report_results=JEST_REPORT_RESULTS,
+        json_rows=JEST_JSON,
     )
 
 

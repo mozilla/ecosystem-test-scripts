@@ -17,6 +17,8 @@ from scripts.metric_reporter.parser.coverage_json_parser import (
     LlvmCovTotals,
     PytestReport,
     PytestTotals,
+    JestCovReport,
+    JestCovTotals,
 )
 from scripts.metric_reporter.reporter.base_reporter import (
     BaseReporter,
@@ -51,6 +53,10 @@ class CoverageReporterResult(ReporterResultBase):
     branch_covered: int | None
     branch_not_covered: int | None
     branch_percent: float | None
+    statement_count: int | None = None  # jest only
+    statement_percent: float | None = None  # jest only
+    statement_not_covered: int | None = None  # jest only
+    statement_covered: int | None = None  # jest only
 
     def dict_with_fieldnames(self) -> dict[str, Any]:
         """Convert the coverage result to a dictionary with field names.
@@ -78,6 +84,10 @@ class CoverageReporterResult(ReporterResultBase):
             "Branch Covered": self.branch_covered,
             "Branch Not Covered": self.branch_not_covered,
             "Branch Percent": self.branch_percent,
+            "Statement Count": self.statement_count,
+            "Statement Percent": self.statement_percent,
+            "Statement Not Covered": self.statement_not_covered,
+            "Statement Covered": self.statement_covered,
         }
 
 
@@ -259,6 +269,8 @@ class CoverageReporter(BaseReporter):
                 results.append(self._parse_llvm_cov_report(artifact))
             elif isinstance(artifact, PytestReport):
                 results.append(self._parse_pytest_report(artifact))
+            elif isinstance(artifact, JestCovReport):
+                results.append(self._parse_jest_report(artifact))
             else:
                 raise ReporterError(f"Unknown coverage type: {type(artifact)}")
         return results
@@ -319,4 +331,33 @@ class CoverageReporter(BaseReporter):
                 if totals.num_branches
                 else 0.0
             ),
+        )
+
+    def _parse_jest_report(self, jest_report: JestCovReport) -> CoverageReporterResult:
+        totals: JestCovTotals = jest_report.totals
+        return CoverageReporterResult(
+            repository=self.repository,
+            workflow=self.workflow,
+            test_suite=self.test_suite,
+            timestamp=jest_report.job_timestamp,
+            date=self._extract_date(jest_report.job_timestamp)
+            if jest_report.job_timestamp
+            else None,
+            job=jest_report.job_number,
+            line_count=totals.line.count,
+            line_covered=totals.line.covered,
+            line_not_covered=totals.line.not_covered,
+            line_percent=totals.line.percent,
+            branch_count=totals.branch.count,
+            branch_covered=totals.branch.covered,
+            branch_not_covered=totals.branch.not_covered,
+            branch_percent=totals.branch.percent,
+            statement_count=totals.statement.count,
+            statement_percent=totals.statement.percent,
+            statement_not_covered=totals.statement.not_covered,
+            statement_covered=totals.statement.covered,
+            function_count=totals.function.count,
+            function_covered=totals.function.covered,
+            function_not_covered=totals.function.not_covered,
+            function_percent=totals.function.percent,
         )
