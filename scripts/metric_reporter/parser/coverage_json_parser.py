@@ -179,7 +179,7 @@ class CoverageJsonParser(BaseParser):
                 job_timestamp=file.job_timestamp,
                 **json_data,
             )
-        elif all(k in next(iter(json_data.values())) for k in ("statementMap")):
+        elif any(k in next(iter(json_data.values())) for k in ("statementMap")):
             results = JestJsonParser.parse_jest_json(json_data)
             return JestCovReport(
                 job_number=file.job_number, job_timestamp=file.job_timestamp, totals=results

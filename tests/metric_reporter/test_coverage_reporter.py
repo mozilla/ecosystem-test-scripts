@@ -187,7 +187,7 @@ def test_coverage_reporter_update_table_without_new_results(
     group: CoverageJsonGroup = coverage_data.coverage_json_group
 
     get_last_update_query_mock = mocker.MagicMock()
-    get_last_update_query_mock.result.return_value = [{"last_update": "2024-09-01T00:00:00Z"}]
+    get_last_update_query_mock.result.return_value = [{"last_update": "2024-10-01T00:00:00Z"}]
     mock_client = mocker.MagicMock()
     mock_client.query.return_value = get_last_update_query_mock
 
