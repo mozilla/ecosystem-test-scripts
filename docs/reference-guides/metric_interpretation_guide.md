@@ -75,7 +75,7 @@ follows:
 
 ## Coverage Metrics
 
-_Supported Coverage Frameworks:_ [pytest-cov][pytest-covI], [llvm-cov][llvm-cov]
+_Supported Coverage Frameworks:_ [pytest-cov][pytest-covI], [llvm-cov][llvm-cov], [jest][jest]
 
 Coverage metrics measure the percentage of the codebase covered by tests. They help identify
 untested areas of the code, allowing teams to determine whether critical paths are adequately
