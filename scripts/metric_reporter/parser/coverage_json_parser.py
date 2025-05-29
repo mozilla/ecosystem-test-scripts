@@ -13,6 +13,7 @@ from pydantic import BaseModel, ValidationError
 
 from scripts.metric_reporter.gcs_client import GCSClient
 from scripts.metric_reporter.parser.base_parser import BaseParser, ParserError, ArtifactFile
+from scripts.metric_reporter.parser.coverage_json_jest_parser import JestJsonParser
 
 
 class LlvmCovStats(BaseModel):
@@ -84,7 +85,33 @@ class PytestReport(BaseModel):
     totals: PytestTotals
 
 
-CoverageJson = LlvmCovReport | PytestReport
+class JestCovDetails(BaseModel):
+    """Represents coverage values from a Jest coverage report."""
+
+    count: int
+    percent: float
+    covered: int
+    not_covered: int
+
+
+class JestCovTotals(BaseModel):
+    """Represents coverage totals from a Jest coverage report."""
+
+    statement: JestCovDetails
+    function: JestCovDetails
+    branch: JestCovDetails
+    line: JestCovDetails
+
+
+class JestCovReport(BaseModel):
+    """Represents a Jest coverage report."""
+
+    job_number: int
+    job_timestamp: str
+    totals: JestCovTotals
+
+
+CoverageJson = LlvmCovReport | PytestReport | JestCovReport
 
 
 class CoverageJsonGroup(BaseModel):
@@ -151,6 +178,11 @@ class CoverageJsonParser(BaseParser):
                 job_number=file.job_number,
                 job_timestamp=file.job_timestamp,
                 **json_data,
+            )
+        elif any(k in next(iter(json_data.values())) for k in ("statementMap")):
+            results = JestJsonParser.parse_jest_json(json_data)
+            return JestCovReport(
+                job_number=file.job_number, job_timestamp=file.job_timestamp, totals=results
             )
         else:
             raise ParserError(f"Unknown JSON format for {file.name}")

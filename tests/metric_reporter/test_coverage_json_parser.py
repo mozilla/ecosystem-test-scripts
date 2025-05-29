@@ -15,10 +15,12 @@ from tests.metric_reporter.conftest import SampleCoverageData
 
 
 @pytest.mark.parametrize(
-    "fixture", ["coverage_llvm_cov_data", "coverage_pytest_data"], ids=["llvm-cov", "pytest"]
+    "fixture",
+    ["coverage_llvm_cov_data", "coverage_pytest_data", "coverage_jest_data"],
+    ids=["llvm-cov", "pytest", "jest"],
 )
 def test_parse(mocker: MockerFixture, fixture: str, request: pytest.FixtureRequest) -> None:
-    """Test CoverageJsonParser parse method with llvm-cov and pytest report data.
+    """Test CoverageJsonParser parse method with llvm-cov, pytest and jest report data.
 
     Args:
         mocker (MockerFixture): pytest_mock fixture for mocking.
