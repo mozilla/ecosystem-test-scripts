@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="0.015" tests="3" failures="1">
+  <testsuite name="lib/client" timestamp="2025-06-12T15:58:36" tests="1" file="/example/project/packages/fxa-auth-client/test/client.ts" time="0.000" failures="0">
+    <testcase name="lib/client fails without headers" time="0.000" classname="fails without headers">
+    </testcase>
+  </testsuite>
+  <testsuite name="getCredentials" timestamp="2025-06-12T15:58:36" tests="1" file="/example/project/packages/fxa-auth-client/test/crypto.ts" time="0.002" failures="0">
+    <testcase name="lib/crypto getCredentials returns the correct authPW and unwrapBKey" time="0.001" classname="returns the correct authPW and unwrapBKey">
+    </testcase>
+  </testsuite>
+  <testsuite name="getCredentialsV2" timestamp="2025-06-12T15:58:36" tests="1" file="/example/project/packages/fxa-auth-client/test/crypto.ts" time="0.013" failures="1">
+    <testcase name="lib/crypto getCredentialsV2 returns the correct authPW and unwrapBKey with v1 salt" time="0.013" classname="returns the correct authPW and unwrapBKey with v1 salt">
+      <failure message="expected 'test' to equal 'actual'" type="AssertionError">
+        AssertionError: expected 'test' to equal 'actual'
+            at Context.&lt;anonymous&gt; (/example/project/packages/fxa-auth-client/test/crypto.ts:45:15)
+      </failure>
+    </testcase>
+  </testsuite>
+</testsuites> 
