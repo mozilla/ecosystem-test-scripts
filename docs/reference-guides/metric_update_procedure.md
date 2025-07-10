@@ -25,7 +25,7 @@ make run_metric_reporter
 
 _**Notes**:_
 
-- Coverage results are produced only for Autopush-rs unit tests and Merino-py unit and integration
+- Coverage results are produced only for Autopush-rs unit tests, Syncstorage-rs unit tests, and Merino-py unit and integration
   tests.
 
 [Developer Setup Guide]: ../developer-guides/developer_setup.md

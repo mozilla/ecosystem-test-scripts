@@ -606,6 +606,148 @@ EXPECTED_TAP = [
     )
 ]
 
+# Mocha XUnit test data - these files are parsed as MochaJUnitXmlTestSuites since Mocha XUnit
+# is a subset of JUnit XML format and doesn't require a separate parser
+EXPECTED_MOCHA_XUNIT = [
+    JUnitXmlGroup(
+        repository=REPOSITORY,
+        workflow=WORKFLOW,
+        test_suite=TEST_SUITE,
+        junit_xmls=[
+            JUnitXmlJobTestSuites(
+                job=1,
+                job_timestamp="2024-09-01T00:17:22Z",
+                test_suites=[
+                    MochaJUnitXmlTestSuites(
+                        name="Mocha Tests",
+                        tests=3,
+                        failures=1,
+                        time=0.015,
+                        test_suites=[
+                            MochaJUnitXmlTestSuite(
+                                name="lib/client",
+                                timestamp="2025-06-12T15:58:36",
+                                tests=1,
+                                failures=0,
+                                file="/example/project/packages/fxa-auth-client/test/client.ts",
+                                time=0.000,
+                                test_cases=[
+                                    MochaJUnitXmlTestCase(
+                                        name="lib/client fails without headers",
+                                        classname="fails without headers",
+                                        time=0.000,
+                                    )
+                                ],
+                            ),
+                            MochaJUnitXmlTestSuite(
+                                name="getCredentials",
+                                timestamp="2025-06-12T15:58:36",
+                                tests=1,
+                                failures=0,
+                                file="/example/project/packages/fxa-auth-client/test/crypto.ts",
+                                time=0.002,
+                                test_cases=[
+                                    MochaJUnitXmlTestCase(
+                                        name="lib/crypto getCredentials returns the correct authPW and unwrapBKey",
+                                        classname="returns the correct authPW and unwrapBKey",
+                                        time=0.001,
+                                    )
+                                ],
+                            ),
+                            MochaJUnitXmlTestSuite(
+                                name="getCredentialsV2",
+                                timestamp="2025-06-12T15:58:36",
+                                tests=1,
+                                failures=1,
+                                file="/example/project/packages/fxa-auth-client/test/crypto.ts",
+                                time=0.013,
+                                test_cases=[
+                                    MochaJUnitXmlTestCase(
+                                        name="lib/crypto getCredentialsV2 returns the correct authPW and unwrapBKey with v1 salt",
+                                        classname="returns the correct authPW and unwrapBKey with v1 salt",
+                                        time=0.013,
+                                        failure=MochaJUnitXmlFailure(
+                                            message="expected 'test' to equal 'actual'",
+                                            type="AssertionError",
+                                            text="AssertionError: expected 'test' to equal 'actual'\n            at Context.<anonymous> (/example/project/packages/fxa-auth-client/test/crypto.ts:45:15)",
+                                        ),
+                                    )
+                                ],
+                            ),
+                        ],
+                    ),
+                    MochaJUnitXmlTestSuites(
+                        name="Mocha Tests",
+                        tests=20,
+                        failures=0,
+                        time=0.112,
+                        test_suites=[
+                            MochaJUnitXmlTestSuite(
+                                name="Root Suite",
+                                timestamp="2025-06-12T15:58:36",
+                                tests=0,
+                                failures=0,
+                                time=0.000,
+                                test_cases=[],
+                            ),
+                            MochaJUnitXmlTestSuite(
+                                name="lib/client",
+                                timestamp="2025-06-12T15:58:36",
+                                tests=1,
+                                failures=0,
+                                file="/example/project/packages/fxa-auth-client/test/client.ts",
+                                time=0.000,
+                                test_cases=[
+                                    MochaJUnitXmlTestCase(
+                                        name="lib/client fails without headers",
+                                        classname="fails without headers",
+                                        time=0.000,
+                                    )
+                                ],
+                            ),
+                            MochaJUnitXmlTestSuite(
+                                name="getCredentials",
+                                timestamp="2025-06-12T15:58:36",
+                                tests=1,
+                                failures=0,
+                                file="/example/project/packages/fxa-auth-client/test/crypto.ts",
+                                time=0.002,
+                                test_cases=[
+                                    MochaJUnitXmlTestCase(
+                                        name="lib/crypto getCredentials returns the correct authPW and unwrapBKey",
+                                        classname="returns the correct authPW and unwrapBKey",
+                                        time=0.001,
+                                    )
+                                ],
+                            ),
+                            MochaJUnitXmlTestSuite(
+                                name="getCredentialsV2",
+                                timestamp="2025-06-12T15:58:36",
+                                tests=2,
+                                failures=0,
+                                file="/example/project/packages/fxa-auth-client/test/crypto.ts",
+                                time=0.102,
+                                test_cases=[
+                                    MochaJUnitXmlTestCase(
+                                        name="lib/crypto getCredentialsV2 returns the correct authPW and unwrapBKey with v1 salt",
+                                        classname="returns the correct authPW and unwrapBKey with v1 salt",
+                                        time=0.000,
+                                    ),
+                                    MochaJUnitXmlTestCase(
+                                        name="lib/crypto getCredentialsV2 returns the correct authPW and unwrapBKey with V2 salt",
+                                        classname="returns the correct authPW and unwrapBKey with V2 salt",
+                                        time=0.100,
+                                    ),
+                                ],
+                            ),
+                        ],
+                    ),
+                ],
+            )
+        ],
+    )
+]
+
 
 @pytest.mark.parametrize(
     "artifact_directory, expected_results",
@@ -616,8 +758,12 @@ EXPECTED_TAP = [
         ("xml_samples_playwright", EXPECTED_PLAYWRIGHT),
         ("xml_samples_pytest", EXPECTED_PYTEST),
         ("xml_samples_tap", EXPECTED_TAP),
+        # Mocha XUnit test data - verifies that Mocha XUnit reports are parsed as MochaJUnitXmlTestSuites
+        # There is no unique parser for Mocha XUnit; these files are expected to be parsed as MochaJUnitXmlTestSuites
+        # This test ensures continued compatibility with standard Mocha XUnit output
+        ("xml_samples_xunit", EXPECTED_MOCHA_XUNIT),
     ],
-    ids=["jest", "mocha", "nextest", "playwright", "pytest", "tap"],
+    ids=["jest", "mocha", "nextest", "playwright", "pytest", "tap", "mocha_xunit"],
 )
 def test_parse(
     mocker: MockerFixture,
