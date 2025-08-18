@@ -25,7 +25,7 @@ jobs:
     env:
       MDBOOK_VERSION: 0.4.44
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install mdBook
         run: cargo install --version ${MDBOOK_VERSION} mdbook
       - id: pages
