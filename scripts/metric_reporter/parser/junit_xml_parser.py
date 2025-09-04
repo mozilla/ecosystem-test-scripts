@@ -371,13 +371,20 @@ class JUnitXmlParser(BaseParser):
         junit_xml_groups: list[JUnitXmlGroup] = []
         for artifact_file_name in artifact_file_names:
             self.logger.info(f"Parsing {artifact_file_name}")
-            file: ArtifactFile = self._parse_artifact_file_name(artifact_file_name)
-            junit_xml: JUnitXmlJobTestSuites = self._get_junit_xml(file, junit_xml_groups)
             try:
+                file: ArtifactFile = self._parse_artifact_file_name(artifact_file_name)
+                junit_xml: JUnitXmlJobTestSuites = self._get_junit_xml(file, junit_xml_groups)
                 test_suites: JUnitXmlTestSuites = self._parse_test_suites(
                     file.repository, file.name
                 )
                 junit_xml.test_suites.append(test_suites)
+            except ParserError as error:
+                # We don't want to completely kill the pipeline if a file is a format that can't
+                # be parsed. So we log a warning and continue with the next file.
+                # Validation error is lower priority, but internally raises
+                # a ParserError so it needs to be second.
+                self.logger.warning("Skipping file %s: %s", artifact_file_name, error)
+                continue
             except ValidationError as error:
                 error_msg: str = f"Unexpected value or schema in file {artifact_file_name}"
                 self.logger.error(error_msg, exc_info=error)
