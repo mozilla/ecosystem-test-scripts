@@ -101,7 +101,9 @@ def main(
     except GCSClientError as error:
         logger.error(f"GCS client error: {error}")
     except ParserError as error:
-        logger.error(f"Parsing error: {error}")
+        # Log as warning since it's not a fatal situation.
+        # This allows the pipeline to continue on parsing other files.
+        logger.warning(f"Parsing error: {error}")
     except ReporterError as error:
         logger.error(f"Test Suite Reporter error: {error}")
     except Exception as error:

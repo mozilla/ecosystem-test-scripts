@@ -204,15 +204,22 @@ class CoverageJsonParser(BaseParser):
         coverage_json_groups: list[CoverageJsonGroup] = []
         for artifact_file_name in artifact_file_names:
             self.logger.info(f"Parsing {artifact_file_name}")
-            file: ArtifactFile = self._parse_artifact_file_name(artifact_file_name)
-            group: CoverageJsonGroup = self._get_coverage_json_group(file, coverage_json_groups)
             try:
+                file: ArtifactFile = self._parse_artifact_file_name(artifact_file_name)
+                group: CoverageJsonGroup = self._get_coverage_json_group(
+                    file, coverage_json_groups
+                )
                 content: str = self._gcs_client.get_coverage_artifact_content(
                     file.repository, artifact_file_name
                 )
                 json_data: dict[str, Any] = json.loads(content)
                 coverage_json: CoverageJson = self._parse_json_data(file, json_data)
                 group.coverage_jsons.append(coverage_json)
+            except ParserError as error:
+                # We don't want to completely kill the pipeline if a file is a format that can't
+                # be parsed. So we log a warning and continue with the next file.
+                self.logger.warning("Skipping file %s: %s", artifact_file_name, error)
+                continue
             except (JSONDecodeError, ValidationError) as error:
                 error_mapping: dict[type, str] = {
                     JSONDecodeError: f"Invalid JSON format for file {artifact_file_name}",
